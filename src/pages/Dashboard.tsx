@@ -1,9 +1,10 @@
 import React, { useState } from 'react'
 import { useQuery, gql } from '@apollo/client';
-import { Button, IconButton } from '@mui/material';
+import { Button, IconButton, Paper, Typography } from '@mui/material';
 import FolderOpenOutlinedIcon from '@mui/icons-material/FolderOpenOutlined';
 import { getOrganizationContents } from '../aws-client';
 import { useNavigate } from 'react-router-dom';
+import { Folder } from '@mui/icons-material';
 export default function Dashboard() {
 
     const [organizations, setOrganizations] = useState([]);
@@ -39,24 +40,26 @@ export default function Dashboard() {
     const renderOrganizations = (organizations: any) => {
         return organizations.map((organization: Organization) => (
             <div key={organization.name}>
-                <IconButton aria-label="delete" size="large" onClick={()=>routeToOrganization(organization)}>
-                    <FolderOpenOutlinedIcon />
+                <div>
+                <IconButton aria-label="delete" size="large" onClick={() => routeToOrganization(organization)}>
+                    <FolderOpenOutlinedIcon fontSize='large' />
                     {organization.name}
                 </IconButton>
+                </div>
             </div>
         ))
     }
 
     const routeToOrganization = (organization: Organization) => {
         // route to path /organization/:orgId and pass organization as props
-        navigate(`/organization/${organization._id}`, {state: organization});
+        navigate(`/organization/${organization._id}`, { state: organization });
     }
 
 
     return (
         <div>
-            <h1>Dashboard</h1>
-            <div style={{display: 'flex'}}>
+            <h1>Institutions</h1>
+            <div style={{ display: 'flex' }}>
                 {renderOrganizations(organizations)}
             </div>
         </div>
