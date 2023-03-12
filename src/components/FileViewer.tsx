@@ -39,6 +39,21 @@ export default function BiologyLabFilesTable({ labFiles }: Props) {
         textOverflow: 'ellipsis',
     };
 
+    function formatFileSize(fileSize: number) {
+        if (fileSize < 1024) {
+          return fileSize.toLocaleString() + " B";
+        } else if (fileSize < 1048576) {
+          return (fileSize / 1024).toFixed(2) + " KB";
+        } else if (fileSize < 1073741824) {
+          return (fileSize / 1048576).toFixed(2) + " MB";
+        } else if (fileSize < 1099511627776) {
+          return (fileSize / 1073741824).toFixed(2) + " GB";
+        } else {
+          return (fileSize / 1099511627776).toFixed(2) + " TB";
+        }
+      }
+      
+
     function handleTableRowClick(file: LabFile) {
         setSelectedFile(file);
     }
@@ -96,7 +111,7 @@ export default function BiologyLabFilesTable({ labFiles }: Props) {
                                 <TableCell sx={tableCellStyle}>{file.description}</TableCell>
                                 <TableCell sx={tableCellStyle}>{new Date(file.createdAt).toLocaleString()}</TableCell>
                                 <TableCell sx={tableCellStyle}>{new Date(file.updatedAt).toLocaleString()}</TableCell>
-                                <TableCell sx={tableCellStyle}>{file.fileSize.toLocaleString()} bytes</TableCell>
+                                <TableCell sx={tableCellStyle}>{formatFileSize(file.fileSize)}</TableCell>
                                 <TableCell sx={tableCellStyle}>
                                     <Tooltip title="Download">
                                         <IconButton onClick={() => handleDownloadClick(file)}>

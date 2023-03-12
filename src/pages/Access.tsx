@@ -29,7 +29,7 @@ export default function Access() {
     
     return (
         <div>
-            <h1>Access</h1>
+            <h1>Manage Access</h1>
             <TextField id="outlined-basic" label="Search Users" variant="outlined" fullWidth />
             <div style={{marginTop: 20}}>
                 <UserPermissionsTable users={userData} />
