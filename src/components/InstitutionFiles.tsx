@@ -74,6 +74,20 @@ export function InstitutionFiles({ s3BucketName }: Props) {
         console.log('Deleting file', fileToDelete.Key);
     }
 
+    function formatFileSize(fileSize: number) {
+        if (fileSize < 1024) {
+          return fileSize.toLocaleString() + " B";
+        } else if (fileSize < 1048576) {
+          return (fileSize / 1024).toFixed(2) + " KB";
+        } else if (fileSize < 1073741824) {
+          return (fileSize / 1048576).toFixed(2) + " MB";
+        } else if (fileSize < 1099511627776) {
+          return (fileSize / 1073741824).toFixed(2) + " GB";
+        } else {
+          return (fileSize / 1099511627776).toFixed(2) + " TB";
+        }
+      }
+
     function handleDeleteCancel() {
         setConfirmDeleteOpen(false);
         setFileToDelete(null);
@@ -111,7 +125,7 @@ export function InstitutionFiles({ s3BucketName }: Props) {
                                         {file.Key}
                                     </TableCell>
                                     <TableCell>{file.LastModified.toISOString()}</TableCell>
-                                    <TableCell>{file.Size.toLocaleString()} bytes</TableCell>
+                                    <TableCell>{formatFileSize(file.Size)}</TableCell>
                                     <TableCell align="right">
                                         <IconButton color="primary" href={`https://${s3BucketName}.s3.amazonaws.com/${encodeURIComponent(file.Key)}`} download>
                                             <CloudDownload />

@@ -1,8 +1,12 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import { Drawer, List, ListItem, ListItemButton } from '@mui/material'
-import { Outlet, Link } from "react-router-dom";
+import { Link } from "react-router-dom";
+import { useQuery } from '@apollo/client';
 
 export default function SideNav() {
+
+
+
     return (
         <div>
             <Drawer

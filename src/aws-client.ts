@@ -1,7 +1,7 @@
 import { S3Client, AbortMultipartUploadCommand, ListObjectsCommand, PutObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
 
 const client = new S3Client({
-  //endpoint: "http://localhost:8080/",
+  // endpoint: "http://localhost:8080/",
   // Get credentials from environment variables
   credentials: {
     accessKeyId: import.meta.env.VITE_AWS_KEY,
@@ -64,12 +64,11 @@ export const uploadToS3 = async ({Bucket, Key, Body }: UploadOptions): Promise<b
     return true;
   } catch (error) {
     console.error('Error uploading file:', error);
-    throw error;
     return false;
   }
 }
 
-export const deleteFromS3 = async ({ Bucket, Key }: DeleteOptions): Promise<boolean> => {
+export const deleteFromS3 = async ({ Bucket, Key }: any): Promise<boolean> => {
   const params = {
     Bucket: Bucket,
     Key: Key,
