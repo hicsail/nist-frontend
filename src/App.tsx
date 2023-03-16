@@ -18,14 +18,13 @@ function App() {
 
   const httpLink = new HttpLink({
     fetch: fetch,
-    uri: 'https://nist-staging.sail.codes/graphql',
+    uri: uri,
     headers: {
       authorization: `Bearer ${token}`
     }
   });
 
   const client = new ApolloClient({
-    uri: 'https://nist-staging.sail.codes/graphql',
     cache: new InMemoryCache(),
     link: httpLink
   }); // Replace with your authentication logic
