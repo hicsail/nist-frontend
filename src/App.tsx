@@ -6,12 +6,12 @@ import { ApolloClient, InMemoryCache, ApolloProvider, gql, HttpLink, useQuery } 
 import { Grid } from '@mui/material';
 import { AuthContext } from './contexts/Auth';
 import { PermissionsContext } from './contexts/Permissions';
+import { setContext } from '@apollo/client/link/context';
 
 
 function App() {
 
-  const storageToken = localStorage.getItem('token');
-  const [token, setToken] = useState<string | null>(storageToken);
+  const [token, setToken] = useState<string | null>(null);
   const [isAuthenticated, setIsAuthenticated] = React.useState(false);
   const navigate = useNavigate();
   const uri = `${import.meta.env.VITE_AUTH_URL}/graphql`;
@@ -19,14 +19,24 @@ function App() {
   const httpLink = new HttpLink({
     fetch: fetch,
     uri: uri,
-    headers: {
-      authorization: `Bearer ${token}`
+  });
+
+  const authLink = setContext((_, { headers }) => {
+    // get the authentication token from local storage if it exists
+    const token = localStorage.getItem('token');
+    setToken(token);
+    // return the headers to the context so httpLink can read them
+    return {
+      headers: {
+        ...headers,
+        authorization: token ? `Bearer ${token}` : "",
+      }
     }
   });
 
   const client = new ApolloClient({
     cache: new InMemoryCache(),
-    link: httpLink
+    link: authLink.concat(httpLink),
   }); // Replace with your authentication logic
 
 
@@ -90,9 +100,7 @@ function App() {
       <AuthContext.Provider value={authContext}>
         <ApolloProvider client={client}>
           {
-
             isAuthenticated ? (
-              
               <AuthContext.Provider value={authContext}>
                 <Grid container>
                   <Grid item xs={12} sm={3}>
