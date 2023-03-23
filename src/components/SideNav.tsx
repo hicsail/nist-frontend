@@ -1,11 +1,18 @@
 import React, { useContext } from 'react'
 import { Drawer, List, ListItem, ListItemButton } from '@mui/material'
-import { Link } from "react-router-dom";
-import { useQuery } from '@apollo/client';
+import { Link, useNavigate } from "react-router-dom";
+import { AuthContext } from '../contexts/Auth';
 
 export default function SideNav() {
 
-
+    const { setIsAuthenticated, setToken } = useContext(AuthContext);
+    const navigate = useNavigate();
+    const logout = () => {
+        localStorage.removeItem('token');
+        setToken("");
+        setIsAuthenticated(false);
+        navigate('/login');
+    }
 
     return (
         <div>
@@ -30,7 +37,7 @@ export default function SideNav() {
                         </Link>
                     </ListItem>
                     <ListItem>
-                        <ListItemButton>
+                        <ListItemButton onClick={logout}>
                             Logout
                         </ListItemButton>
                     </ListItem>

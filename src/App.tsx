@@ -1,12 +1,12 @@
 import React, { useContext, createContext, useState, useEffect } from 'react';
 import './App.css'
 import SideNav from './components/SideNav'
-import { Outlet, RouterProvider, Routes, createBrowserRouter, useNavigate } from "react-router-dom";
+import { Outlet, useNavigate } from "react-router-dom";
 import { ApolloClient, InMemoryCache, ApolloProvider, gql, HttpLink, useQuery } from '@apollo/client';
 import { Grid } from '@mui/material';
 import { AuthContext } from './contexts/Auth';
-import { PermissionsContext } from './contexts/Permissions';
 import { setContext } from '@apollo/client/link/context';
+import jwtDecode from 'jwt-decode';
 
 
 function App() {
@@ -24,45 +24,43 @@ function App() {
   const authLink = setContext((_, { headers }) => {
     // get the authentication token from local storage if it exists
     const token = localStorage.getItem('token');
-    setToken(token);
-    // return the headers to the context so httpLink can read them
-    return {
-      headers: {
-        ...headers,
-        authorization: token ? `Bearer ${token}` : "",
+    if (token) {
+      const decodedToken: any = jwtDecode(token);
+      console.log(token);
+      if (decodedToken.exp < Date.now() / 1000) {
+        // token expired, logic for handling token expiration
+        localStorage.removeItem('token');
+        setToken(null);
+        setIsAuthenticated(false);
+        navigate('/login');
+      }
+      setToken(token);
+      setIsAuthenticated(true);
+      // return the headers to the context so httpLink can read them
+      return {
+        headers: {
+          ...headers,
+          authorization: token ? `Bearer ${token}` : "",
+        }
+      }
+    } else {
+      setToken(null);
+      setIsAuthenticated(false);
+      navigate('/login');
+      return {
+        headers: {
+          ...headers,
+          authorization: token ? `Bearer ${token}` : "",
+        }
       }
     }
   });
+
 
   const client = new ApolloClient({
     cache: new InMemoryCache(),
     link: authLink.concat(httpLink),
   }); // Replace with your authentication logic
-
-
-  useEffect(() => {
-
-    client.query({
-      query: gql`
-      query {
-        authenticate
-      }
-    `
-    }).then(result => {
-      console.log(result);
-      if (result.data.authenticate) {
-        setIsAuthenticated(true);
-        navigate('/dashboard');
-      } else {
-        setIsAuthenticated(false);
-        navigate('/login');
-      }
-    })
-      .catch(err => {
-        setIsAuthenticated(false);
-        navigate('/login');
-      });
-  }, [token, isAuthenticated]);
 
   const authContext = {
     isAuthenticated,
@@ -70,30 +68,6 @@ function App() {
     token,
     setToken
   }
-
-  console.log(authContext);
-
-  client.query({
-    query: gql`
-    query {
-      getUserPermissions {
-    _id
-    user
-    org {
-      name
-    }
-    read
-    write
-    delete
-    admin
-  }
-    }
-  `
-  }).then(result => {
-    console.log(result);
-  }).catch(err => {
-    console.log(err);
-  });
 
   return (
     <div className="App">

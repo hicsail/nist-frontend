@@ -8,7 +8,6 @@ import { InstitutionFiles } from '../components/InstitutionFiles';
 
 export default function Organization(props: any) {
   const location = useLocation();
-  const [organizationContents, setOrganizationContents] = useState<any>([]);
   const organization = location.state;
 
   const labFiles = [
@@ -47,11 +46,6 @@ export default function Organization(props: any) {
     },
     // Add more lab files as needed
   ];
-
-
-  useEffect(() => {
-    setOrganizationContents(getOrganizationContents(location.state.bucket));
-  }, [location.state.bucket]);
 
   return (
     <div>

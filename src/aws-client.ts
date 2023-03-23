@@ -20,7 +20,6 @@ type S3Object = {
 
 export const getOrganizationContents = async (bucketName: string): Promise<S3Object[]> => {
   const command = new ListObjectsCommand({ Bucket: bucketName });
-
   // Execute the command and handle the response
   try {
     const data = await client.send(command);
