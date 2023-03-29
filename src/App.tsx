@@ -21,11 +21,8 @@ function App() {
     uri: uri,
   });
 
-  const authLink = setContext((_, { headers }) => {
-    // get the authentication token from local storage if it exists
-    console.log('setting token');
+  const authLogic = async (headers: any) => {
     const token = localStorage.getItem('token');
-    console.log(token);
     if (token) {
       const decodedToken: any = jwtDecode(token);
       if (decodedToken.exp < Date.now() / 1000) {
@@ -56,7 +53,15 @@ function App() {
         }
       }
     }
+  }
+
+  const authLink = setContext((_, { headers }) => {
+    return authLogic(headers);
   });
+
+  useEffect(() => {
+    authLogic({});
+  }, []);
 
 
   const createNewClient = () => {

@@ -1,4 +1,4 @@
-import { S3Client, AbortMultipartUploadCommand, ListObjectsCommand, PutObjectCommand, DeleteObjectCommand, ListObjectsV2Command } from "@aws-sdk/client-s3";
+import { S3Client, ListObjectsCommand, PutObjectCommand, DeleteObjectCommand, ListObjectsV2Command } from "@aws-sdk/client-s3";
 
 export const client = new S3Client({
   // endpoint: "http://localhost:8080/",
@@ -49,7 +49,7 @@ export const getOrganizationContents = async (bucketName: string): Promise<S3Obj
   }
 }
 
-export const uploadToS3 = async ({Bucket, Key, Body }: UploadOptions): Promise<boolean> => {
+export const uploadToS3 = async ({Bucket, Key, Body }: any): Promise<boolean> => {
   const params = {
     Bucket: Bucket,
     Key: Key,

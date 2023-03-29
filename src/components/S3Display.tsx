@@ -3,7 +3,6 @@ import { useState, useEffect } from "react";
 import {
     Button,
     Paper,
-    Tab,
     Table,
     TableBody,
     TableCell,
@@ -15,6 +14,7 @@ import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
 import { getOrganizationContents, getFolderContents, uploadToS3 } from "../aws-client";
 import { useDropzone } from "react-dropzone";
+
 function FileList({ files }: { files: any[] }) {
     return (
         <TableContainer component={Paper}>
