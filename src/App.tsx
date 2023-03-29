@@ -23,10 +23,11 @@ function App() {
 
   const authLink = setContext((_, { headers }) => {
     // get the authentication token from local storage if it exists
+    console.log('setting token');
     const token = localStorage.getItem('token');
+    console.log(token);
     if (token) {
       const decodedToken: any = jwtDecode(token);
-      console.log(token);
       if (decodedToken.exp < Date.now() / 1000) {
         // token expired, logic for handling token expiration
         localStorage.removeItem('token');
@@ -34,6 +35,7 @@ function App() {
         setIsAuthenticated(false);
         navigate('/login');
       }
+      console.log('token')
       setToken(token);
       setIsAuthenticated(true);
       // return the headers to the context so httpLink can read them
@@ -57,10 +59,15 @@ function App() {
   });
 
 
-  const client = new ApolloClient({
-    cache: new InMemoryCache(),
-    link: authLink.concat(httpLink),
-  }); // Replace with your authentication logic
+  const createNewClient = () => {
+    console.log('creating new client')
+    return new ApolloClient({
+      cache: new InMemoryCache(),
+      link: authLink.concat(httpLink),
+    });
+  }
+
+  const client = createNewClient();
 
   const authContext = {
     isAuthenticated,
@@ -68,6 +75,8 @@ function App() {
     token,
     setToken
   }
+
+  console.log(authContext);
 
   return (
     <div className="App">

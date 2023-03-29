@@ -23,8 +23,8 @@ export default function Dashboard() {
 
     useQuery(GET_ORGANIZATIONS, {
         onCompleted: (data) => {
-            console.log(data);
             setOrganizations(data.getOriganizations);
+            console.log("organizations set:", data.getOriganizations);
         },
         onError: (error) => {
             console.log(error);
@@ -88,7 +88,6 @@ export default function Dashboard() {
                 return permissions.some((permission: Permissions) => permission.admin && permission.bucket === organization.bucket);
             });
         }
-
         if (permission === 'access') {
             orgs = organizations.filter((organization: Organization) => {
                 return permissions.some((permission: Permissions) => (permission.read || permission.write || permission.delete) && permission.bucket === organization.bucket);

@@ -9,7 +9,6 @@ export default function Callback() {
 
     useEffect(() => {
         const token = new URLSearchParams(window.location.search).get('token');
-        console.log(token);
         if (token) {
             localStorage.setItem('token', token);
             setToken(token);

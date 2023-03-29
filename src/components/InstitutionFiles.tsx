@@ -1,5 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import {
+    Accordion,
+    AccordionDetails,
+    AccordionSummary,
     Button,
     Dialog,
     DialogActions,
@@ -17,8 +20,12 @@ import {
     Typography,
     CircularProgress, Snackbar, Alert
 } from '@mui/material';
-import { CloudDownload, Delete } from '@mui/icons-material';
+import { CloudDownload, Delete, ExpandMore } from '@mui/icons-material';
 import { deleteFromS3, getOrganizationContents } from '../aws-client';
+import { Folder } from '@mui/icons-material';
+import { FilePresent } from '@mui/icons-material';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
 type Props = {
     s3BucketName: string;
@@ -37,11 +44,14 @@ export function InstitutionFiles({ s3BucketName }: Props) {
     const [loading, setLoading] = useState<boolean>(false);
     const [deleteSuccess, setDeleteSuccess] = useState<boolean>(false);
     const [deleteError, setDeleteError] = useState<boolean>(false);
+    const navigate = useNavigate();
+    const params = useParams();
 
     useEffect(() => {
         async function getContents(s3BucketName: string) {
             console.log('Getting contents of bucket', s3BucketName);
             const s3Files: S3Object[] = await getOrganizationContents(s3BucketName);
+            console.log('Files:', s3Files)
             setFiles(s3Files)
         }
         getContents(s3BucketName);
@@ -76,17 +86,17 @@ export function InstitutionFiles({ s3BucketName }: Props) {
 
     function formatFileSize(fileSize: number) {
         if (fileSize < 1024) {
-          return fileSize.toLocaleString() + " B";
+            return fileSize.toLocaleString() + " B";
         } else if (fileSize < 1048576) {
-          return (fileSize / 1024).toFixed(2) + " KB";
+            return (fileSize / 1024).toFixed(2) + " KB";
         } else if (fileSize < 1073741824) {
-          return (fileSize / 1048576).toFixed(2) + " MB";
+            return (fileSize / 1048576).toFixed(2) + " MB";
         } else if (fileSize < 1099511627776) {
-          return (fileSize / 1073741824).toFixed(2) + " GB";
+            return (fileSize / 1073741824).toFixed(2) + " GB";
         } else {
-          return (fileSize / 1099511627776).toFixed(2) + " TB";
+            return (fileSize / 1099511627776).toFixed(2) + " TB";
         }
-      }
+    }
 
     function handleDeleteCancel() {
         setConfirmDeleteOpen(false);
@@ -96,7 +106,40 @@ export function InstitutionFiles({ s3BucketName }: Props) {
     function handleClose() {
         setDeleteSuccess(false);
         setDeleteError(false);
-      }
+    }
+
+    function renderDataRow(files: any) {
+        return files.map((file: any) => {
+            const isFolder = file.Key.endsWith('/');
+            (
+                <TableRow key={file.Key} onClick={() => isFolder ? navigate('/folder') : null}>
+                    <TableCell>
+                        {
+                            isFolder ? (
+                                <Folder />
+                            ) : (
+                                <FilePresent />
+                            )
+                        }
+                    </TableCell>
+                    <TableCell component="th" scope="row">
+                        {file.Key}
+                    </TableCell>
+                    <TableCell>{file.LastModified.toISOString()}</TableCell>
+                    <TableCell>{formatFileSize(file.Size)}</TableCell>
+                    <TableCell align="right">
+                        <IconButton color="primary" href={`https://${s3BucketName}.s3.amazonaws.com/${encodeURIComponent(file.Key)}`} download>
+                            <CloudDownload />
+                        </IconButton>
+                        <IconButton color="error" onClick={() => handleDeleteClick(file.Key)}>
+                            <Delete />
+                        </IconButton>
+                    </TableCell>
+                </TableRow>
+            )
+        }
+        );
+    }
 
     return (
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '16px', textAlign: 'center' }}>
@@ -112,6 +155,7 @@ export function InstitutionFiles({ s3BucketName }: Props) {
                     <Table>
                         <TableHead>
                             <TableRow>
+                                <TableCell>Type</TableCell>
                                 <TableCell>File Name</TableCell>
                                 <TableCell>Last Modified</TableCell>
                                 <TableCell>Size</TableCell>
@@ -119,28 +163,80 @@ export function InstitutionFiles({ s3BucketName }: Props) {
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {files.map((file) => (
-                                <TableRow key={file.Key}>
-                                    <TableCell component="th" scope="row">
-                                        {file.Key}
-                                    </TableCell>
-                                    <TableCell>{file.LastModified.toISOString()}</TableCell>
-                                    <TableCell>{formatFileSize(file.Size)}</TableCell>
-                                    <TableCell align="right">
-                                        <IconButton color="primary" href={`https://${s3BucketName}.s3.amazonaws.com/${encodeURIComponent(file.Key)}`} download>
-                                            <CloudDownload />
-                                        </IconButton>
-                                        <IconButton color="error" onClick={() => handleDeleteClick(file.Key)}>
-                                            <Delete />
-                                        </IconButton>
-                                    </TableCell>
-                                </TableRow>
-                            ))}
+                            {files.map((file) => {
+                                const isFolder = file.Key.endsWith('/');
+                                if (!isFolder) {
+                                    return (
+                                        <TableRow key={file.Key} onClick={() => isFolder ? navigate(`/organization/${params.orgId}/${file.Key.substring(0, file.Key.length - 1)}`) : null}>
+                                            <TableCell>
+                                                {
+                                                    isFolder ? (
+                                                        <Folder />
+                                                    ) : (
+                                                        <FilePresent />
+                                                    )
+                                                }
+                                            </TableCell>
+                                            <TableCell component="th" scope="row">
+                                                {file.Key}
+                                            </TableCell>
+                                            <TableCell>{file.LastModified.toISOString()}</TableCell>
+                                            <TableCell>{formatFileSize(file.Size)}</TableCell>
+                                            <TableCell align="right">
+                                                <IconButton color="primary" href={`https://${s3BucketName}.s3.amazonaws.com/${encodeURIComponent(file.Key)}`} download>
+                                                    <CloudDownload />
+                                                </IconButton>
+                                                <IconButton color="error" onClick={() => handleDeleteClick(file.Key)}>
+                                                    <Delete />
+                                                </IconButton>
+                                            </TableCell>
+                                        </TableRow>
+                                    )
+                                } else {
+                                    return (
+                                        <Accordion>
+                                            <AccordionSummary
+                                                expandIcon={<ExpandMore />}
+                                                aria-controls="panel1a-content"
+                                                id="panel1a-header"
+                                            >
+                                                <Typography>{file.Key}</Typography>
+                                            </AccordionSummary>
+                                            <AccordionDetails>
+
+                                                <TableRow key={file.Key} onClick={() => isFolder ? navigate(`/organization/${params.orgId}/${file.Key.substring(0, file.Key.length - 1)}`) : null}>
+                                                    <TableCell>
+                                                        {
+                                                            isFolder ? (
+                                                                <Folder />
+                                                            ) : (
+                                                                <FilePresent />
+                                                            )
+                                                        }
+                                                    </TableCell>
+                                                    <TableCell component="th" scope="row">
+                                                        {file.Key.substring(0, file.Key.length - 1)}
+                                                    </TableCell>
+                                                    <TableCell>{file.LastModified.toISOString()}</TableCell>
+                                                    <TableCell>{formatFileSize(file.Size)}</TableCell>
+                                                    <TableCell align="right">
+                                                        <IconButton color="primary" href={`https://${s3BucketName}.s3.amazonaws.com/${encodeURIComponent(file.Key)}`} download>
+                                                            <CloudDownload />
+                                                        </IconButton>
+                                                        <IconButton color="error" onClick={() => handleDeleteClick(file.Key)}>
+                                                            <Delete />
+                                                        </IconButton>
+                                                    </TableCell>
+                                                </TableRow>
+                                            </AccordionDetails>
+                                        </Accordion>
+                                    )
+                                }
+                            })}
                         </TableBody>
                     </Table>
                 </TableContainer>
             )}
-
             <Dialog open={confirmDeleteOpen} onClose={handleDeleteCancel}>
                 <DialogTitle>Delete File</DialogTitle>
                 <DialogContent>

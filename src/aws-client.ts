@@ -1,6 +1,6 @@
-import { S3Client, AbortMultipartUploadCommand, ListObjectsCommand, PutObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
+import { S3Client, AbortMultipartUploadCommand, ListObjectsCommand, PutObjectCommand, DeleteObjectCommand, ListObjectsV2Command } from "@aws-sdk/client-s3";
 
-const client = new S3Client({
+export const client = new S3Client({
   // endpoint: "http://localhost:8080/",
   // Get credentials from environment variables
   credentials: {
@@ -32,13 +32,13 @@ export const getOrganizationContents = async (bucketName: string): Promise<S3Obj
 
     let s3Objects: S3Object[] = [];
     for (const content of contents) {
-      if (!content.Key || !content.LastModified || !content.Size) {
+      if (!content.Key || !content.LastModified) {
         continue;
       }
       s3Objects.push({
         Key: content.Key,
         LastModified: content.LastModified,
-        Size: content.Size,
+        Size: content.Size ? content.Size : 0,
       });
     }
     return s3Objects;
@@ -81,5 +81,62 @@ export const deleteFromS3 = async ({ Bucket, Key }: any): Promise<boolean> => {
   } catch (error) {
     console.error('Error deleting file:', error);
     return false;
+  }
+}
+
+export const createFolder = async (bucketName: string, folderName: string) => {
+  const params = {
+    Bucket: bucketName,
+    Key: `${folderName}/`,
+    Body: '',
+  };
+
+  const command = new PutObjectCommand(params);
+
+  try {
+    await client.send(command);
+    console.log(`Successfully created folder ${folderName} in bucket ${bucketName}`);
+  } catch (err) {
+    console.log(`Error creating folder: ${err}`);
+  }
+};
+
+export const listFolders = async (bucketName: string, prefix = '') => {
+  const params = {
+    Bucket: bucketName,
+    Prefix: prefix,
+    Delimiter: '/',
+  };
+
+  const command = new ListObjectsV2Command(params);
+
+  try {
+    const response = await client.send(command);
+    if (!response.CommonPrefixes) {
+      throw new Error('No folders found');
+    }
+    const folders = response.CommonPrefixes.map((prefix) => prefix.Prefix);
+    console.log(`Folders in ${bucketName}/${prefix}:`, folders);
+    return folders;
+  } catch (err) {
+    console.log(`Error listing folders: ${err}`);
+    return [];
+  }
+};
+
+export const getFolderContents = async (bucketName: string, folderKey: string): Promise<S3.Object[]> => {
+
+  const command = new ListObjectsCommand({
+    Bucket: bucketName,
+    Prefix: folderKey,
+    Delimiter: "/",
+  });
+
+  try {
+    const response = await client.send(command);
+    return response.Contents ?? [];
+  } catch (err) {
+    console.error(`Error fetching contents of folder '${folderKey}' in bucket '${bucketName}': ${err}`);
+    return [];
   }
 }
