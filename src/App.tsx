@@ -32,7 +32,7 @@ function App() {
         setIsAuthenticated(false);
         navigate('/login');
       }
-      console.log('token')
+      
       setToken(token);
       setIsAuthenticated(true);
       // return the headers to the context so httpLink can read them
