@@ -1,6 +1,35 @@
 import { TextField, Checkbox } from '@mui/material'
 import React from 'react'
 import UserPermissionsTable from '../components/UserPermissionsTable';
+import { useQuery, gql } from '@apollo/client';
+
+type CargoPermission = {
+    _id: string;
+    user: string;
+    bucket: string;
+    read: boolean;
+    write: boolean;
+    delete: boolean;
+    admin: boolean;
+  }
+  
+  type CargoGetAllBucketPermissionsResult = {
+    cargoGetAllBucketPermissions: CargoPermission[];
+  }
+  
+  const CARGO_GET_ALL_BUCKET_PERMISSIONS = gql`
+    query CargoGetAllBucketPermissions($bucket: String!) {
+      cargoGetAllBucketPermissions(bucket: $bucket) {
+        _id
+        user
+        bucket
+        read
+        write
+        delete
+        admin
+      }
+    }
+  `;
 
 export default function Access() {
 
@@ -25,6 +54,14 @@ export default function Access() {
 
     // function that returns rows of users along with checkboxes that indicate if they have read, write, or admin access using MUI Checkbox component
     
+    const { loading, error, data } = useQuery<CargoGetAllBucketPermissionsResult>(
+        CARGO_GET_ALL_BUCKET_PERMISSIONS,
+        { variables: { bucket: "nist-ucdavis-dev"  } }
+    );
+
+    if (loading) return <p>Loading...</p>;
+    if (error) return <p>Error :</p>;
+    console.log(data);
 
     
     return (

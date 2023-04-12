@@ -1,18 +1,30 @@
 import React, { useEffect, useState } from 'react'
 import { useLocation } from 'react-router-dom';
 import { createFolder, getOrganizationContents } from '../aws-client';
-import BiologyLabFilesTable from '../components/FileViewer';
 import FileUploader from '../components/FileUploader';
-import { S3FileViewer } from '../components/S3FileViewer';
-import { InstitutionFiles } from '../components/InstitutionFiles';
 import { Button, Dialog, DialogTitle, DialogContent, DialogActions, TextField, CircularProgress, Snackbar } from '@mui/material';
 import { Alert } from '@mui/material';
 import S3Display from '../components/S3Display';
-import { client } from '../aws-client';
+import { useContext } from "react";
+import { PermissionsContext } from "../contexts/Permissions";
+import Chip from '@mui/material/Chip';
+
+type Permission = {
+  _id: string,
+  user: string,
+  org: any,
+  read: boolean,
+  write: boolean,
+  delete: boolean,
+  admin: boolean,
+  bucket: string
+};
 
 export default function Organization(props: any) {
   const location = useLocation();
   const organization = location.state;
+  const [userPermissions, setUserPermissions] = useState<any>({});
+  const [permissionsString, setPermissionsString] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [folderName, setFolderName] = useState('');
   const [isCreatingFolder, setIsCreatingFolder] = useState(false);
@@ -35,15 +47,40 @@ export default function Organization(props: any) {
       setIsModalOpen(false);
     }
   };
+  const permissions = useContext(PermissionsContext);
+  const getPermissionsForOrganization = (bucket: string) => {
+    const orgPermissions = permissions.find((permission: Permission) => permission.bucket === bucket);
+    return orgPermissions;
+  };
 
-
+  useEffect(() => {
+    const permissions = getPermissionsForOrganization(organization.bucket);
+    setUserPermissions(permissions)
+    setPermissionsString(JSON.stringify(permissions, null, 2));
+  }, []);
 
   return (
     <div>
       <h2>{organization.name}</h2>
-      <Button variant="contained" startIcon={<i className="fa fa-folder-plus" aria-hidden="true"></i>} onClick={() => setIsModalOpen(true)}>
-        Create Folder
-      </Button>
+      <div style={{ padding: 10, margin: 10 }}>
+        {
+          userPermissions.admin ? <Chip label="Admin" color="success" /> : null
+        }
+        {
+          userPermissions.write && !userPermissions.admin ? <Chip label="Write" color="success" /> : null
+        }{
+          userPermissions.read && !userPermissions.admin ? <Chip label="Read" color="success" /> : null
+        }{
+          userPermissions.delete && !userPermissions.admin ? <Chip label="Delete" color="success" /> : null
+        }
+      </div>
+      {
+        userPermissions.admin || userPermissions.write ? (
+          <Button variant="contained" startIcon={<i className="fa fa-folder-plus" aria-hidden="true"></i>} onClick={() => setIsModalOpen(true)}>
+            Create Folder
+          </Button>
+        ) : null
+      }
       <Dialog open={isModalOpen} onClose={() => setIsModalOpen(false)}>
         <DialogTitle>Create New Folder</DialogTitle>
         <DialogContent>
@@ -65,8 +102,16 @@ export default function Organization(props: any) {
           Folder created successfully!
         </Alert>
       </Snackbar>
-      <FileUploader s3BucketName={location.state.bucket} />
-      <S3Display s3BucketName={location.state.bucket} />
+      {
+        userPermissions.admin || userPermissions.write ? (
+          <FileUploader s3BucketName={location.state.bucket} />
+        ) : null
+      }
+      {
+        userPermissions.admin || userPermissions.read ? (
+          <S3Display s3BucketName={location.state.bucket} />
+        ) : null
+      }
     </div>
   )
 }

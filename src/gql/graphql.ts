@@ -122,10 +122,16 @@ export type QueryCargoSignRequestArgs = {
   request: CargoResourceRequest;
 };
 
+export type CargoGetPermissionsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type CargoGetPermissionsQuery = { __typename?: 'Query', cargoGetPermissions: Array<{ __typename?: 'CargoPermissions', read: boolean, write: boolean, delete: boolean, admin: boolean, bucket: string }> };
+
 export type GetOrganizationsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type GetOrganizationsQuery = { __typename?: 'Query', getOriganizations: Array<{ __typename?: 'Organization', _id: string, name: string, bucket: string }> };
 
 
+export const CargoGetPermissionsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"cargoGetPermissions"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"cargoGetPermissions"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"read"}},{"kind":"Field","name":{"kind":"Name","value":"write"}},{"kind":"Field","name":{"kind":"Name","value":"delete"}},{"kind":"Field","name":{"kind":"Name","value":"admin"}},{"kind":"Field","name":{"kind":"Name","value":"bucket"}}]}}]}}]} as unknown as DocumentNode<CargoGetPermissionsQuery, CargoGetPermissionsQueryVariables>;
 export const GetOrganizationsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetOrganizations"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"getOriganizations"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"_id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"bucket"}}]}}]}}]} as unknown as DocumentNode<GetOrganizationsQuery, GetOrganizationsQueryVariables>;

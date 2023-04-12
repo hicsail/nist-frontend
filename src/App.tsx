@@ -5,14 +5,15 @@ import { Outlet, useNavigate } from "react-router-dom";
 import { ApolloClient, InMemoryCache, ApolloProvider, gql, HttpLink, useQuery } from '@apollo/client';
 import { Grid } from '@mui/material';
 import { AuthContext } from './contexts/Auth';
+import { PermissionsContext, OrganizationPermissionType, PermissionsContextType } from './contexts/Permissions';
 import { setContext } from '@apollo/client/link/context';
 import jwtDecode from 'jwt-decode';
-
 
 function App() {
 
   const [token, setToken] = useState<string | null>(null);
   const [isAuthenticated, setIsAuthenticated] = React.useState(false);
+  const [permissions, setPermissions] = useState<OrganizationPermissionType[]>([]);
   const navigate = useNavigate();
   const uri = `${import.meta.env.VITE_AUTH_URL}/graphql`;
 
@@ -23,6 +24,7 @@ function App() {
 
   const authLogic = async (headers: any) => {
     const token = localStorage.getItem('token');
+    console.log(token);
     if (token) {
       const decodedToken: any = jwtDecode(token);
       if (decodedToken.exp < Date.now() / 1000) {
@@ -32,7 +34,7 @@ function App() {
         setIsAuthenticated(false);
         navigate('/login');
       }
-      
+
       setToken(token);
       setIsAuthenticated(true);
       // return the headers to the context so httpLink can read them
@@ -59,13 +61,7 @@ function App() {
     return authLogic(headers);
   });
 
-  useEffect(() => {
-    authLogic({});
-  }, []);
-
-
   const createNewClient = () => {
-    console.log('creating new client')
     return new ApolloClient({
       cache: new InMemoryCache(),
       link: authLink.concat(httpLink),
@@ -74,14 +70,51 @@ function App() {
 
   const client = createNewClient();
 
+  const GET_PERMISSIONS = gql`
+    query cargoGetPermissions {
+        cargoGetPermissions {
+            read
+            write
+            delete
+            admin
+            bucket
+        }
+    }
+  `
+
+  const GET_ORGANIZATIONS = gql`
+    query GetOrganizations {
+        getOriganizations {
+            _id
+            name 
+            bucket
+        }
+    }
+  `;
+
+
+  useEffect(() => {
+    authLogic({}).then(()=> {
+      client.query({ query: GET_ORGANIZATIONS }).then((result) => {
+        const orgs = result.data.getOriganizations;
+        const orgsBuckets = orgs.map((org: any) => org.bucket);
+        client.query({ query: GET_PERMISSIONS }).then((result) => {
+          const allPermissions = result.data.cargoGetPermissions;
+          const adminAccess = result.data.cargoGetPermissions.filter((organization: any) => organization.admin);
+          const appPermissions = allPermissions.filter((organization: any) => orgsBuckets.includes(organization.bucket));
+          setPermissions(appPermissions);
+          console.log(appPermissions);
+        });
+      });
+    });
+  }, []);
+
   const authContext = {
     isAuthenticated,
     setIsAuthenticated,
     token,
     setToken
   }
-
-  console.log(authContext);
 
   return (
     <div className="App">
@@ -90,16 +123,18 @@ function App() {
           {
             isAuthenticated ? (
               <AuthContext.Provider value={authContext}>
-                <Grid container>
-                  <Grid item xs={12} sm={3}>
-                    <SideNav />
+                <PermissionsContext.Provider value={permissions}>
+                  <Grid container>
+                    <Grid item xs={12} sm={3}>
+                      <SideNav />
+                    </Grid>
+                    <Grid item xs={12} sm={9}>
+                      <div id='detail'>
+                        <Outlet />
+                      </div>
+                    </Grid>
                   </Grid>
-                  <Grid item xs={12} sm={9}>
-                    <div id='detail'>
-                      <Outlet />
-                    </div>
-                  </Grid>
-                </Grid>
+                </PermissionsContext.Provider>
               </AuthContext.Provider>
             ) : (
               <div>
@@ -113,7 +148,6 @@ function App() {
         </ApolloProvider>
       </AuthContext.Provider>
     </div>
-
   )
 }
 
