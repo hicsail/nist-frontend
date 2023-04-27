@@ -4,12 +4,12 @@ on:
   push:
     paths:
       - "**"
-    braches:
+    branches:
       - main
   pull_request:
     paths:
       - "**"
-    braches:
+    branches:
       - main
 
 jobs:
@@ -22,7 +22,7 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 18
-    - name: Install dependencies
-      run: npm install
-    - name: Build
-      run: npm run build
+      - name: Install dependencies
+        run: npm install
+      - name: Build
+        run: npm run build
