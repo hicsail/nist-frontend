@@ -6,6 +6,11 @@ on:
       - "**"
     braches:
       - main
+  pull_request:
+    paths:
+      - "**"
+    braches:
+      - main
 
 jobs:
   build:
