@@ -1,6 +1,13 @@
-import { S3Client, ListObjectsCommand, PutObjectCommand, DeleteObjectCommand, ListObjectsV2Command, GetObjectCommand, GetObjectOutput } from "@aws-sdk/client-s3";
+import {
+  S3Client,
+  ListObjectsCommand,
+  PutObjectCommand,
+  DeleteObjectCommand,
+  ListObjectsV2Command,
+  GetObjectCommand,
+  GetObjectOutput,
+} from "@aws-sdk/client-s3";
 import { registerMiddleware } from "@bu-sail/cargo-middleware";
-
 
 export const notclient = new S3Client({
   // endpoint: "http://localhost:8080/",
@@ -10,32 +17,27 @@ export const notclient = new S3Client({
     secretAccessKey: import.meta.env.VITE_AWS_SECRET,
   },
   region: "us-east-1",
-  forcePathStyle: true
+  forcePathStyle: true,
 });
-
 
 // Function to get the JWT. This function will be called on every request.
 // const getJWTToken: () => Promise<string> = async () => {
 //   return process.env.JWT_TOKEN;
 // }
 
-
 export const client = new S3Client({
   forcePathStyle: true,
 
-  endpoint: 'https://minio.sail.codes',
+  endpoint: "https://minio.sail.codes",
 
   // The following need to exist for the S3 Client to work, but the values
   // themselves do not matter
-  region: 'us-east-1',
+  region: "us-east-1",
   credentials: {
     accessKeyId: import.meta.env.VITE_AWS_KEY,
     secretAccessKey: import.meta.env.VITE_AWS_SECRET,
   },
 });
-
-
-
 
 //export const getAllBuckets = async () => {
 type S3Object = {
@@ -68,12 +70,11 @@ export const getOrganizationContents = async (bucketName: string): Promise<S3Obj
       });
     }
     return s3Objects;
-
   } catch (error) {
     console.error("Error", error);
     throw error;
   }
-}
+};
 
 export const uploadToS3 = async ({ Bucket, Key, Body }: any): Promise<boolean> => {
   const params = {
@@ -88,10 +89,10 @@ export const uploadToS3 = async ({ Bucket, Key, Body }: any): Promise<boolean> =
     console.log(`File uploaded to S3 bucket "${Bucket}" with key "${Key}".`);
     return true;
   } catch (error) {
-    console.error('Error uploading file:', error);
+    console.error("Error uploading file:", error);
     return false;
   }
-}
+};
 
 export const deleteFromS3 = async ({ Bucket, Key }: any): Promise<boolean> => {
   const params = {
@@ -105,16 +106,16 @@ export const deleteFromS3 = async ({ Bucket, Key }: any): Promise<boolean> => {
     console.log(`File deleted from S3 bucket "${Bucket}" with key "${Key}".`);
     return true;
   } catch (error) {
-    console.error('Error deleting file:', error);
+    console.error("Error deleting file:", error);
     return false;
   }
-}
+};
 
 export const createFolder = async (bucketName: string, folderName: string) => {
   const params = {
     Bucket: bucketName,
     Key: `${folderName}/`,
-    Body: '',
+    Body: "",
   };
 
   const command = new PutObjectCommand(params);
@@ -127,11 +128,11 @@ export const createFolder = async (bucketName: string, folderName: string) => {
   }
 };
 
-export const listFolders = async (bucketName: string, prefix = '') => {
+export const listFolders = async (bucketName: string, prefix = "") => {
   const params = {
     Bucket: bucketName,
     Prefix: prefix,
-    Delimiter: '/',
+    Delimiter: "/",
   };
 
   const command = new ListObjectsV2Command(params);
@@ -139,7 +140,7 @@ export const listFolders = async (bucketName: string, prefix = '') => {
   try {
     const response = await client.send(command);
     if (!response.CommonPrefixes) {
-      throw new Error('No folders found');
+      throw new Error("No folders found");
     }
     const folders = response.CommonPrefixes.map((prefix) => prefix.Prefix);
     console.log(`Folders in ${bucketName}/${prefix}:`, folders);
@@ -150,8 +151,7 @@ export const listFolders = async (bucketName: string, prefix = '') => {
   }
 };
 
-export const getFolderContents = async (bucketName: string, folderKey: string): Promise<S3.Object[]> => {
-
+export const getFolderContents = async (bucketName: string, folderKey: string): Promise<any[]> => {
   const command = new ListObjectsCommand({
     Bucket: bucketName,
     Prefix: folderKey,
@@ -162,12 +162,14 @@ export const getFolderContents = async (bucketName: string, folderKey: string): 
     const response = await client.send(command);
     return response.Contents ?? [];
   } catch (err) {
-    console.error(`Error fetching contents of folder '${folderKey}' in bucket '${bucketName}': ${err}`);
+    console.error(
+      `Error fetching contents of folder '${folderKey}' in bucket '${bucketName}': ${err}`
+    );
     return [];
   }
-}
+};
 
-export const getFile = async (bucketName: string, key: string): Promise<S3.GetObjectOutput | null> => {
+export const getFile = async (bucketName: string, key: string): Promise<any | null> => {
   const command = new GetObjectCommand({
     Bucket: bucketName,
     Key: key,
@@ -180,7 +182,7 @@ export const getFile = async (bucketName: string, key: string): Promise<S3.GetOb
     console.error(`Error fetching file '${key}' in bucket '${bucketName}': ${err}`);
     return null;
   }
-}
+};
 
 export const downloadFile = async (bucketName: string, key: string): Promise<void> => {
   const getObjectCommand = new GetObjectCommand({ Bucket: bucketName, Key: key });
@@ -203,13 +205,13 @@ const streamToString = async (stream: ReadableStream<Uint8Array>): Promise<strin
     if (value) chunks.push(value);
   }
   const decoder = new TextDecoder();
-  return chunks.map(chunk => decoder.decode(chunk)).join('');
+  return chunks.map((chunk) => decoder.decode(chunk)).join("");
 };
 
 const downloadData = (data: string, filename: string): void => {
-  const blob = new Blob([data], { type: 'application/octet-stream' });
+  const blob = new Blob([data], { type: "application/octet-stream" });
   const url = window.URL.createObjectURL(blob);
-  const a = document.createElement('a');
+  const a = document.createElement("a");
   a.href = url;
   a.download = filename;
   a.click();
@@ -225,4 +227,4 @@ export const deleteFile = async (bucketName: string, key: string): Promise<boole
     console.error(err);
     return false;
   }
-}
+};
