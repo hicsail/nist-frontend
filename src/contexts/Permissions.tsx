@@ -11,9 +11,4 @@ export type OrganizationPermissionType = {
     admin: boolean
 }
 
-export type PermissionsContextType = {
-    permissions: OrganizationPermissionType[],
-    adminAccess: string[]
-}
-
-export const PermissionsContext = createContext({} as OrganizationPermissionType[]);
+export const PermissionsContext = createContext([] as OrganizationPermissionType[]);

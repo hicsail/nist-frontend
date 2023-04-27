@@ -1,27 +1,18 @@
-import { TextField, Checkbox } from '@mui/material'
-import React from 'react'
+import { TextField, Checkbox, MenuItem, OutlinedInput, InputLabel } from '@mui/material'
+import React, { useEffect, useState, useContext } from 'react'
 import UserPermissionsTable from '../components/UserPermissionsTable';
+import { PermissionsContext } from "../contexts/Permissions";
 import { useQuery, gql } from '@apollo/client';
+import Select from '@mui/material/Select';
 
-type CargoPermission = {
-    _id: string;
-    user: string;
-    bucket: string;
-    read: boolean;
-    write: boolean;
-    delete: boolean;
-    admin: boolean;
-  }
-  
-  type CargoGetAllBucketPermissionsResult = {
-    cargoGetAllBucketPermissions: CargoPermission[];
-  }
-  
-  const CARGO_GET_ALL_BUCKET_PERMISSIONS = gql`
+const CARGO_GET_ALL_BUCKET_PERMISSIONS = gql`
     query CargoGetAllBucketPermissions($bucket: String!) {
       cargoGetAllBucketPermissions(bucket: $bucket) {
         _id
-        user
+        user {
+          id
+          email
+        }
         bucket
         read
         write
@@ -32,45 +23,76 @@ type CargoPermission = {
   `;
 
 export default function Access() {
+  const [userPermissions, setUserPermissions] = useState<any[]>([]);
+  const [notLoadingContent, setNotLoadingContent] = useState<any>();
+  const [organizationsWithAdminAccess, setOrganizationsWithAdminAccess] = useState<any[]>([]);
+  const [currentOrganization, setCurrentOrganization] = useState<string>();
+  const permissions = useContext(PermissionsContext);
 
-    const userData: any = [
-        { id: 1, name: 'Alice', read: true, write: true, delete: false, admin: false },
-        { id: 2, name: 'Bob', read: true, write: false, delete: false, admin: false },
-        { id: 3, name: 'Charlie', read: true, write: true, delete: true, admin: false },
-        { id: 4, name: 'Dave', read: true, write: true, delete: true, admin: false },
-        { id: 5, name: 'Eve', read: true, write: true, delete: true, admin: true },
-        { id: 6, name: 'Frank', read: true, write: false, delete: false, admin: false },
-        { id: 7, name: 'Grace', read: true, write: true, delete: true, admin: true },
-        { id: 8, name: 'Heidi', read: true, write: false, delete: false, admin: false },
-        { id: 9, name: 'Ivan', read: true, write: true, delete: false, admin: false },
-        { id: 10, name: 'Jack', read: true, write: true, delete: true, admin: true },
-        { id: 11, name: 'Kate', read: true, write: false, delete: false, admin: false },
-        { id: 12, name: 'Liam', read: true, write: true, delete: false, admin: false },
-        { id: 13, name: 'Mia', read: true, write: true, delete: true, admin: false },
-        { id: 14, name: 'Nick', read: true, write: true, delete: false, admin: false },
-        { id: 15, name: 'Olivia', read: true, write: false, delete: false, admin: false }
-      ];
-      
+  // set organizationsWithAdminAccess to all organizations that the user has admin access to
+  const getOrganizationsWithAdminAccess = () => {
+    console.log(permissions);
+    const organizationsWithAdminAccess = permissions.filter((permission: any) => permission.admin);
+    setOrganizationsWithAdminAccess(organizationsWithAdminAccess);
+  };
 
-    // function that returns rows of users along with checkboxes that indicate if they have read, write, or admin access using MUI Checkbox component
-    
-    const { loading, error, data } = useQuery<CargoGetAllBucketPermissionsResult>(
-        CARGO_GET_ALL_BUCKET_PERMISSIONS,
-        { variables: { bucket: "nist-ucdavis-dev"  } }
-    );
 
-    if (loading) return <p>Loading...</p>;
-    if (error) return <p>Error :</p>;
-    console.log(data);
+  // function that returns rows of users along with checkboxes that indicate if they have read, write, or admin access using MUI Checkbox component
 
-    
-    return (
-        <div>
-            <h1>Manage Access</h1>
-            <TextField id="outlined-basic" label="Search Users" variant="outlined" fullWidth />
-            <div style={{marginTop: 20}}>
-                <UserPermissionsTable users={userData} />
-            </div>
-        </div>
-    )
+  const { loading, error, data } = useQuery<any>(
+    CARGO_GET_ALL_BUCKET_PERMISSIONS,
+    { variables: { bucket: "nist-uc-davis" } }
+  );
+
+  const handleLoading = () => {
+    if (error) return <p>Error : {error.clientErrors.toString()}</p>;
+  }
+
+  useEffect(() => {
+    const change = handleLoading();
+    if (change) {
+      setNotLoadingContent(change);
+    }
+    setUserPermissions(data?.cargoGetAllBucketPermissions);
+  }, [data]);
+
+  useEffect(() => {
+    getOrganizationsWithAdminAccess();
+    if (organizationsWithAdminAccess.length > 0) {
+      console.log(organizationsWithAdminAccess);
+      setCurrentOrganization(organizationsWithAdminAccess[0].bucket);
+      console.log(currentOrganization);
+    }
+  }, [userPermissions]);
+
+
+
+
+  return (
+    <div>
+      <h1>Manage Access</h1>
+      {
+        notLoadingContent ? notLoadingContent :
+          (
+            <>
+              <TextField id="outlined-basic" label="Search Users" variant="outlined" fullWidth />
+              <InputLabel id="test-select-label">Select an Organization</InputLabel>
+              <Select
+                style={{ marginTop: 20, marginBottom: 20, width: 300 }}
+                id="demo-simple-select"
+                label="Select an Organization"
+                onChange={(event: any) => setCurrentOrganization(event.target.value)}
+              >
+                {organizationsWithAdminAccess.map((organization: any) => (
+                  <MenuItem value={organization.bucket} key={organization.bucket}>{organization.bucket}</MenuItem>
+                ))}
+              </Select>
+              <div style={{ marginTop: 20 }}>
+                <UserPermissionsTable userPermissions={userPermissions} />
+              </div>
+            </>
+          )
+      }
+    </div>
+  )
 }

@@ -35,7 +35,7 @@ export default function SideNav() {
                         </Link>
                     </ListItem>
                     <ListItem>
-                        <Link to={`access`}>
+                        <Link to={`access-manager`}>
                             <ListItemButton>
                                 Control Access
                             </ListItemButton>

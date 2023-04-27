@@ -12,7 +12,7 @@ import {
 } from "@mui/material";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
-import { getOrganizationContents, getFolderContents, uploadToS3 } from "../aws-client";
+import { getOrganizationContents, getFolderContents, uploadToS3, downloadFile, deleteFile } from "../aws-client";
 import { useDropzone } from "react-dropzone";
 
 function FileList({ files }: { files: any[] }) {
@@ -125,6 +125,10 @@ function S3FileList({ files, s3BucketName }: { files: any[], s3BucketName: strin
                         <TableCell>{file.Key}</TableCell>
                         <TableCell>{file.LastModified.toISOString()}</TableCell>
                         <TableCell>{file.Size}</TableCell>
+                        <TableCell> 
+                            <Button onClick={()=>deleteFile(s3BucketName, file.Key)}>Delete</Button>
+                            <Button onClick={()=>downloadFile(s3BucketName, file.Key)}>Download</Button>
+                        </TableCell>
                     </TableRow>
                 );
             })}

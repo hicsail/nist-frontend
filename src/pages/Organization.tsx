@@ -23,8 +23,7 @@ type Permission = {
 export default function Organization(props: any) {
   const location = useLocation();
   const organization = location.state;
-  const [userPermissions, setUserPermissions] = useState<any>({});
-  const [permissionsString, setPermissionsString] = useState('');
+  const [userPermissions, setUserPermissions] = useState<any>();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [folderName, setFolderName] = useState('');
   const [isCreatingFolder, setIsCreatingFolder] = useState(false);
@@ -48,34 +47,37 @@ export default function Organization(props: any) {
     }
   };
   const permissions = useContext(PermissionsContext);
+
   const getPermissionsForOrganization = (bucket: string) => {
     const orgPermissions = permissions.find((permission: Permission) => permission.bucket === bucket);
     return orgPermissions;
   };
 
   useEffect(() => {
-    const permissions = getPermissionsForOrganization(organization.bucket);
-    setUserPermissions(permissions)
-    setPermissionsString(JSON.stringify(permissions, null, 2));
+    if (permissions){
+      const permissions = getPermissionsForOrganization(organization.bucket);
+      setUserPermissions(permissions)
+    }
   }, []);
+
 
   return (
     <div>
       <h2>{organization.name}</h2>
       <div style={{ padding: 10, margin: 10 }}>
         {
-          userPermissions.admin ? <Chip label="Admin" color="success" /> : null
+          (userPermissions && userPermissions.admin) ? <Chip label="Admin" color="success" /> : null
         }
         {
-          userPermissions.write && !userPermissions.admin ? <Chip label="Write" color="success" /> : null
+          (userPermissions && userPermissions.write && !userPermissions.admin) ? <Chip label="Write" color="success" /> : null
         }{
-          userPermissions.read && !userPermissions.admin ? <Chip label="Read" color="success" /> : null
+          (userPermissions && userPermissions.read && !userPermissions.admin) ? <Chip label="Read" color="success" /> : null
         }{
-          userPermissions.delete && !userPermissions.admin ? <Chip label="Delete" color="success" /> : null
+          (userPermissions && userPermissions.delete && !userPermissions.admin) ? <Chip label="Delete" color="success" /> : null
         }
       </div>
       {
-        userPermissions.admin || userPermissions.write ? (
+        userPermissions && (userPermissions.admin || userPermissions.write) ? (
           <Button variant="contained" startIcon={<i className="fa fa-folder-plus" aria-hidden="true"></i>} onClick={() => setIsModalOpen(true)}>
             Create Folder
           </Button>
@@ -103,12 +105,12 @@ export default function Organization(props: any) {
         </Alert>
       </Snackbar>
       {
-        userPermissions.admin || userPermissions.write ? (
+        userPermissions && (userPermissions.admin || userPermissions.write) ? (
           <FileUploader s3BucketName={location.state.bucket} />
         ) : null
       }
       {
-        userPermissions.admin || userPermissions.read ? (
+        userPermissions && (userPermissions.admin || userPermissions.read) ? (
           <S3Display s3BucketName={location.state.bucket} />
         ) : null
       }

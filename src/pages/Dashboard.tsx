@@ -14,11 +14,11 @@ interface Organization {
 export default function Dashboard() {
 
     const [organizations, setOrganizations] = useState([]);
-    const [adminOrganizations, setAdminOrganizations] = useState([]);
-    const [accessOrganizations, setAccessOrganizations] = useState([]);
-    const [noAccessOrganizations, setNoAccessOrganizations] = useState([]);
+    const [adminOrganizations, setAdminOrganizations] = useState<any>([]);
+    const [accessOrganizations, setAccessOrganizations] = useState<any>([]);
+    const [noAccessOrganizations, setNoAccessOrganizations] = useState<any>([]);
     const navigate = useNavigate();
-    const permissions  = useContext(PermissionsContext);
+    const permissions = useContext(PermissionsContext);
     const GET_ORGANIZATIONS = gql`
         query GetOrganizations {
             getOriganizations {
@@ -28,13 +28,13 @@ export default function Dashboard() {
             }
         }
     `;
-    
+
     // function that takes in a list of organizations and returns a list of JSX elements with folder icon and organization name
     const renderOrganizations = (organizations: any, canClick: boolean) => {
         return organizations.map((organization: Organization) => (
             <div key={organization.name}>
                 <div>
-                    <IconButton aria-label="delete" size="large" onClick={() => canClick ? routeToOrganization(organization): alert("Contact Administrator for Org to request Access")}>
+                    <IconButton aria-label="delete" size="large" onClick={() => canClick ? routeToOrganization(organization) : alert("Contact Administrator for Org to request Access")}>
                         <FolderOpenOutlinedIcon fontSize='large' />
                         {organization.name}
                     </IconButton>
@@ -44,28 +44,30 @@ export default function Dashboard() {
     }
 
     const filterOrgsByPermission = (organizations: any, permission: string) => {
-
-        // filter organizations based on permission admin || read || write || delete
-        let orgs = [];
-        if (permission === 'admin') {
-            orgs = organizations.filter((organization: Organization) => {
-                // add organization to permissionOrgs
-                const adminOrgs = permissions.some((permission: any) => permission.admin && permission.bucket === organization.bucket);
-                // add adminOrgs to accessOrganizations
-                return adminOrgs;
-            });
-        }
-        if (permission === 'access') {
-            orgs = organizations.filter((organization: Organization) => {
-                return permissions.some((permission: any) => ((permission.read || permission.write || permission.delete) && (!permission.admin)) && permission.bucket === organization.bucket);
-            });
-        }
-        if (permission === 'noAccess') {
-            orgs = organizations.filter((organization: Organization) => {
-                return permissions.some((permission: any) => (!permission.read && !permission.write && !permission.delete && !permission.admin) && permission.bucket === organization.bucket);
-            });
-        }
-
+        let orgs: any[] = [];
+        organizations.forEach((organization: Organization) => {
+            if (permission === 'admin') {
+                // get permission for org from permissions              
+                const orgPermission = permissions.find((orgPermission: any) => orgPermission.bucket === organization.bucket);
+                if (orgPermission && orgPermission.admin) {
+                    orgs.push(organization);
+                }
+            }
+            if (permission === 'access') {
+                // get permission for org from permissions
+                const orgPermission = permissions.find((orgPermission: any) => orgPermission.bucket === organization.bucket);
+                if (orgPermission && orgPermission.read && !orgPermission.admin) {
+                    orgs.push(organization);
+                }
+            }
+            if (permission === 'noAccess') {
+                // get permission for org from permissions
+                const orgPermission = permissions.find((orgPermission: any) => orgPermission.bucket === organization.bucket);
+                if (orgPermission && !orgPermission.read && !orgPermission.admin && !orgPermission.write && !orgPermission.delete) {
+                    orgs.push(organization);
+                }
+            }
+        });
         return orgs;
     }
 
@@ -75,7 +77,6 @@ export default function Dashboard() {
             setAdminOrganizations(filterOrgsByPermission(data.getOriganizations, 'admin'));
             setAccessOrganizations(filterOrgsByPermission(data.getOriganizations, 'access'));
             setNoAccessOrganizations(filterOrgsByPermission(data.getOriganizations, 'noAccess'));
-            console.log("organizations set:", data.getOriganizations);
         },
         onError: (error) => {
             console.log(error);
