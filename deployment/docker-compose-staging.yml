@@ -1,7 +1,7 @@
 version: "3"
 services:
   nist-frontend:
-    image: nist-frontend:test
+    image: hicsail/nist-frontend:test
     restart: always
     ports:
       - 3009:80
