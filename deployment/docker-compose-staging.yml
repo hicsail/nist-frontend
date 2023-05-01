@@ -1,0 +1,9 @@
+version: "3"
+services:
+  nist-frontend:
+    image: nist-frontend:test
+    restart: always
+    ports:
+      - 3009:80
+    env_file:
+      - ../stack.env
