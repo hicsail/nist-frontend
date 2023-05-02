@@ -13,4 +13,4 @@ COPY --from=build /app/dist /usr/share/nginx/html
 
 COPY generate_env.sh /
 
-CMD ["/bin/bash", "-c", "generate_env.sh && nginx -g 'daemon off;'"]
+CMD ["/bin/bash", "-c", "/generate_env.sh && nginx -g 'daemon off;'"]
