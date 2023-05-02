@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import {
     Button,
     Paper,
+    Snackbar,
     Table,
     TableBody,
     TableCell,
@@ -106,6 +107,13 @@ function FolderItem({ folderName, s3BucketName, lastModified }: { folderName: st
 }
 
 function S3FileList({ files, s3BucketName }: { files: any[], s3BucketName: string }) {
+
+    // state variables to control toast display
+    const [open, setOpen] = useState(false);
+    const [message, setMessage] = useState("");
+    const handleClose = () => setOpen(false);
+
+
     return (
         <>
             {files.map((file) => {
@@ -125,13 +133,29 @@ function S3FileList({ files, s3BucketName }: { files: any[], s3BucketName: strin
                         <TableCell>{file.Key}</TableCell>
                         <TableCell>{file.LastModified.toISOString()}</TableCell>
                         <TableCell>{file.Size}</TableCell>
-                        <TableCell> 
-                            <Button onClick={()=>deleteFile(s3BucketName, file.Key)}>Delete</Button>
-                            <Button onClick={()=>downloadFile(s3BucketName, file.Key)}>Download</Button>
+                        <TableCell>
+                            <Button onClick={async () => {
+                                const success = await deleteFile(s3BucketName, file.Key)
+                                if (success) setMessage("File deleted successfully");
+                                else setMessage("File deletion failed");
+                                setOpen(true);
+                            }
+                            }>Delete</Button>
+                            <Button onClick={async () => {
+                                await downloadFile(s3BucketName, file.Key)
+                                setMessage("File downloaded successfully");
+                                setOpen(true);
+                            }}>Download</Button>
                         </TableCell>
                     </TableRow>
                 );
             })}
+            <Snackbar
+                open={open}
+                autoHideDuration={2000}
+                onClose={handleClose}
+                message={message}
+            />
         </>
     );
 }
@@ -146,7 +170,10 @@ export default function ({ s3BucketName }: { s3BucketName: string }) {
             const contents = await getOrganizationContents(s3BucketName);
             setFiles(contents);
         }
-        fetchS3Contents();
+        // temp fix to handle race condition
+        setTimeout(() => {
+            fetchS3Contents();
+        }, 150);
     }, [s3BucketName]);
 
     return (

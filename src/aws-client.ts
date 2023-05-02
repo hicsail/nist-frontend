@@ -46,6 +46,7 @@ type S3Object = {
 
 export const getOrganizationContents = async (bucketName: string): Promise<S3Object[]> => {
   const command = new ListObjectsCommand({ Bucket: bucketName });
+  console.log('getting org contents');
   // Execute the command and handle the response
   try {
     const data = await client.send(command);
@@ -93,7 +94,7 @@ export const uploadToS3 = async ({ Bucket, Key, Body }: any): Promise<boolean> =
   }
 }
 
-export const deleteFromS3 = async ({ Bucket, Key }: any): Promise<boolean> => {
+export const deleteFromS3 = async ({ Bucket, Key }: any): Promise<any> => {
   const params = {
     Bucket: Bucket,
     Key: Key,
@@ -102,11 +103,17 @@ export const deleteFromS3 = async ({ Bucket, Key }: any): Promise<boolean> => {
   try {
     const command = new DeleteObjectCommand(params);
     await client.send(command);
-    console.log(`File deleted from S3 bucket "${Bucket}" with key "${Key}".`);
-    return true;
+    const message = `File deleted from S3 bucket "${Bucket}" with key "${Key}".`;
+    return {
+      success: true,
+      message,
+    };
   } catch (error) {
-    console.error('Error deleting file:', error);
-    return false;
+    const message = `Error deleting file:', ${error}`;
+    return {
+      success: false,
+      message,
+    }
   }
 }
 
@@ -151,7 +158,7 @@ export const listFolders = async (bucketName: string, prefix = '') => {
 };
 
 export const getFolderContents = async (bucketName: string, folderKey: string): Promise<S3.Object[]> => {
-
+  console.log('getting folder contents');
   const command = new ListObjectsCommand({
     Bucket: bucketName,
     Prefix: folderKey,
