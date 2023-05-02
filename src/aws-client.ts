@@ -161,7 +161,7 @@ export const listFolders = async (bucketName: string, prefix = "") => {
 export const getFolderContents = async (
   bucketName: string,
   folderKey: string
-): Promise<S3.Object[]> => {
+): Promise<any[]> => {
   console.log("getting folder contents");
   const command = new ListObjectsCommand({
     Bucket: bucketName,
