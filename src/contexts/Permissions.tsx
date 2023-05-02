@@ -1,6 +1,7 @@
 import { createContext } from "react";
 
 export type OrganizationPermissionType = {
+    id: string;
     _id: string,
     user: string,
     org: any,

@@ -78,19 +78,13 @@ const AccessManager = () => {
         setSearchText(event.target.value);
     };
 
-    const handlePermissionUpdate = () => {
-        // Implement API call to update permissions here
-        setUpdateMessage('Permissions updated successfully');
-        setSnackbarOpen(true);
-    };
-
     const handlePermissionChange = (index: number, permissionType: any, isChecked: boolean) => {
         // update permissions in state
         const updatedPermissions = [...userPermissions];
         const updatedPermission = {
             ...updatedPermissions[index],
             [permissionType]: isChecked,
-        };
+        };    
         updatedPermissions[index] = updatedPermission;
         setUserPermissions(updatedPermissions);
     };
@@ -104,7 +98,7 @@ const AccessManager = () => {
     ) : [];
 
     if (error) {
-        return <p>Error: {error.message}</p>;
+        return <p>Error fetching access manager: {error.message}</p>;
     }
 
     if (loading) {

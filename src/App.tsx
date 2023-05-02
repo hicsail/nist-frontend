@@ -101,7 +101,7 @@ function App() {
         setPermissions(allPermissions);
         const CARGO_ENDPOINT = 'https://nist-staging-gateway.sail.codes/graphql';
         if (token) {
-          console.log({ cargoEndpoint: CARGO_ENDPOINT, jwtTokenProvider: () => Promise.resolve(token) }, AWSclient.middlewareStack);
+          console.log('registering middleware');
           registerMiddleware({ cargoEndpoint: CARGO_ENDPOINT, jwtTokenProvider: () => Promise.resolve(token) }, AWSclient.middlewareStack);
         }
       });
