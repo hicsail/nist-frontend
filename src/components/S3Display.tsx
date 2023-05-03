@@ -2,17 +2,17 @@ import React from "react";
 import { useState, useEffect, useContext } from 'react';
 import { S3Context } from '../contexts/s3.context';
 import {
-    Button,
-    IconButton,
-    Paper,
-    Snackbar,
-    Table,
-    TableBody,
-    TableCell,
-    TableContainer,
-    TableHead,
-    TableRow,
-    TextField,
+  Button,
+  IconButton,
+  Paper,
+  Snackbar,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  TextField,
 } from "@mui/material";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
@@ -29,16 +29,17 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import GetAppIcon from '@mui/icons-material/GetApp';
 
 function formatBytes(size: number): string {
-    const units = ['B', 'KB', 'MB', 'GB', 'TB'];
-    let n = 0;
-    while (size >= 1024 && n < units.length - 1) {
-        size /= 1024;
-        n++;
-    }
-    return `${size.toFixed(2)} ${units[n]}`;
+  const units = ['B', 'KB', 'MB', 'GB', 'TB'];
+  let n = 0;
+  while (size >= 1024 && n < units.length - 1) {
+    size /= 1024;
+    n++;
+  }
+  return `${size.toFixed(2)} ${units[n]}`;
 }
 
 function FileList({ files, s3BucketName }: { files: any[], s3BucketName: string }) {
+<<<<<<< HEAD
     const s3Client = useContext(S3Context);
     return (
         <TableContainer component={Paper}>
@@ -71,6 +72,39 @@ function FileList({ files, s3BucketName }: { files: any[], s3BucketName: string 
             </Table>
         </TableContainer>
     );
+=======
+  return (
+    <TableContainer component={Paper}>
+      <Table>
+        <TableHead>
+          <TableRow>
+            <TableCell>Name</TableCell>
+            <TableCell>Last Modified</TableCell>
+            <TableCell>Size</TableCell>
+            <TableCell>Actions</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {files.map((file: any) => (
+            <TableRow key={file.Key}>
+              <TableCell>{file.Key}</TableCell>
+              <TableCell>{file.LastModified.toISOString()}</TableCell>
+              <TableCell>{formatBytes(file.Size)}</TableCell>
+              <TableCell>
+                <IconButton size="small" onClick={() => downloadFile(s3BucketName, file.Key)}>
+                  <GetAppIcon />
+                </IconButton>
+                <IconButton size="small" onClick={() => deleteFile(s3BucketName, file.Key)}>
+                  <DeleteIcon />
+                </IconButton>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </TableContainer>
+  );
+>>>>>>> 067d412 (Indent fix)
 }
 
 function FolderItem({
@@ -114,39 +148,39 @@ function FolderItem({
 
   const { getRootProps, getInputProps } = useDropzone({ onDrop });
 
-    return (
-        <>
-            <TableRow>
-                <TableCell>
-                    <IconButton size="small" onClick={handleExpand}>
-                        {expanded ? <KeyboardArrowDownIcon /> : <KeyboardArrowRightIcon />}
-                    </IconButton>
-                    Folder
-                </TableCell>
-                <TableCell>
-                    {folderKey}
-                </TableCell>
-                <TableCell>
-                    {lastModified.toDateString()}
-                </TableCell>
-                <TableCell>
-                </TableCell>
-                <TableCell>
-                    <div {...getRootProps()}>
-                        <input {...getInputProps()} />
-                        <Button>Upload</Button>
-                    </div>
-                </TableCell>
-            </TableRow>
-            {expanded && (
-                <TableRow>
-                    <TableCell colSpan={3}>
-                        {isFolder && <FileList files={folderContents} s3BucketName={s3BucketName} />}
-                    </TableCell>
-                </TableRow>
-            )}
-        </>
-    );
+  return (
+    <>
+      <TableRow>
+        <TableCell>
+          <IconButton size="small" onClick={handleExpand}>
+            {expanded ? <KeyboardArrowDownIcon /> : <KeyboardArrowRightIcon />}
+          </IconButton>
+          Folder
+        </TableCell>
+        <TableCell>
+          {folderKey}
+        </TableCell>
+        <TableCell>
+          {lastModified.toDateString()}
+        </TableCell>
+        <TableCell>
+        </TableCell>
+        <TableCell>
+          <div {...getRootProps()}>
+            <input {...getInputProps()} />
+            <Button>Upload</Button>
+          </div>
+        </TableCell>
+      </TableRow>
+      {expanded && (
+        <TableRow>
+          <TableCell colSpan={3}>
+            {isFolder && <FileList files={folderContents} s3BucketName={s3BucketName} />}
+          </TableCell>
+        </TableRow>
+      )}
+    </>
+  );
 }
 
 function S3FileList({ files, s3BucketName, reloadFiles }: { files: any[], s3BucketName: string, reloadFiles: () => void }) {
@@ -230,32 +264,32 @@ export default function ({ s3BucketName }: { s3BucketName: string }) {
         
     }, [s3BucketName]);
 
-    const handleFilter = (event: any) => {
-        const searchQuery = event.target.value;
-        const filteredFiles = files.filter((file: any) => file.Key.includes(searchQuery));
-        console.log(filteredFiles);
-        setFilteredFiles(filteredFiles);
-    };
+  const handleFilter = (event: any) => {
+    const searchQuery = event.target.value;
+    const filteredFiles = files.filter((file: any) => file.Key.includes(searchQuery));
+    console.log(filteredFiles);
+    setFilteredFiles(filteredFiles);
+  };
 
-    return (
-        <div>
-            <TableContainer>
-                <TextField id="outlined-basic" label="Search Files" variant="outlined" onChange={handleFilter}/>
-                <Table>
-                    <TableHead>
-                        <TableRow>
-                            <TableCell>Type</TableCell>
-                            <TableCell>Name</TableCell>
-                            <TableCell>Last Modified</TableCell>
-                            <TableCell>Size</TableCell>
-                            <TableCell>Actions</TableCell>
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        <S3FileList files={filteredFiles} s3BucketName={s3BucketName} reloadFiles={fetchS3Contents}  />
-                    </TableBody>
-                </Table>
-            </TableContainer>
-        </div>
-    )
+  return (
+    <div>
+      <TableContainer>
+        <TextField id="outlined-basic" label="Search Files" variant="outlined" onChange={handleFilter} />
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell>Type</TableCell>
+              <TableCell>Name</TableCell>
+              <TableCell>Last Modified</TableCell>
+              <TableCell>Size</TableCell>
+              <TableCell>Actions</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            <S3FileList files={filteredFiles} s3BucketName={s3BucketName} reloadFiles={fetchS3Contents} />
+          </TableBody>
+        </Table>
+      </TableContainer>
+    </div>
+  )
 }
