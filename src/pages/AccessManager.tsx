@@ -16,27 +16,10 @@ import {
     Paper,
     TablePagination
 } from '@mui/material';
-import { useQuery, gql } from '@apollo/client';
 import { PermissionsContext } from '../contexts/Permissions';
 import { HandleUpdate } from '../components/UpdatePermissionsButton';
 import { UIContext } from '../contexts/UI';
-
-const CARGO_GET_ALL_BUCKET_PERMISSIONS = gql`
-    query CargoGetAllBucketPermissions($bucket: String!) {
-      cargoGetAllBucketPermissions(bucket: $bucket) {
-        _id
-        user {
-          id
-          email
-        }
-        bucket
-        read
-        write
-        delete
-        admin
-      }
-    }
-  `;
+import { useCargoGetAllBucketPermissionsQuery } from '../graphql/permissions/permissions';
 
 const AccessManager = () => {
     const [userPermissions, setUserPermissions] = useState<any>([]);
@@ -52,12 +35,7 @@ const AccessManager = () => {
     const permissions = useContext(PermissionsContext);
     const { path, setPath } = useContext(UIContext);
 
-    const { loading, error, data } = useQuery(CARGO_GET_ALL_BUCKET_PERMISSIONS, {
-        variables: { bucket: currentOrganization },
-        onCompleted: (data) => {
-            setUserPermissions(data?.cargoGetAllBucketPermissions);
-        }
-    });
+    const { loading, error, data } = useCargoGetAllBucketPermissionsQuery({ variables: { bucket: currentOrganization } });
 
     useEffect(() => {
         const organizationsWithAdminAccess = permissions.filter((permission) => permission.admin);

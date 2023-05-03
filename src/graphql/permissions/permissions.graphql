@@ -1,0 +1,14 @@
+query cargoGetAllBucketPermissions($bucket: String!) {
+  cargoGetAllBucketPermissions(bucket: $bucket) {
+    _id,
+    user {
+      id,
+      email
+    },
+    bucket,
+    read,
+    write,
+    delete,
+    admin
+  }
+}
