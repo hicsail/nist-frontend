@@ -1,13 +1,13 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useContext } from 'react'
 import { useLocation } from 'react-router-dom';
 import { createFolder, getOrganizationContents } from '../aws-client';
 import FileUploader from '../components/FileUploader';
 import { Button, Dialog, DialogTitle, DialogContent, DialogActions, TextField, CircularProgress, Snackbar } from '@mui/material';
 import { Alert } from '@mui/material';
 import S3Display from '../components/S3Display';
-import { useContext } from "react";
 import { PermissionsContext } from "../contexts/Permissions";
 import Chip from '@mui/material/Chip';
+import { S3Context } from '../contexts/s3.context';
 
 type Permission = {
   _id: string,
@@ -29,6 +29,7 @@ export default function Organization(props: any) {
   const [isCreatingFolder, setIsCreatingFolder] = useState(false);
   const [hasCreatedFolder, setHasCreatedFolder] = useState(false);
   const [error, setError] = useState(null);
+  const s3Client = useContext(S3Context);
 
   const handleFolderNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setFolderName(event.target.value);
@@ -37,7 +38,7 @@ export default function Organization(props: any) {
   const handleCreateFolder = async () => {
     setIsCreatingFolder(true);
     try {
-      await createFolder(organization.bucket, folderName);
+      await createFolder(s3Client, organization.bucket, folderName);
       setHasCreatedFolder(true);
     } catch (error: any) {
       setError(error);

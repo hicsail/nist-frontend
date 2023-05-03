@@ -7,37 +7,6 @@ import {
   GetObjectCommand,
   GetObjectOutput,
 } from "@aws-sdk/client-s3";
-import { registerMiddleware } from "@bu-sail/cargo-middleware";
-
-export const notclient = new S3Client({
-  // endpoint: "http://localhost:8080/",
-  // Get credentials from environment variables
-  credentials: {
-    accessKeyId: import.meta.env.VITE_AWS_KEY,
-    secretAccessKey: import.meta.env.VITE_AWS_SECRET,
-  },
-  region: "us-east-1",
-  forcePathStyle: true,
-});
-
-// Function to get the JWT. This function will be called on every request.
-// const getJWTToken: () => Promise<string> = async () => {
-//   return process.env.JWT_TOKEN;
-// }
-
-export const client = new S3Client({
-  forcePathStyle: true,
-
-  endpoint: "https://minio.sail.codes",
-
-  // The following need to exist for the S3 Client to work, but the values
-  // themselves do not matter
-  region: "us-east-1",
-  credentials: {
-    accessKeyId: import.meta.env.VITE_AWS_KEY,
-    secretAccessKey: import.meta.env.VITE_AWS_SECRET,
-  },
-});
 
 //export const getAllBuckets = async () => {
 type S3Object = {
@@ -46,7 +15,7 @@ type S3Object = {
   Size: number;
 };
 
-export const getOrganizationContents = async (bucketName: string): Promise<S3Object[]> => {
+export const getOrganizationContents = async (client: S3Client, bucketName: string): Promise<S3Object[]> => {
   const command = new ListObjectsCommand({ Bucket: bucketName });
   console.log("getting org contents");
   // Execute the command and handle the response
@@ -77,7 +46,7 @@ export const getOrganizationContents = async (bucketName: string): Promise<S3Obj
   }
 };
 
-export const uploadToS3 = async ({ Bucket, Key, Body }: any): Promise<boolean> => {
+export const uploadToS3 = async (client: S3Client, { Bucket, Key, Body }: any): Promise<boolean> => {
   const params = {
     Bucket: Bucket,
     Key: Key,
@@ -95,7 +64,7 @@ export const uploadToS3 = async ({ Bucket, Key, Body }: any): Promise<boolean> =
   }
 };
 
-export const deleteFromS3 = async ({ Bucket, Key }: any): Promise<any> => {
+export const deleteFromS3 = async (client: S3Client, { Bucket, Key }: any): Promise<any> => {
   const params = {
     Bucket: Bucket,
     Key: Key,
@@ -118,7 +87,7 @@ export const deleteFromS3 = async ({ Bucket, Key }: any): Promise<any> => {
   }
 };
 
-export const createFolder = async (bucketName: string, folderName: string) => {
+export const createFolder = async (client: S3Client, bucketName: string, folderName: string) => {
   const params = {
     Bucket: bucketName,
     Key: `${folderName}/`,
@@ -135,7 +104,7 @@ export const createFolder = async (bucketName: string, folderName: string) => {
   }
 };
 
-export const listFolders = async (bucketName: string, prefix = "") => {
+export const listFolders = async (client: S3Client, bucketName: string, prefix = "") => {
   const params = {
     Bucket: bucketName,
     Prefix: prefix,
@@ -159,6 +128,7 @@ export const listFolders = async (bucketName: string, prefix = "") => {
 };
 
 export const getFolderContents = async (
+  client: S3Client,
   bucketName: string,
   folderKey: string
 ): Promise<any[]> => {
@@ -180,7 +150,7 @@ export const getFolderContents = async (
   }
 };
 
-export const getFile = async (bucketName: string, key: string): Promise<any | null> => {
+export const getFile = async (client: S3Client, bucketName: string, key: string): Promise<any | null> => {
   const command = new GetObjectCommand({
     Bucket: bucketName,
     Key: key,
@@ -195,7 +165,7 @@ export const getFile = async (bucketName: string, key: string): Promise<any | nu
   }
 };
 
-export const downloadFile = async (bucketName: string, key: string): Promise<void> => {
+export const downloadFile = async (client: S3Client, bucketName: string, key: string): Promise<void> => {
   const getObjectCommand = new GetObjectCommand({ Bucket: bucketName, Key: key });
 
   try {
@@ -228,7 +198,7 @@ const downloadData = (data: string, filename: string): void => {
   a.click();
 };
 
-export const deleteFile = async (bucketName: string, key: string): Promise<boolean> => {
+export const deleteFile = async (client: S3Client, bucketName: string, key: string): Promise<boolean> => {
   const deleteObjectCommand = new DeleteObjectCommand({ Bucket: bucketName, Key: key });
 
   try {
