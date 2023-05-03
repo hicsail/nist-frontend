@@ -10,6 +10,7 @@ import { setContext } from '@apollo/client/link/context';
 import jwtDecode from 'jwt-decode';
 import {S3Provider} from './contexts/s3.context';
 import { UIContext } from './contexts/UI';
+import {MuiThemeProvider} from './contexts/theme.providers';
 
 function App() {
 
@@ -102,42 +103,44 @@ function App() {
 
   return (
     <div className="App">
-      <S3Provider
-        s3Endpoint={import.meta.env.VITE_S3_ENDPOINT}
-        cargoEndpoint={import.meta.env.VITE_CARGO_ENDPOINT}
-      >
-        <AuthContext.Provider value={authContext}>
-          <ApolloProvider client={client}>
-          <UIContext.Provider value={{ path: path, setPath: setPath }}>
-            {
-              isAuthenticated && permissions ? (
-                <AuthContext.Provider value={authContext}>
-                  <PermissionsContext.Provider value={permissions}>
-                    <Grid container>
-                      <Grid item xs={12} sm={3}>
-                        <SideNav />
+      <MuiThemeProvider>
+        <S3Provider
+          s3Endpoint={import.meta.env.VITE_S3_ENDPOINT}
+          cargoEndpoint={import.meta.env.VITE_CARGO_ENDPOINT}
+        >
+          <AuthContext.Provider value={authContext}>
+            <ApolloProvider client={client}>
+            <UIContext.Provider value={{ path: path, setPath: setPath }}>
+              {
+                isAuthenticated && permissions ? (
+                  <AuthContext.Provider value={authContext}>
+                    <PermissionsContext.Provider value={permissions}>
+                      <Grid container>
+                        <Grid item xs={12} sm={3}>
+                          <SideNav />
+                        </Grid>
+                        <Grid item xs={12} sm={9}>
+                          <div id='detail'>
+                            <Outlet />
+                          </div>
+                        </Grid>
                       </Grid>
-                      <Grid item xs={12} sm={9}>
-                        <div id='detail'>
-                          <Outlet />
-                        </div>
-                      </Grid>
-                    </Grid>
-                  </PermissionsContext.Provider>
-                </AuthContext.Provider>
-              ) : (
-                <div>
-                  <h2>
-                    Please login
-                  </h2>
-                  <Outlet />
-                </div>
-              )
-            }
-            </UIContext.Provider>
-          </ApolloProvider>
-        </AuthContext.Provider>
-      </S3Provider>
+                    </PermissionsContext.Provider>
+                  </AuthContext.Provider>
+                ) : (
+                  <div>
+                    <h2>
+                      Please login
+                    </h2>
+                    <Outlet />
+                  </div>
+                )
+              }
+              </UIContext.Provider>
+            </ApolloProvider>
+          </AuthContext.Provider>
+        </S3Provider>
+      </MuiThemeProvider>
     </div>
   )
 }
