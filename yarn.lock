@@ -1606,6 +1606,14 @@
   "resolved" "https://registry.npmjs.org/@esbuild/linux-x64/-/linux-x64-0.16.17.tgz"
   "version" "0.16.17"
 
+"@graphql-codegen/add@^3.2.1":
+  "integrity" "sha512-sQOnWpMko4JLeykwyjFTxnhqjd/3NOG2OyMuvK76Wnnwh8DRrNf2VEs2kmSvLl7MndMlOj7Kh5U154dVcvhmKQ=="
+  "resolved" "https://registry.npmjs.org/@graphql-codegen/add/-/add-3.2.3.tgz"
+  "version" "3.2.3"
+  dependencies:
+    "@graphql-codegen/plugin-helpers" "^3.1.1"
+    "tslib" "~2.4.0"
+
 "@graphql-codegen/add@^4.0.1":
   "integrity" "sha512-A7k+9eRfrKyyNfhWEN/0eKz09R5cp4XXxUuNLQAVm/aohmVI2xdMV4lM02rTlM6Pyou3cU/v0iZnhgo6IRpqeg=="
   "resolved" "https://registry.npmjs.org/@graphql-codegen/add/-/add-4.0.1.tgz"
@@ -1695,6 +1703,18 @@
     "auto-bind" "~4.0.0"
     "tslib" "~2.5.0"
 
+"@graphql-codegen/near-operation-file-preset@^2.5.0":
+  "integrity" "sha512-S9PNJP5tTkUWBQ6inbviOsTREzsMxYVqJGrtPcIdMWkKLZAAItAfAb60klB1T64vt6Oru+nUf8IYUNrchJ8MYg=="
+  "resolved" "https://registry.npmjs.org/@graphql-codegen/near-operation-file-preset/-/near-operation-file-preset-2.5.0.tgz"
+  "version" "2.5.0"
+  dependencies:
+    "@graphql-codegen/add" "^3.2.1"
+    "@graphql-codegen/plugin-helpers" "^2.7.2"
+    "@graphql-codegen/visitor-plugin-common" "2.13.1"
+    "@graphql-tools/utils" "^8.8.0"
+    "parse-filepath" "^1.0.2"
+    "tslib" "~2.4.0"
+
 "@graphql-codegen/plugin-helpers@^2.7.2":
   "integrity" "sha512-kln2AZ12uii6U59OQXdjLk5nOlh1pHis1R98cDZGFnfaiAbX9V3fxcZ1MMJkB7qFUymTALzyjZoXXdyVmPMfRg=="
   "resolved" "https://registry.npmjs.org/@graphql-codegen/plugin-helpers/-/plugin-helpers-2.7.2.tgz"
@@ -1702,6 +1722,18 @@
   dependencies:
     "@graphql-tools/utils" "^8.8.0"
     "change-case-all" "1.0.14"
+    "common-tags" "1.8.2"
+    "import-from" "4.0.0"
+    "lodash" "~4.17.0"
+    "tslib" "~2.4.0"
+
+"@graphql-codegen/plugin-helpers@^3.1.1":
+  "integrity" "sha512-emOQiHyIliVOIjKVKdsI5MXj312zmRDwmHpyUTZMjfpvxq/UVAHUJIVdVf+lnjjrI+LXBTgMlTWTgHQfmICxjg=="
+  "resolved" "https://registry.npmjs.org/@graphql-codegen/plugin-helpers/-/plugin-helpers-3.1.2.tgz"
+  "version" "3.1.2"
+  dependencies:
+    "@graphql-tools/utils" "^9.0.0"
+    "change-case-all" "1.0.15"
     "common-tags" "1.8.2"
     "import-from" "4.0.0"
     "lodash" "~4.17.0"
