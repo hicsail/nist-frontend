@@ -65,9 +65,6 @@ export default function Access() {
     }
   }, [userPermissions]);
 
-
-
-
   return (
     <div>
       <h1>Manage Access</h1>

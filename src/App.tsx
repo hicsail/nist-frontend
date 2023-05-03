@@ -3,7 +3,7 @@ import './App.css'
 import SideNav from './components/SideNav'
 import { Outlet, useNavigate } from "react-router-dom";
 import { ApolloClient, InMemoryCache, ApolloProvider, gql, HttpLink } from '@apollo/client';
-import { Grid } from '@mui/material';
+import { Breadcrumbs, Grid, Link, Typography } from '@mui/material';
 import { AuthContext } from './contexts/Auth';
 import { PermissionsContext, OrganizationPermissionType } from './contexts/Permissions';
 import { setContext } from '@apollo/client/link/context';
@@ -13,7 +13,8 @@ import {S3Provider} from './contexts/s3.context';
 function App() {
 
   const [token, setToken] = useState<string | null>(null);
-  const [isAuthenticated, setIsAuthenticated] = React.useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [path, setPath] = useState<string[]>([]);
   const [permissions, setPermissions] = useState<OrganizationPermissionType[]>();
   const navigate = useNavigate();
   const uri = `${import.meta.env.VITE_AUTH_URL}/graphql`;
@@ -69,7 +70,7 @@ function App() {
   }
 
   const client = createNewClient();
-
+  
   const GET_PERMISSIONS = gql`
     query cargoGetPermissions {
         cargoGetPermissions {
@@ -80,18 +81,7 @@ function App() {
             bucket
         }
     }
-  `
-
-  const GET_ORGANIZATIONS = gql`
-    query GetOrganizations {
-        getOriganizations {
-            _id
-            name
-            bucket
-        }
-    }
   `;
-
 
   useEffect(() => {
     authLogic({}).then(() => {
@@ -126,6 +116,19 @@ function App() {
                         <SideNav />
                       </Grid>
                       <Grid item xs={12} sm={9}>
+                        <div>
+                        <Breadcrumbs separator="›" aria-label="breadcrumb">
+                          {
+                            path.map((path : any) => {
+                              return (
+                                <Link key={path.name} color="text.primary" href={path.path}>
+                                  {path.name}
+                                </Link>
+                              )
+                            })
+                          }
+                          </Breadcrumbs>
+                        </div>
                         <div id='detail'>
                           <Outlet />
                         </div>

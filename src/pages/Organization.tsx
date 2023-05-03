@@ -8,6 +8,7 @@ import S3Display from '../components/S3Display';
 import { PermissionsContext } from "../contexts/Permissions";
 import Chip from '@mui/material/Chip';
 import { S3Context } from '../contexts/s3.context';
+import { UIContext } from '../contexts/UI';
 
 type Permission = {
   _id: string,
@@ -30,6 +31,8 @@ export default function Organization(props: any) {
   const [hasCreatedFolder, setHasCreatedFolder] = useState(false);
   const [error, setError] = useState(null);
   const s3Client = useContext(S3Context);
+  const { path, setPath } = useContext(UIContext);
+
 
   const handleFolderNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setFolderName(event.target.value);
@@ -58,6 +61,17 @@ export default function Organization(props: any) {
     if (permissions){
       const permissions = getPermissionsForOrganization(organization.bucket);
       setUserPermissions(permissions)
+    }
+  }, []);
+
+  useEffect(() => {
+
+    // if set path has been added to global context from app
+    if (path) {
+      // check if path includes dashboard in names
+      const pathIncludesDashboard = path.some((pathItem) => pathItem.name === 'dashboard');
+      if (pathIncludesDashboard) setPath([...path, { name: organization.bucket, path: `/organization/${organization._id}`}]);
+      else setPath([{ name: 'dashboard', path: '/dashboard' }, { name: organization.bucket, path: `/organization/${organization._id}`}]);   
     }
   }, []);
 
