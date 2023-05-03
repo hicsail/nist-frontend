@@ -38,7 +38,7 @@ export const S3Provider: FC<S3ProviderProps> = (props) => {
 
   // Register the Cargo middleware
   registerMiddleware({
-    cargoEndpoint: import.meta.env.VITE_CARGO_ENDPOINT,
+    cargoEndpoint: props.cargoEndpoint,
     jwtTokenProvider: getJWTToken
   }, client.middlewareStack)
 

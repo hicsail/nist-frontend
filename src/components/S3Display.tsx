@@ -1,5 +1,6 @@
 import React from "react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from 'react';
+import { S3Context } from '../contexts/s3.context';
 import {
   Button,
   Paper,
@@ -60,10 +61,11 @@ function FolderItem({
   const [folderContents, setFolderContents] = useState<any[]>([]);
   const isFolder = folderName.endsWith("/");
   const folderKey = folderName.slice(0, -1);
+  const s3Client = useContext(S3Context);
 
   const handleExpand = async () => {
     if (!expanded) {
-      const contents = await getFolderContents(s3BucketName, folderKey);
+      const contents = await getFolderContents(s3Client, s3BucketName, folderKey);
       console.log(contents);
       setFolderContents(contents);
     }
@@ -78,9 +80,9 @@ function FolderItem({
       Key: fileName,
       Body: file,
     };
-    const success = await uploadToS3(uploadOptions);
+    const success = await uploadToS3(s3Client, uploadOptions);
     if (success) {
-      const contents = await getFolderContents(s3BucketName, folderKey);
+      const contents = await getFolderContents(s3Client, s3BucketName, folderKey);
       setFolderContents(contents);
     }
   };
@@ -115,6 +117,7 @@ function S3FileList({ files, s3BucketName }: { files: any[]; s3BucketName: strin
   const [open, setOpen] = useState(false);
   const [message, setMessage] = useState("");
   const handleClose = () => setOpen(false);
+  const s3Client = useContext(S3Context);
 
   return (
     <>
@@ -136,7 +139,7 @@ function S3FileList({ files, s3BucketName }: { files: any[]; s3BucketName: strin
             <TableCell>
               <Button
                 onClick={async () => {
-                  const success = await deleteFile(s3BucketName, file.Key);
+                  const success = await deleteFile(s3Client, s3BucketName, file.Key);
                   if (success) setMessage("File deleted successfully");
                   else setMessage("File deletion failed");
                   setOpen(true);
@@ -146,7 +149,7 @@ function S3FileList({ files, s3BucketName }: { files: any[]; s3BucketName: strin
               </Button>
               <Button
                 onClick={async () => {
-                  await downloadFile(s3BucketName, file.Key);
+                  await downloadFile(s3Client, s3BucketName, file.Key);
                   setMessage("File downloaded successfully");
                   setOpen(true);
                 }}
@@ -164,10 +167,11 @@ function S3FileList({ files, s3BucketName }: { files: any[]; s3BucketName: strin
 
 export default function ({ s3BucketName }: { s3BucketName: string }) {
   const [files, setFiles] = useState<any>([]);
+  const s3Client = useContext(S3Context);
 
   useEffect(() => {
     async function fetchS3Contents() {
-      const contents = await getOrganizationContents(s3BucketName);
+      const contents = await getOrganizationContents(s3Client, s3BucketName);
       setFiles(contents);
     }
     // temp fix to handle race condition

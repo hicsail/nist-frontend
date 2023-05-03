@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { Alert, Button, Paper, Snackbar, Typography } from '@mui/material';
 import { uploadToS3 } from '../aws-client';
+import { S3Context } from '../contexts/s3.context';
 
 const dropZoneStyle = {
     width: '100%',
@@ -24,6 +25,7 @@ function FileUploader({ s3BucketName }: Props) {
     const [snackbarMessage, setSnackbarMessage] = useState("");
     const [openSnackbar, setOpenSnackbar] = useState(false);
     const [snackbarSeverity, setSnackbarSeverity] = useState<any>("success");
+    const s3Client = useContext(S3Context);
 
     function handleFileSelect(event: React.ChangeEvent<HTMLInputElement>) {
         setFile(event.target.files && event.target.files[0]);
@@ -65,7 +67,7 @@ function FileUploader({ s3BucketName }: Props) {
         setSnackbarMessage(`Uploading file ${file.name} to S3 bucket ${s3BucketName}`);
         setSnackbarSeverity("info");
         setOpenSnackbar(true);
-        const success = await uploadToS3(params);
+        const success = await uploadToS3(s3Client, params);
         if (success){
             setSnackbarMessage(`Successfully uploaded file ${file.name} to S3 bucket ${s3BucketName}`);
             setSnackbarSeverity("success");
