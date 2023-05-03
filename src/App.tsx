@@ -8,9 +8,9 @@ import { AuthContext } from './contexts/Auth';
 import { PermissionsContext, OrganizationPermissionType } from './contexts/Permissions';
 import { setContext } from '@apollo/client/link/context';
 import jwtDecode from 'jwt-decode';
-import {S3Provider} from './contexts/s3.context';
 import { UIContext } from './contexts/UI';
 import {MuiThemeProvider} from './contexts/theme.providers';
+import { S3Provider } from './contexts/s3.context';
 
 function App() {
 
