@@ -68,7 +68,6 @@ export default function Organization(props: any) {
 
     // if set path has been added to global context from app
     if (path) {
-      // check if path includes dashboard in names
        setPath([{ name: organization.name, path: `/organization/${organization._id}` }]);
     }
   }, []);
