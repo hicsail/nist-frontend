@@ -10,31 +10,52 @@ import ErrorPage from './pages/error-route';
 import Dashboard from './pages/Dashboard';
 import Organization from './pages/Organization';
 import Access from './pages/Access';
+import Login from './pages/Login';
+import Callback from './pages/Callback';
+import AccessManager from './pages/AccessManager';
 
-const router = createBrowserRouter([
+const appRouter = createBrowserRouter([
   {
     path: "/",
     element: <App></App>,
     errorElement: <ErrorPage></ErrorPage>,
     children: [
       {
+        path: "/",
+        element: <Dashboard />,
+      },
+      
+      {
         path: "/dashboard",
         element: <Dashboard />,
       },
       {
         path: "/access",
-        element: <Access/>,
+        element: <Access />,
+      },
+      {
+        path: "/access-manager",
+        element: <AccessManager />,
       },
       {
         path: "/organization/:orgId",
         element: <Organization />,
-      }
+      },
+      {
+        path: "/login",
+        element: <Login/>,
+      },
+      {
+        path: "/auth/callback",
+        element: <Callback />,
+      },
     ]
   },
 ]);
 
+
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
-    <RouterProvider router={router} />
+    <RouterProvider router={appRouter} />
   </React.StrictMode>,
 )

@@ -1,63 +1,119 @@
 import React, { useEffect, useState } from 'react'
 import { useLocation } from 'react-router-dom';
-import { getOrganizationContents } from '../aws-client';
-import BiologyLabFilesTable from '../components/FileViewer';
+import { createFolder, getOrganizationContents } from '../aws-client';
 import FileUploader from '../components/FileUploader';
-import { S3FileViewer } from '../components/S3FileViewer';
-import { InstitutionFiles } from '../components/InstitutionFiles';
+import { Button, Dialog, DialogTitle, DialogContent, DialogActions, TextField, CircularProgress, Snackbar } from '@mui/material';
+import { Alert } from '@mui/material';
+import S3Display from '../components/S3Display';
+import { useContext } from "react";
+import { PermissionsContext } from "../contexts/Permissions";
+import Chip from '@mui/material/Chip';
+
+type Permission = {
+  _id: string,
+  user: string,
+  org: any,
+  read: boolean,
+  write: boolean,
+  delete: boolean,
+  admin: boolean,
+  bucket: string
+};
 
 export default function Organization(props: any) {
   const location = useLocation();
-  const [organizationContents, setOrganizationContents] = useState<any>([]);
   const organization = location.state;
+  const [userPermissions, setUserPermissions] = useState<any>();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [folderName, setFolderName] = useState('');
+  const [isCreatingFolder, setIsCreatingFolder] = useState(false);
+  const [hasCreatedFolder, setHasCreatedFolder] = useState(false);
+  const [error, setError] = useState(null);
 
-  const labFiles = [
-    {
-      id: 1,
-      name: 'Lab Report 1',
-      description: 'Report on the first biology lab',
-      createdAt: '2022-01-01T12:00:00.000Z',
-      updatedAt: '2022-01-02T10:00:00.000Z',
-      s3Bucket: 'biology-labs',
-      s3Key: 'lab-reports/lab-report-1.pdf',
-      fileSize: 152000,
-      fileUrl: 'https://s3.amazonaws.com/biology-labs/lab-reports/lab-report-1.pdf'
-    },
-    {
-      id: 2,
-      name: 'Lab Report 2',
-      description: 'Report on the second biology lab',
-      createdAt: '2022-01-05T14:00:00.000Z',
-      updatedAt: '2022-01-06T15:00:00.000Z',
-      s3Bucket: 'biology-labs',
-      s3Key: 'lab-reports/lab-report-2.pdf',
-      fileSize: 205000,
-      fileUrl: 'https://s3.amazonaws.com/biology-labs/lab-reports/lab-report-2.pdf'
-    },
-    {
-      id: 3,
-      name: 'Lab Report 3',
-      description: 'Report on the third biology lab',
-      createdAt: '2022-01-10T09:00:00.000Z',
-      updatedAt: '2022-01-11T11:00:00.000Z',
-      s3Bucket: 'biology-labs',
-      s3Key: 'lab-reports/lab-report-3.pdf',
-      fileSize: 183000,
-      fileUrl: 'https://s3.amazonaws.com/biology-labs/lab-reports/lab-report-3.pdf'
-    },
-    // Add more lab files as needed
-  ];
+  const handleFolderNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setFolderName(event.target.value);
+  };
 
+  const handleCreateFolder = async () => {
+    setIsCreatingFolder(true);
+    try {
+      await createFolder(organization.bucket, folderName);
+      setHasCreatedFolder(true);
+    } catch (error: any) {
+      setError(error);
+    } finally {
+      setIsCreatingFolder(false);
+      setIsModalOpen(false);
+    }
+  };
+  const permissions = useContext(PermissionsContext);
+
+  const getPermissionsForOrganization = (bucket: string) => {
+    const orgPermissions = permissions.find((permission: Permission) => permission.bucket === bucket);
+    return orgPermissions;
+  };
 
   useEffect(() => {
-    setOrganizationContents(getOrganizationContents(location.state.bucket));
-  }, [location.state.bucket]);
+    if (permissions){
+      const permissions = getPermissionsForOrganization(organization.bucket);
+      setUserPermissions(permissions)
+    }
+  }, []);
+
 
   return (
     <div>
       <h2>{organization.name}</h2>
-      <FileUploader s3BucketName={location.state.bucket} />
-      <InstitutionFiles s3BucketName={location.state.bucket} />
+      <div style={{ padding: 10, margin: 10 }}>
+        {
+          (userPermissions && userPermissions.admin) ? <Chip label="Admin" color="success" /> : null
+        }
+        {
+          (userPermissions && userPermissions.write && !userPermissions.admin) ? <Chip label="Write" color="success" /> : null
+        }{
+          (userPermissions && userPermissions.read && !userPermissions.admin) ? <Chip label="Read" color="success" /> : null
+        }{
+          (userPermissions && userPermissions.delete && !userPermissions.admin) ? <Chip label="Delete" color="success" /> : null
+        }
+      </div>
+      {
+        userPermissions && (userPermissions.admin || userPermissions.write) ? (
+          <Button variant="contained" startIcon={<i className="fa fa-folder-plus" aria-hidden="true"></i>} onClick={() => setIsModalOpen(true)}>
+            Create Folder
+          </Button>
+        ) : null
+      }
+      <Dialog open={isModalOpen} onClose={() => setIsModalOpen(false)}>
+        <DialogTitle>Create New Folder</DialogTitle>
+        <DialogContent>
+          <TextField label="Folder Name" value={folderName} onChange={handleFolderNameChange} fullWidth />
+        </DialogContent>
+        <DialogActions>
+          <Button disabled={!folderName || isCreatingFolder} onClick={handleCreateFolder}>
+            {isCreatingFolder ? <CircularProgress size={24} /> : 'Create'}
+          </Button>
+        </DialogActions>
+      </Dialog>
+      <Snackbar open={!!error} autoHideDuration={6000} onClose={() => setError(null)}>
+        <Alert severity="error" sx={{ width: '100%' }} onClose={() => setError(null)}>
+          {error}
+        </Alert>
+      </Snackbar>
+      <Snackbar open={hasCreatedFolder} autoHideDuration={6000} onClose={() => setHasCreatedFolder(false)}>
+        <Alert severity="success" sx={{ width: '100%' }} onClose={() => setHasCreatedFolder(false)}>
+          Folder created successfully!
+        </Alert>
+      </Snackbar>
+      {
+        userPermissions && (userPermissions.admin || userPermissions.write) ? (
+          <FileUploader s3BucketName={location.state.bucket} />
+        ) : null
+      }
+      {
+        userPermissions && (userPermissions.admin || userPermissions.read) ? (
+          <S3Display s3BucketName={location.state.bucket} />
+        ) : null
+      }
     </div>
   )
 }
