@@ -96,7 +96,7 @@ export default function Dashboard() {
         if (path) {
           // if the path is not the same as the current path
             // set the path to the current path
-            setPath([{ name: 'dashboard', path: '/dashboard' }]);
+            setPath([{ name: 'Dashboard', path: '/dashboard' }]);
         }
       }, []);
 
