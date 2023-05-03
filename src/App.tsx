@@ -1,20 +1,22 @@
-import React, { useContext, createContext, useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import './App.css'
 import SideNav from './components/SideNav'
 import { Outlet, useNavigate } from "react-router-dom";
 import { ApolloClient, InMemoryCache, ApolloProvider, gql, HttpLink, useQuery } from '@apollo/client';
-import { Grid } from '@mui/material';
+import { Breadcrumbs, Grid, Link, Typography } from '@mui/material';
 import { AuthContext } from './contexts/Auth';
 import { PermissionsContext, OrganizationPermissionType } from './contexts/Permissions';
 import { setContext } from '@apollo/client/link/context';
 import jwtDecode from 'jwt-decode';
 import { registerMiddleware } from "@bu-sail/cargo-middleware";
 import { client as AWSclient } from './aws-client';
+import { UIContext } from './contexts/UI';
 
 function App() {
 
   const [token, setToken] = useState<string | null>(null);
-  const [isAuthenticated, setIsAuthenticated] = React.useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [path, setPath] = useState<string[]>([]);
   const [permissions, setPermissions] = useState<OrganizationPermissionType[]>();
   const navigate = useNavigate();
   const uri = `${import.meta.env.VITE_AUTH_URL}/graphql`;
@@ -81,18 +83,7 @@ function App() {
             bucket
         }
     }
-  `
-
-  const GET_ORGANIZATIONS = gql`
-    query GetOrganizations {
-        getOriganizations {
-            _id
-            name 
-            bucket
-        }
-    }
   `;
-
 
   useEffect(() => {
     authLogic({}).then(() => {
@@ -123,23 +114,35 @@ function App() {
             isAuthenticated && permissions ? (
               <AuthContext.Provider value={authContext}>
                 <PermissionsContext.Provider value={permissions}>
-                  <Grid container>
-                    <Grid item xs={12} sm={3}>
-                      <SideNav />
+                  <UIContext.Provider value={{ path: path, setPath: setPath }}>
+                    <Grid container>
+                      <Grid item xs={12} sm={3}>
+                        <SideNav />
+                      </Grid>
+                      <Grid item xs={12} sm={9}>
+                        <div>
+                        <Breadcrumbs separator="›" aria-label="breadcrumb">
+                          {
+                            path.map((path : any) => {
+                              return (
+                                <Link key={path.name} color="text.primary" href={path.path}>
+                                  {path.name}
+                                </Link>
+                              )
+                            })
+                          }
+                          </Breadcrumbs>
+                        </div>
+                        <div id='detail'>
+                          <Outlet />
+                        </div>
+                      </Grid>
                     </Grid>
-                    <Grid item xs={12} sm={9}>
-                      <div id='detail'>
-                        <Outlet />
-                      </div>
-                    </Grid>
-                  </Grid>
+                  </UIContext.Provider>
                 </PermissionsContext.Provider>
               </AuthContext.Provider>
             ) : (
               <div>
-                <h2>
-                  Please login
-                </h2>
                 <Outlet />
               </div>
             )

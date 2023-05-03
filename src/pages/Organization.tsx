@@ -1,13 +1,13 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useContext } from 'react'
 import { useLocation } from 'react-router-dom';
 import { createFolder, getOrganizationContents } from '../aws-client';
 import FileUploader from '../components/FileUploader';
 import { Button, Dialog, DialogTitle, DialogContent, DialogActions, TextField, CircularProgress, Snackbar } from '@mui/material';
 import { Alert } from '@mui/material';
 import S3Display from '../components/S3Display';
-import { useContext } from "react";
 import { PermissionsContext } from "../contexts/Permissions";
 import Chip from '@mui/material/Chip';
+import { UIContext } from '../contexts/UI';
 
 type Permission = {
   _id: string,
@@ -29,6 +29,8 @@ export default function Organization(props: any) {
   const [isCreatingFolder, setIsCreatingFolder] = useState(false);
   const [hasCreatedFolder, setHasCreatedFolder] = useState(false);
   const [error, setError] = useState(null);
+  const { path, setPath } = useContext(UIContext);
+
 
   const handleFolderNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setFolderName(event.target.value);
@@ -57,6 +59,17 @@ export default function Organization(props: any) {
     if (permissions){
       const permissions = getPermissionsForOrganization(organization.bucket);
       setUserPermissions(permissions)
+    }
+  }, []);
+
+  useEffect(() => {
+
+    // if set path has been added to global context from app
+    if (path) {
+      // check if path includes dashboard in names
+      const pathIncludesDashboard = path.some((pathItem) => pathItem.name === 'dashboard');
+      if (pathIncludesDashboard) setPath([...path, { name: organization.bucket, path: `/organization/${organization._id}`}]);
+      else setPath([{ name: 'dashboard', path: '/dashboard' }, { name: organization.bucket, path: `/organization/${organization._id}`}]);   
     }
   }, []);
 

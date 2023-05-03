@@ -1,10 +1,12 @@
-import React, { useState, useContext } from 'react'
+import React, { useState, useContext, useEffect } from 'react'
 import { useQuery, gql } from '@apollo/client';
 import { Button, IconButton, Paper, Typography } from '@mui/material';
 import FolderOpenOutlinedIcon from '@mui/icons-material/FolderOpenOutlined';
 import { getOrganizationContents } from '../aws-client';
 import { useNavigate } from 'react-router-dom';
 import { PermissionsContext } from '../contexts/Permissions';
+import { UIContext } from '../contexts/UI';
+
 
 interface Organization {
     _id: string
@@ -19,6 +21,7 @@ export default function Dashboard() {
     const [noAccessOrganizations, setNoAccessOrganizations] = useState<any>([]);
     const navigate = useNavigate();
     const permissions = useContext(PermissionsContext);
+    const { path, setPath } = useContext(UIContext);
     const GET_ORGANIZATIONS = gql`
         query GetOrganizations {
             getOriganizations {
@@ -87,6 +90,15 @@ export default function Dashboard() {
         // route to path /organization/:orgId and pass organization as props
         navigate(`/organization/${organization._id}`, { state: organization });
     }
+
+    useEffect(() => {
+        // if set path has been added to global context from app
+        if (path) {
+          // if the path is not the same as the current path
+            // set the path to the current path
+            setPath([{ name: 'dashboard', path: '/dashboard' }]);
+        }
+      }, []);
 
 
     return (
