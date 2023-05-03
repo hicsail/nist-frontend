@@ -170,14 +170,7 @@ export default function ({ s3BucketName }: { s3BucketName: string }) {
   const s3Client = useContext(S3Context);
 
   useEffect(() => {
-    async function fetchS3Contents() {
-      const contents = await getOrganizationContents(s3Client, s3BucketName);
-      setFiles(contents);
-    }
-    // temp fix to handle race condition
-    setTimeout(() => {
-      fetchS3Contents();
-    }, 150);
+    getOrganizationContents(s3Client, s3BucketName).then((contents) => setFiles(contents));
   }, [s3BucketName]);
 
   return (
