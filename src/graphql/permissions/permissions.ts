@@ -17,6 +17,15 @@ export type CargoGetPermissionsQueryVariables = Types.Exact<{ [key: string]: nev
 
 export type CargoGetPermissionsQuery = { __typename?: 'Query', cargoGetPermissions: Array<{ __typename?: 'CargoPermissions', read: boolean, write: boolean, delete: boolean, admin: boolean, bucket: string }> };
 
+export type CargoChangePermissionsMutationVariables = Types.Exact<{
+  change: Types.CargoPermissionChange;
+  user: Types.Scalars['String'];
+  bucket: Types.Scalars['String'];
+}>;
+
+
+export type CargoChangePermissionsMutation = { __typename?: 'Mutation', cargoChangePermissions: { __typename?: 'CargoPermissions', _id: string, bucket: string, read: boolean, write: boolean, delete: boolean, admin: boolean, user: { __typename?: 'UserModel', id: string, email?: string | null } } };
+
 
 export const CargoGetAllBucketPermissionsDocument = gql`
     query cargoGetAllBucketPermissions($bucket: String!) {
@@ -100,3 +109,47 @@ export function useCargoGetPermissionsLazyQuery(baseOptions?: Apollo.LazyQueryHo
 export type CargoGetPermissionsQueryHookResult = ReturnType<typeof useCargoGetPermissionsQuery>;
 export type CargoGetPermissionsLazyQueryHookResult = ReturnType<typeof useCargoGetPermissionsLazyQuery>;
 export type CargoGetPermissionsQueryResult = Apollo.QueryResult<CargoGetPermissionsQuery, CargoGetPermissionsQueryVariables>;
+export const CargoChangePermissionsDocument = gql`
+    mutation cargoChangePermissions($change: CargoPermissionChange!, $user: String!, $bucket: String!) {
+  cargoChangePermissions(change: $change, user: $user, bucket: $bucket) {
+    _id
+    user {
+      id
+      email
+    }
+    bucket
+    read
+    write
+    delete
+    admin
+  }
+}
+    `;
+export type CargoChangePermissionsMutationFn = Apollo.MutationFunction<CargoChangePermissionsMutation, CargoChangePermissionsMutationVariables>;
+
+/**
+ * __useCargoChangePermissionsMutation__
+ *
+ * To run a mutation, you first call `useCargoChangePermissionsMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCargoChangePermissionsMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [cargoChangePermissionsMutation, { data, loading, error }] = useCargoChangePermissionsMutation({
+ *   variables: {
+ *      change: // value for 'change'
+ *      user: // value for 'user'
+ *      bucket: // value for 'bucket'
+ *   },
+ * });
+ */
+export function useCargoChangePermissionsMutation(baseOptions?: Apollo.MutationHookOptions<CargoChangePermissionsMutation, CargoChangePermissionsMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CargoChangePermissionsMutation, CargoChangePermissionsMutationVariables>(CargoChangePermissionsDocument, options);
+      }
+export type CargoChangePermissionsMutationHookResult = ReturnType<typeof useCargoChangePermissionsMutation>;
+export type CargoChangePermissionsMutationResult = Apollo.MutationResult<CargoChangePermissionsMutation>;
+export type CargoChangePermissionsMutationOptions = Apollo.BaseMutationOptions<CargoChangePermissionsMutation, CargoChangePermissionsMutationVariables>;

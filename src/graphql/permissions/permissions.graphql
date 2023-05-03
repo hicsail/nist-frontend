@@ -22,3 +22,18 @@ query cargoGetPermissions {
     bucket
   }
 }
+
+mutation cargoChangePermissions($change: CargoPermissionChange!, $user: String!, $bucket: String!) {
+  cargoChangePermissions(change: $change, user: $user, bucket: $bucket) {
+    _id,
+    user {
+      id,
+      email
+    },
+    bucket,
+    read,
+    write,
+    delete,
+    admin
+  }
+}
