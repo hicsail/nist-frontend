@@ -13,6 +13,7 @@ import {
     Checkbox,
     Snackbar,
     Button,
+    Paper
 } from '@mui/material';
 import { useQuery, gql } from '@apollo/client';
 import { PermissionsContext } from '../contexts/Permissions';
@@ -57,7 +58,7 @@ const AccessManager = () => {
     const { loading, error, data } = useQuery(CARGO_GET_ALL_BUCKET_PERMISSIONS, {
         variables: { bucket: currentOrganization },
         onCompleted: (data) => {
-            console.log(data);
+            setUserPermissions(data?.cargoGetAllBucketPermissions);
         }
     });
 
@@ -70,9 +71,9 @@ const AccessManager = () => {
         }
     }, [permissions]);
 
-    useEffect(() => {
-        setUserPermissions(data?.cargoGetAllBucketPermissions);
-    }, [data]);
+    // useEffect(() => {
+    //     setUserPermissions(data?.cargoGetAllBucketPermissions);
+    // }, [data]);
 
     const handleSearchChange = (event: any) => {
         setSearchText(event.target.value);
