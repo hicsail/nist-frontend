@@ -85,7 +85,13 @@ const AccessManager = () => {
         const updatedPermission = {
             ...updatedPermissions[index],
             [permissionType]: isChecked,
-        };    
+        };
+
+        if (isChecked && permissionType === 'admin') {
+            updatedPermission.read = isChecked;
+            updatedPermission.write = isChecked;
+            updatedPermission.delete = isChecked;   
+        }
         updatedPermissions[index] = updatedPermission;
         setUserPermissions(updatedPermissions);
     };
