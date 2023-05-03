@@ -29,20 +29,26 @@ export default function Organization(props: any) {
   const [folderName, setFolderName] = useState('');
   const [isCreatingFolder, setIsCreatingFolder] = useState(false);
   const [hasCreatedFolder, setHasCreatedFolder] = useState(false);
+  const [files, setFiles] = useState<any[]>([]);
   const [error, setError] = useState(null);
   const s3Client = useContext(S3Context);
   const { path, setPath } = useContext(UIContext);
 
-
   const handleFolderNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setFolderName(event.target.value);
   };
+
+  async function fetchS3Contents() {
+    const contents = await getOrganizationContents(s3Client, organization.bucket);
+    setFiles(contents);
+  }
 
   const handleCreateFolder = async () => {
     setIsCreatingFolder(true);
     try {
       await createFolder(s3Client, organization.bucket, folderName);
       setHasCreatedFolder(true);
+      fetchS3Contents();
     } catch (error: any) {
       setError(error);
     } finally {
@@ -68,10 +74,15 @@ export default function Organization(props: any) {
 
     // if set path has been added to global context from app
     if (path) {
-      // check if path includes dashboard in names
        setPath([{ name: organization.name, path: `/organization/${organization._id}` }]);
     }
   }, []);
+
+  useEffect(() => {
+
+    fetchS3Contents();
+
+  }, [organization]);
 
 
   return (
@@ -130,12 +141,12 @@ export default function Organization(props: any) {
       </Snackbar>
       {
         userPermissions && (userPermissions.admin || userPermissions.write) ? (
-          <FileUploader s3BucketName={location.state.bucket} />
+          <FileUploader s3BucketName={location.state.bucket} loadFiles={fetchS3Contents} />
         ) : null
       }
       {
         userPermissions && (userPermissions.admin || userPermissions.read) ? (
-          <S3Display s3BucketName={location.state.bucket} />
+          <S3Display s3BucketName={location.state.bucket} files={files} loadFiles={fetchS3Contents} />
         ) : null
       }
     </div>
