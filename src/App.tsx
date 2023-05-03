@@ -118,19 +118,6 @@ function App() {
                         <SideNav />
                       </Grid>
                       <Grid item xs={12} sm={9}>
-                        <div>
-                        <Breadcrumbs separator="›" aria-label="breadcrumb">
-                          {
-                            path.map((path : any) => {
-                              return (
-                                <Link key={path.name} color="text.primary" href={path.path}>
-                                  {path.name}
-                                </Link>
-                              )
-                            })
-                          }
-                          </Breadcrumbs>
-                        </div>
                         <div id='detail'>
                           <Outlet />
                         </div>
