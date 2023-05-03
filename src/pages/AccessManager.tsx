@@ -26,7 +26,7 @@ const AccessManager = () => {
     const [searchText, setSearchText] = useState('');
     const [organizationsWithAdminAccess, setOrganizationsWithAdminAccess] = useState<any[]>([]);
     const [currentOrganization, setCurrentOrganization] = useState('');
-    const [updateMessage, setUpdateMessage] = useState('');
+    const [updateMessage, _setUpdateMessage] = useState('');
     const [snackbarOpen, setSnackbarOpen] = useState(false);
 
     const [page, setPage] = useState(0);

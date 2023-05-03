@@ -12,6 +12,11 @@ export type CargoGetAllBucketPermissionsQueryVariables = Types.Exact<{
 
 export type CargoGetAllBucketPermissionsQuery = { __typename?: 'Query', cargoGetAllBucketPermissions: Array<{ __typename?: 'CargoPermissions', _id: string, bucket: string, read: boolean, write: boolean, delete: boolean, admin: boolean, user: { __typename?: 'UserModel', id: string, email?: string | null } }> };
 
+export type CargoGetPermissionsQueryVariables = Types.Exact<{ [key: string]: never; }>;
+
+
+export type CargoGetPermissionsQuery = { __typename?: 'Query', cargoGetPermissions: Array<{ __typename?: 'CargoPermissions', read: boolean, write: boolean, delete: boolean, admin: boolean, bucket: string }> };
+
 
 export const CargoGetAllBucketPermissionsDocument = gql`
     query cargoGetAllBucketPermissions($bucket: String!) {
@@ -57,3 +62,41 @@ export function useCargoGetAllBucketPermissionsLazyQuery(baseOptions?: Apollo.La
 export type CargoGetAllBucketPermissionsQueryHookResult = ReturnType<typeof useCargoGetAllBucketPermissionsQuery>;
 export type CargoGetAllBucketPermissionsLazyQueryHookResult = ReturnType<typeof useCargoGetAllBucketPermissionsLazyQuery>;
 export type CargoGetAllBucketPermissionsQueryResult = Apollo.QueryResult<CargoGetAllBucketPermissionsQuery, CargoGetAllBucketPermissionsQueryVariables>;
+export const CargoGetPermissionsDocument = gql`
+    query cargoGetPermissions {
+  cargoGetPermissions {
+    read
+    write
+    delete
+    admin
+    bucket
+  }
+}
+    `;
+
+/**
+ * __useCargoGetPermissionsQuery__
+ *
+ * To run a query within a React component, call `useCargoGetPermissionsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useCargoGetPermissionsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useCargoGetPermissionsQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useCargoGetPermissionsQuery(baseOptions?: Apollo.QueryHookOptions<CargoGetPermissionsQuery, CargoGetPermissionsQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<CargoGetPermissionsQuery, CargoGetPermissionsQueryVariables>(CargoGetPermissionsDocument, options);
+      }
+export function useCargoGetPermissionsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<CargoGetPermissionsQuery, CargoGetPermissionsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<CargoGetPermissionsQuery, CargoGetPermissionsQueryVariables>(CargoGetPermissionsDocument, options);
+        }
+export type CargoGetPermissionsQueryHookResult = ReturnType<typeof useCargoGetPermissionsQuery>;
+export type CargoGetPermissionsLazyQueryHookResult = ReturnType<typeof useCargoGetPermissionsLazyQuery>;
+export type CargoGetPermissionsQueryResult = Apollo.QueryResult<CargoGetPermissionsQuery, CargoGetPermissionsQueryVariables>;

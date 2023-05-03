@@ -12,3 +12,13 @@ query cargoGetAllBucketPermissions($bucket: String!) {
     admin
   }
 }
+
+query cargoGetPermissions {
+  cargoGetPermissions {
+    read,
+    write,
+    delete,
+    admin,
+    bucket
+  }
+}
