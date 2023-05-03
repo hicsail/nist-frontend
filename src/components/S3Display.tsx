@@ -213,22 +213,10 @@ function S3FileList({ files, s3BucketName, reloadFiles }: { files: any[], s3Buck
   );
 }
 
-export default function ({ s3BucketName }: { s3BucketName: string }) {
+export default function ({ s3BucketName, files, loadFiles }: { s3BucketName: string, files: any[], loadFiles: () => void }) {
 
-  const [files, setFiles] = useState<any>([]);
   const [filteredFiles, setFilteredFiles] = useState<any>([]);
   const s3Client = useContext(S3Context);
-  async function fetchS3Contents() {
-    const contents = await getOrganizationContents(s3Client, s3BucketName);
-    setFiles(contents);
-    setFilteredFiles(contents);
-  }
-
-  useEffect(() => {
-
-    fetchS3Contents();
-
-  }, [s3BucketName]);
 
   const handleFilter = (event: any) => {
     const searchQuery = event.target.value;
@@ -236,6 +224,10 @@ export default function ({ s3BucketName }: { s3BucketName: string }) {
     console.log(filteredFiles);
     setFilteredFiles(filteredFiles);
   };
+
+  useEffect(() => {
+    setFilteredFiles(files);
+  }, [files]);
 
   return (
     <div>
@@ -252,7 +244,7 @@ export default function ({ s3BucketName }: { s3BucketName: string }) {
             </TableRow>
           </TableHead>
           <TableBody>
-            <S3FileList files={filteredFiles} s3BucketName={s3BucketName} reloadFiles={fetchS3Contents} />
+            <S3FileList files={filteredFiles} s3BucketName={s3BucketName} reloadFiles={loadFiles} />
           </TableBody>
         </Table>
       </TableContainer>

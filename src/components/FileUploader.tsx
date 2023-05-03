@@ -18,9 +18,10 @@ const dropZoneStyle = {
 
 type Props = {
     s3BucketName: string;
+    loadFiles: () => void;
 };
 
-function FileUploader({ s3BucketName }: Props) {
+function FileUploader({ s3BucketName, loadFiles }: Props) {
     const [file, setFile] = useState<File | null>(null);
     const [snackbarMessage, setSnackbarMessage] = useState("");
     const [openSnackbar, setOpenSnackbar] = useState(false);
@@ -72,6 +73,8 @@ function FileUploader({ s3BucketName }: Props) {
             setSnackbarMessage(`Successfully uploaded file ${file.name} to S3 bucket ${s3BucketName}`);
             setSnackbarSeverity("success");
             setOpenSnackbar(true);
+            setFile(null);
+            loadFiles();
         } else {
             setSnackbarMessage(`Failed to upload file ${file.name} to S3 bucket ${s3BucketName}`);
             setSnackbarSeverity("error");
