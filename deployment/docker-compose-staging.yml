@@ -5,3 +5,5 @@ services:
     restart: always
     ports:
       - 3009:80
+    env_file:
+      - ../stack.env
