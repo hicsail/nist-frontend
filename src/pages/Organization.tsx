@@ -69,9 +69,8 @@ export default function Organization(props: any) {
     // if set path has been added to global context from app
     if (path) {
       // check if path includes dashboard in names
-      const pathIncludesDashboard = path.some((pathItem) => pathItem.name === 'Dashboard');
-      console.log(pathIncludesDashboard);
-      if (pathIncludesDashboard && path.length < 2) setPath([...path, { name: organization.name, path: `/organization/${organization._id}`}]);
+      const pathIncludesDashboard = path.some((pathItem) => pathItem.name === 'dashboard');
+      if (pathIncludesDashboard) setPath([...path, { name: organization.name, path: `/organization/${organization._id}`}]);
       else setPath([{ name: 'Dashboard', path: '/dashboard' }, { name: organization.name, path: `/organization/${organization._id}`}]);   
     }
   }, []);

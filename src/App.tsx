@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './App.css'
 import SideNav from './components/SideNav'
 import { Outlet, useNavigate } from "react-router-dom";
-import { ApolloClient, InMemoryCache, ApolloProvider, gql, HttpLink } from '@apollo/client';
+import { ApolloClient, InMemoryCache, ApolloProvider, gql, HttpLink, useQuery } from '@apollo/client';
 import { Breadcrumbs, Grid, Link, Typography } from '@mui/material';
 import { AuthContext } from './contexts/Auth';
 import { PermissionsContext, OrganizationPermissionType } from './contexts/Permissions';
