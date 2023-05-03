@@ -17,7 +17,7 @@ export default function Dashboard() {
     const { path, setPath } = useContext(UIContext);
 
     // function that takes in a list of organizations and returns a list of JSX elements with folder icon and organization name
-    const renderOrganizations = (organizations: any, canClick: boolean) => {
+    const renderOrganizations = (organizations: Organization[], canClick: boolean) => {
         return organizations.map((organization: Organization) => (
             <div key={organization.name}>
                 <div>
@@ -30,8 +30,8 @@ export default function Dashboard() {
         ))
     }
 
-    const filterOrgsByPermission = (organizations: any, permission: string) => {
-        let orgs: any[] = [];
+    const filterOrgsByPermission = (organizations: Organization[], permission: string) => {
+        let orgs: Organization[] = [];
         organizations.forEach((organization: Organization) => {
             if (permission === 'admin') {
                 // get permission for org from permissions

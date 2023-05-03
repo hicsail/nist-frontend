@@ -38,15 +38,6 @@ const CARGO_GET_ALL_BUCKET_PERMISSIONS = gql`
     }
   `;
 
-type User = {
-    id: number;
-    name: string;
-    read: boolean;
-    write: boolean;
-    delete: boolean;
-    admin: boolean;
-};
-
 const AccessManager = () => {
     const [userPermissions, setUserPermissions] = useState<any>([]);
     const [searchText, setSearchText] = useState('');
@@ -99,11 +90,10 @@ const AccessManager = () => {
             ...updatedPermissions[index],
             [permissionType]: isChecked,
         };
-
         if (isChecked && permissionType === 'admin') {
             updatedPermission.read = isChecked;
             updatedPermission.write = isChecked;
-            updatedPermission.delete = isChecked;   
+            updatedPermission.delete = isChecked;
         }
         updatedPermissions[index] = updatedPermission;
         setUserPermissions(updatedPermissions);
@@ -130,7 +120,7 @@ const AccessManager = () => {
         const firstPageIndex = page * rowsPerPage;
         const lastPageIndex = firstPageIndex + rowsPerPage;
         return filteredUserPermissions.slice(firstPageIndex, lastPageIndex);
-    }, [page, rowsPerPage, filteredUserPermissions]); 
+    }, [page, rowsPerPage, filteredUserPermissions]);
 
     if (error) {
         return <p>Error fetching access manager: {error.message}</p>;
@@ -225,7 +215,7 @@ const AccessManager = () => {
                             </TableBody>
                         </Table>
                     </TableContainer>
-                    <TablePagination 
+                    <TablePagination
                         rowsPerPageOptions={[5, 10, 25]}
                         component="div"
                         count={filteredUserPermissions.length}
