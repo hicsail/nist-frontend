@@ -5,7 +5,7 @@ import { Outlet, useNavigate } from "react-router-dom";
 import { ApolloClient, InMemoryCache, ApolloProvider, gql, HttpLink, useQuery } from '@apollo/client';
 import { Breadcrumbs, Grid, Link, Typography } from '@mui/material';
 import { AuthContext } from './contexts/Auth';
-import { PermissionsContext, OrganizationPermissionType } from './contexts/Permissions';
+import { PermissionsProvider } from './contexts/Permissions';
 import { setContext } from '@apollo/client/link/context';
 import jwtDecode from 'jwt-decode';
 import { UIContext } from './contexts/UI';
@@ -15,9 +15,8 @@ import { S3Provider } from './contexts/s3.context';
 function App() {
 
   const [token, setToken] = useState<string | null>(null);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [path, setPath] = useState<any[]>([]);
-  const [permissions, setPermissions] = useState<OrganizationPermissionType[]>();
+  const [isAuthenticated, setIsAuthenticated] = React.useState(false);
   const navigate = useNavigate();
   const uri = `${import.meta.env.VITE_AUTH_URL}/graphql`;
 
@@ -73,18 +72,7 @@ function App() {
 
   const client = createNewClient();
 
-  const GET_PERMISSIONS = gql`
-    query cargoGetPermissions {
-        cargoGetPermissions {
-            read
-            write
-            delete
-            admin
-            bucket
-        }
-    }
-  `;
-
+/*
   useEffect(() => {
     authLogic({}).then(() => {
       client.query({ query: GET_PERMISSIONS }).then(async (result) => {
@@ -92,7 +80,7 @@ function App() {
         setPermissions(allPermissions);
       });
     });
-  }, [token]);
+  }, [token]); */
 
   const authContext = {
     isAuthenticated,
@@ -112,9 +100,8 @@ function App() {
             <ApolloProvider client={client}>
             <UIContext.Provider value={{ path: path, setPath: setPath }}>
               {
-                isAuthenticated && permissions ? (
-                  <AuthContext.Provider value={authContext}>
-                    <PermissionsContext.Provider value={permissions}>
+                isAuthenticated ? (
+                    <PermissionsProvider>
                       <Grid container>
                         <Grid item xs={12} sm={3}>
                           <SideNav />
@@ -125,8 +112,7 @@ function App() {
                           </div>
                         </Grid>
                       </Grid>
-                    </PermissionsContext.Provider>
-                  </AuthContext.Provider>
+                    </PermissionsProvider>
                 ) : (
                   <div>
                     <h2>

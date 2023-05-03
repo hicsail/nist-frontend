@@ -9,17 +9,7 @@ import { PermissionsContext } from "../contexts/Permissions";
 import Chip from '@mui/material/Chip';
 import { S3Context } from '../contexts/s3.context';
 import { UIContext } from '../contexts/UI';
-
-type Permission = {
-  _id: string,
-  user: string,
-  org: any,
-  read: boolean,
-  write: boolean,
-  delete: boolean,
-  admin: boolean,
-  bucket: string
-};
+import { CargoPermissions } from '../graphql/graphql';
 
 export default function Organization(props: any) {
   const location = useLocation();
@@ -59,7 +49,7 @@ export default function Organization(props: any) {
   const permissions = useContext(PermissionsContext);
 
   const getPermissionsForOrganization = (bucket: string) => {
-    const orgPermissions = permissions.find((permission: Permission) => permission.bucket === bucket);
+    const orgPermissions = permissions.find((permission: CargoPermissions) => permission.bucket === bucket);
     return orgPermissions;
   };
 
@@ -68,7 +58,7 @@ export default function Organization(props: any) {
       const permissions = getPermissionsForOrganization(organization.bucket);
       setUserPermissions(permissions)
     }
-  }, []);
+  }, [permissions]);
 
   useEffect(() => {
 

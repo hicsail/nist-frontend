@@ -70,7 +70,7 @@ export default function Dashboard() {
       if (orgQuery.error) {
         console.error(orgQuery.error);
       }
-    }, [orgQuery.data, orgQuery.error]);
+    }, [orgQuery.data, orgQuery.error, permissions]);
 
     const routeToOrganization = (organization: Organization) => {
         // route to path /organization/:orgId and pass organization as props
