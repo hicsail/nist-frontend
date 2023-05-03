@@ -1,4 +1,3 @@
-import React from 'react';
 import { Snackbar } from '@mui/material';
 import Button from '@mui/material/Button';
 import { useEffect, useState } from 'react';
