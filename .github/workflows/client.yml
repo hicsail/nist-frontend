@@ -35,10 +35,11 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           context: .
-          push: true
+          push: ${{ github.event_name != 'pull_request' }}
           tags: hicsail/nist-frontend:test
       - name: Push to Staging
         uses: fjogeleit/http-request-action@v1
+        if: github.ref == 'refs/heads/main'
         with:
           method: "POST"
           url: ${{ secrets.PORTAINER_WEBHOOK }}
