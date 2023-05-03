@@ -39,40 +39,7 @@ function formatBytes(size: number): string {
 }
 
 function FileList({ files, s3BucketName }: { files: any[], s3BucketName: string }) {
-<<<<<<< HEAD
-    const s3Client = useContext(S3Context);
-    return (
-        <TableContainer component={Paper}>
-            <Table>
-                <TableHead>
-                    <TableRow>
-                        <TableCell>Name</TableCell>
-                        <TableCell>Last Modified</TableCell>
-                        <TableCell>Size</TableCell>
-                        <TableCell>Actions</TableCell>
-                    </TableRow>
-                </TableHead>
-                <TableBody>
-                    {files.map((file: any) => (
-                        <TableRow key={file.Key}>
-                            <TableCell>{file.Key}</TableCell>
-                            <TableCell>{file.LastModified.toISOString()}</TableCell>
-                            <TableCell>{formatBytes(file.Size)}</TableCell>
-                            <TableCell>
-                                <IconButton size="small" onClick={() => downloadFile(s3Client, s3BucketName, file.Key)}>
-                                    <GetAppIcon />
-                                </IconButton>
-                                <IconButton size="small" onClick={() => deleteFile(s3Client, s3BucketName, file.Key)}>
-                                    <DeleteIcon />
-                                </IconButton>
-                            </TableCell>
-                        </TableRow>
-                    ))}
-                </TableBody>
-            </Table>
-        </TableContainer>
-    );
-=======
+  const s3Client = useContext(S3Context);
   return (
     <TableContainer component={Paper}>
       <Table>
@@ -91,10 +58,10 @@ function FileList({ files, s3BucketName }: { files: any[], s3BucketName: string 
               <TableCell>{file.LastModified.toISOString()}</TableCell>
               <TableCell>{formatBytes(file.Size)}</TableCell>
               <TableCell>
-                <IconButton size="small" onClick={() => downloadFile(s3BucketName, file.Key)}>
+                <IconButton size="small" onClick={() => downloadFile(s3Client, s3BucketName, file.Key)}>
                   <GetAppIcon />
                 </IconButton>
-                <IconButton size="small" onClick={() => deleteFile(s3BucketName, file.Key)}>
+                <IconButton size="small" onClick={() => deleteFile(s3Client, s3BucketName, file.Key)}>
                   <DeleteIcon />
                 </IconButton>
               </TableCell>
@@ -104,7 +71,6 @@ function FileList({ files, s3BucketName }: { files: any[], s3BucketName: string 
       </Table>
     </TableContainer>
   );
->>>>>>> 067d412 (Indent fix)
 }
 
 function FolderItem({
@@ -185,84 +151,83 @@ function FolderItem({
 
 function S3FileList({ files, s3BucketName, reloadFiles }: { files: any[], s3BucketName: string, reloadFiles: () => void }) {
 
-    // state variables to control toast display
-    const [open, setOpen] = useState(false);
-    const [message, setMessage] = useState("");
-    const handleClose = () => setOpen(false);
-    const s3Client = useContext(S3Context);
+  // state variables to control toast display
+  const [open, setOpen] = useState(false);
+  const [message, setMessage] = useState("");
+  const handleClose = () => setOpen(false);
+  const s3Client = useContext(S3Context);
 
-    return (
-        <>
-            {files.map((file) => {
-                const isFolder = file.Key.endsWith("/");
-                return isFolder ? (
-                    <FolderItem
-                        key={file.Key}
-                        folderName={file.Key}
-                        s3BucketName={s3BucketName}
-                        lastModified={file.LastModified}
-                    />
-                ) : (
-                    <TableRow key={file.Key}>
-                        <TableCell>
-                            <IconButton size="small">
-                                <ArticleOutlinedIcon />
-                            </IconButton>
-                            File
-                        </TableCell>
-                        <TableCell>{file.Key}</TableCell>
-                        <TableCell>{file.LastModified.toDateString()}</TableCell>
-                        <TableCell>{formatBytes(file.Size)}</TableCell>
-                        <TableCell>
-                            <IconButton size='small' onClick={async () => {
-                                if (confirm("Are you sure you want to delete this file?")){
-                                    const success = await deleteFile(s3Client, s3BucketName, file.Key)
-                                    if (success) setMessage("File deleted successfully");
-                                    setOpen(true);
-                                    reloadFiles();
-                                }
-                            }
-                            }>
-                                <DeleteIcon />
-                            </IconButton>
-                            <IconButton onClick={async () => {
-                                await downloadFile(s3Client, s3BucketName, file.Key)
-                                setMessage("File downloaded successfully");
-                                setOpen(true);
-                            }}>
-                                <GetAppIcon />
-                            </IconButton>
-                        </TableCell>
-                    </TableRow>
-                );
-            })}
-            <Snackbar
-                open={open}
-                autoHideDuration={2000}
-                onClose={handleClose}
-                message={message}
-            />
-        </>
-    );
+  return (
+    <>
+      {files.map((file) => {
+        const isFolder = file.Key.endsWith("/");
+        return isFolder ? (
+          <FolderItem
+            key={file.Key}
+            folderName={file.Key}
+            s3BucketName={s3BucketName}
+            lastModified={file.LastModified}
+          />
+        ) : (
+          <TableRow key={file.Key}>
+            <TableCell>
+              <IconButton size="small">
+                <ArticleOutlinedIcon />
+              </IconButton>
+              File
+            </TableCell>
+            <TableCell>{file.Key}</TableCell>
+            <TableCell>{file.LastModified.toDateString()}</TableCell>
+            <TableCell>{formatBytes(file.Size)}</TableCell>
+            <TableCell>
+              <IconButton size='small' onClick={async () => {
+                if (confirm("Are you sure you want to delete this file?")) {
+                  const success = await deleteFile(s3Client, s3BucketName, file.Key)
+                  if (success) setMessage("File deleted successfully");
+                  setOpen(true);
+                  reloadFiles();
+                }
+              }
+              }>
+                <DeleteIcon />
+              </IconButton>
+              <IconButton onClick={async () => {
+                await downloadFile(s3Client, s3BucketName, file.Key)
+                setMessage("File downloaded successfully");
+                setOpen(true);
+              }}>
+                <GetAppIcon />
+              </IconButton>
+            </TableCell>
+          </TableRow>
+        );
+      })}
+      <Snackbar
+        open={open}
+        autoHideDuration={2000}
+        onClose={handleClose}
+        message={message}
+      />
+    </>
+  );
 }
 
 export default function ({ s3BucketName }: { s3BucketName: string }) {
 
-    const [files, setFiles] = useState<any>([]);
-    const [filteredFiles, setFilteredFiles] = useState<any>([]);
-    const s3Client = useContext(S3Context);
-    async function fetchS3Contents() {
-        const contents = await getOrganizationContents(s3Client, s3BucketName);
-        setFiles(contents);
-        setFilteredFiles(contents);
-    }
+  const [files, setFiles] = useState<any>([]);
+  const [filteredFiles, setFilteredFiles] = useState<any>([]);
+  const s3Client = useContext(S3Context);
+  async function fetchS3Contents() {
+    const contents = await getOrganizationContents(s3Client, s3BucketName);
+    setFiles(contents);
+    setFilteredFiles(contents);
+  }
 
-    useEffect(() => {
-        
-        // temp fix to handle race condition
-            fetchS3Contents();
-        
-    }, [s3BucketName]);
+  useEffect(() => {
+
+    fetchS3Contents();
+
+  }, [s3BucketName]);
 
   const handleFilter = (event: any) => {
     const searchQuery = event.target.value;

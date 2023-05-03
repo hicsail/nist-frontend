@@ -70,7 +70,8 @@ export default function Organization(props: any) {
     if (path) {
       // check if path includes dashboard in names
       const pathIncludesDashboard = path.some((pathItem) => pathItem.name === 'Dashboard');
-      if (pathIncludesDashboard) setPath([...path, { name: organization.name, path: `/organization/${organization._id}`}]);
+      console.log(pathIncludesDashboard);
+      if (pathIncludesDashboard && path.length < 2) setPath([...path, { name: organization.name, path: `/organization/${organization._id}`}]);
       else setPath([{ name: 'Dashboard', path: '/dashboard' }, { name: organization.name, path: `/organization/${organization._id}`}]);   
     }
   }, []);

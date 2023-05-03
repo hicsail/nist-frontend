@@ -9,12 +9,13 @@ import { PermissionsContext, OrganizationPermissionType } from './contexts/Permi
 import { setContext } from '@apollo/client/link/context';
 import jwtDecode from 'jwt-decode';
 import {S3Provider} from './contexts/s3.context';
+import { UIContext } from './contexts/UI';
 
 function App() {
 
   const [token, setToken] = useState<string | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [path, setPath] = useState<string[]>([]);
+  const [path, setPath] = useState<any[]>([]);
   const [permissions, setPermissions] = useState<OrganizationPermissionType[]>();
   const navigate = useNavigate();
   const uri = `${import.meta.env.VITE_AUTH_URL}/graphql`;
@@ -70,7 +71,7 @@ function App() {
   }
 
   const client = createNewClient();
-  
+
   const GET_PERMISSIONS = gql`
     query cargoGetPermissions {
         cargoGetPermissions {
@@ -107,6 +108,7 @@ function App() {
       >
         <AuthContext.Provider value={authContext}>
           <ApolloProvider client={client}>
+          <UIContext.Provider value={{ path: path, setPath: setPath }}>
             {
               isAuthenticated && permissions ? (
                 <AuthContext.Provider value={authContext}>
@@ -145,6 +147,7 @@ function App() {
                 </div>
               )
             }
+            </UIContext.Provider>
           </ApolloProvider>
         </AuthContext.Provider>
       </S3Provider>
