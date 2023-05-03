@@ -2,18 +2,20 @@ import React, { useState, useEffect } from 'react';
 import './App.css'
 import SideNav from './components/SideNav'
 import { Outlet, useNavigate } from "react-router-dom";
-import { ApolloClient, InMemoryCache, ApolloProvider, gql, HttpLink } from '@apollo/client';
-import { Grid } from '@mui/material';
+import { ApolloClient, InMemoryCache, ApolloProvider, gql, HttpLink, useQuery } from '@apollo/client';
+import { Breadcrumbs, Grid, Link, Typography } from '@mui/material';
 import { AuthContext } from './contexts/Auth';
 import { PermissionsContext, OrganizationPermissionType } from './contexts/Permissions';
 import { setContext } from '@apollo/client/link/context';
 import jwtDecode from 'jwt-decode';
 import {S3Provider} from './contexts/s3.context';
+import { UIContext } from './contexts/UI';
 
 function App() {
 
   const [token, setToken] = useState<string | null>(null);
-  const [isAuthenticated, setIsAuthenticated] = React.useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [path, setPath] = useState<any[]>([]);
   const [permissions, setPermissions] = useState<OrganizationPermissionType[]>();
   const navigate = useNavigate();
   const uri = `${import.meta.env.VITE_AUTH_URL}/graphql`;
@@ -80,18 +82,7 @@ function App() {
             bucket
         }
     }
-  `
-
-  const GET_ORGANIZATIONS = gql`
-    query GetOrganizations {
-        getOriganizations {
-            _id
-            name
-            bucket
-        }
-    }
   `;
-
 
   useEffect(() => {
     authLogic({}).then(() => {
@@ -117,6 +108,7 @@ function App() {
       >
         <AuthContext.Provider value={authContext}>
           <ApolloProvider client={client}>
+          <UIContext.Provider value={{ path: path, setPath: setPath }}>
             {
               isAuthenticated && permissions ? (
                 <AuthContext.Provider value={authContext}>
@@ -142,6 +134,7 @@ function App() {
                 </div>
               )
             }
+            </UIContext.Provider>
           </ApolloProvider>
         </AuthContext.Provider>
       </S3Provider>

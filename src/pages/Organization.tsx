@@ -2,12 +2,13 @@ import React, { useEffect, useState, useContext } from 'react'
 import { useLocation } from 'react-router-dom';
 import { createFolder, getOrganizationContents } from '../aws-client';
 import FileUploader from '../components/FileUploader';
-import { Button, Dialog, DialogTitle, DialogContent, DialogActions, TextField, CircularProgress, Snackbar } from '@mui/material';
+import { Button, Dialog, DialogTitle, DialogContent, DialogActions, TextField, CircularProgress, Snackbar, Breadcrumbs, Link } from '@mui/material';
 import { Alert } from '@mui/material';
 import S3Display from '../components/S3Display';
 import { PermissionsContext } from "../contexts/Permissions";
 import Chip from '@mui/material/Chip';
 import { S3Context } from '../contexts/s3.context';
+import { UIContext } from '../contexts/UI';
 
 type Permission = {
   _id: string,
@@ -30,6 +31,8 @@ export default function Organization(props: any) {
   const [hasCreatedFolder, setHasCreatedFolder] = useState(false);
   const [error, setError] = useState(null);
   const s3Client = useContext(S3Context);
+  const { path, setPath } = useContext(UIContext);
+
 
   const handleFolderNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setFolderName(event.target.value);
@@ -55,15 +58,35 @@ export default function Organization(props: any) {
   };
 
   useEffect(() => {
-    if (permissions){
+    if (permissions) {
       const permissions = getPermissionsForOrganization(organization.bucket);
       setUserPermissions(permissions)
+    }
+  }, []);
+
+  useEffect(() => {
+
+    // if set path has been added to global context from app
+    if (path) {
+      // check if path includes dashboard in names
+       setPath([{ name: organization.name, path: `/organization/${organization._id}` }]);
     }
   }, []);
 
 
   return (
     <div>
+      <Breadcrumbs separator="›" aria-label="breadcrumb">
+        {
+          path.map((path: any) => {
+            return (
+              <Link key={path.name} color="text.primary" href={path.path}>
+                {path.name}
+              </Link>
+            )
+          })
+        }
+      </Breadcrumbs>
       <h2>{organization.name}</h2>
       <div style={{ padding: 10, margin: 10 }}>
         {

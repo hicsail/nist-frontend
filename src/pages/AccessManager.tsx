@@ -17,6 +17,7 @@ import {
 import { useQuery, gql } from '@apollo/client';
 import { PermissionsContext } from '../contexts/Permissions';
 import { HandleUpdate } from '../components/UpdatePermissionsButton';
+import { UIContext } from '../contexts/UI';
 
 const CARGO_GET_ALL_BUCKET_PERMISSIONS = gql`
     query CargoGetAllBucketPermissions($bucket: String!) {
@@ -53,6 +54,7 @@ const AccessManager = () => {
     const [snackbarOpen, setSnackbarOpen] = useState(false);
 
     const permissions = useContext(PermissionsContext);
+    const { path, setPath } = useContext(UIContext);
 
     const { loading, error, data } = useQuery(CARGO_GET_ALL_BUCKET_PERMISSIONS, {
         variables: { bucket: currentOrganization },
@@ -73,6 +75,13 @@ const AccessManager = () => {
     useEffect(() => {
         setUserPermissions(data?.cargoGetAllBucketPermissions);
     }, [data]);
+
+    useEffect(() => {
+        if (path){
+            setPath([]);
+        }
+
+    },[]);
 
     const handleSearchChange = (event: any) => {
         setSearchText(event.target.value);
