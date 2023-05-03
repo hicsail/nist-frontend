@@ -72,15 +72,9 @@ function App() {
 
   const client = createNewClient();
 
-/*
   useEffect(() => {
-    authLogic({}).then(() => {
-      client.query({ query: GET_PERMISSIONS }).then(async (result) => {
-        const allPermissions = result.data.cargoGetPermissions;
-        setPermissions(allPermissions);
-      });
-    });
-  }, [token]); */
+    authLogic({});
+  }, [token]);
 
   const authContext = {
     isAuthenticated,

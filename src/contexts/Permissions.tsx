@@ -13,7 +13,6 @@ export const PermissionsProvider: FC<PermissionsProviderProps> = (props) => {
   const { data } = useCargoGetPermissionsQuery({});
 
   useEffect(() => {
-    console.log(data);
     if (data) {
       setPermissions(data.cargoGetPermissions as CargoPermissions[]);
     }
