@@ -4,9 +4,11 @@ import {
   TableHead,
   TableCell,
   TableRow,
-  Table
+  Table,
+  Typography,
+  Button
 } from '@mui/material';
-import { FC, useContext, useState, useEffect } from 'react';
+import { FC, useContext, useState, useEffect, ReactNode, Dispatch, SetStateAction } from 'react';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import DeleteIcon from '@mui/icons-material/Delete';
 import FolderIcon from '@mui/icons-material/Folder';
@@ -35,11 +37,26 @@ const getObjectsForPath = async (s3Client: S3Client, bucket: string, path: strin
   });
 }
 
+const formatBytes = (size: number | undefined): string => {
+  if (!size || size == 0) {
+    return '-';
+  }
+
+  const units = ['B', 'KB', 'MB', 'GB', 'TB'];
+  let n = 0;
+  while (size >= 1024 && n < units.length - 1) {
+    size /= 1024;
+    n++;
+  }
+  return `${size.toFixed(2)} ${units[n]}`;
+};
+
 interface FileRowProps {
   object: S3Object;
+  setPath: Dispatch<SetStateAction<string>>;
 }
 
-const FileRowView: FC<FileRowProps> = ({ object }) => {
+const FileRowView: FC<FileRowProps> = ({ object, setPath }) => {
   const fileComponents = object.Key!.split('/');
   const isFolder = fileComponents[fileComponents.length - 1] == '';
 
@@ -47,11 +64,32 @@ const FileRowView: FC<FileRowProps> = ({ object }) => {
   // second to last in the case of a folder
   const name = fileComponents[isFolder ? fileComponents.length - 2 : fileComponents.length - 1];
 
+  // Determine if the view of the file should just be the name or the
+  // folder view
+  let fileNameView: ReactNode = name;
+  if (isFolder) {
+    fileNameView = (
+      <Button variant='text'
+        onClick={() => setPath(object.Key!)}
+        style={{
+          alignItems: 'center',
+          display: 'flex',
+          color: 'black',
+          outline: 'none'
+        }}>
+        <FolderIcon style={{ marginRight: 3 }} />
+        {name}
+      </Button>
+    );
+  }
+
   return (
     <TableRow>
-      <TableCell>{isFolder ? <FolderIcon /> : <></>}{name}</TableCell>
-      <TableCell>{object.LastModified ? object.LastModified.getDate() : ''}</TableCell>
-      <TableCell>{object.Size}</TableCell>
+      <TableCell>
+        {fileNameView}
+      </TableCell>
+      <TableCell>{object.LastModified ? object.LastModified.toLocaleDateString() : ''}</TableCell>
+      <TableCell>{formatBytes(object.Size)}</TableCell>
     </TableRow>
   );
 };
@@ -79,7 +117,7 @@ export const FileListView: FC = () => {
           </TableRow>
         </TableHead>
 
-        {objects.map((object) => <FileRowView object={object} />)}
+        {objects.map((object) => <FileRowView object={object} setPath={setPath} />)}
 
       </Table>
     </TableContainer>
