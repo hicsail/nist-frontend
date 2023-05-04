@@ -30,6 +30,7 @@ import FolderIcon from '@mui/icons-material/Folder';
 import { IconButton } from '@mui/material';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import AddIcon from '@mui/icons-material/Add';
+import { FileListView } from '../components/file-list-view';
 
 const FileBreadcrumbs: FC = () => {
   const { path } = useContext(UIContext);
@@ -49,7 +50,7 @@ const FileBreadcrumbs: FC = () => {
   );
 }
 
-export const Organization: FC<any> = (props: any) => {
+export const Organization: FC = () => {
   const location = useLocation();
   const organization = location.state;
   const [userPermissions, setUserPermissions] = useState<any>();
@@ -137,6 +138,8 @@ export const Organization: FC<any> = (props: any) => {
         <Typography variant='h1'>Folder Name</Typography>
         <Button variant='contained'><AddIcon />New</Button>
       </Box>
+
+      <FileListView />
 
 
     </Box>
