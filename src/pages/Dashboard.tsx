@@ -7,8 +7,6 @@ import { UIContext } from '../contexts/UI';
 import { useGetOrganizationsQuery } from '../graphql/organization/organization';
 import { Organization } from '../graphql/graphql';
 import thumbnail from '../assets/thumbnail.png';
-// import favorite icon
-import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder';
 
 export default function Dashboard() {
 
