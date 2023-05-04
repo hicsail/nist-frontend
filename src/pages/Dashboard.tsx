@@ -7,6 +7,7 @@ import { UIContext } from '../contexts/UI';
 import { useGetOrganizationsQuery } from '../graphql/organization/organization';
 import { Organization } from '../graphql/graphql';
 import thumbnail from '../assets/thumbnail.png';
+import OrganizationCard from '../components/OrganizationCard';
 
 export default function Dashboard() {
 
@@ -21,22 +22,10 @@ export default function Dashboard() {
     const renderOrganizations = (organizations: Organization[], canClick: boolean, accessType: string) => {
         // card for each organization that show cases organization name and thumbnail image
         return organizations.map((organization: Organization) => (
-            <div key={organization.name} style={{ margin: 20 }}>
-                <Card onClick={() => canClick ? routeToOrganization(organization) : alert("Contact Administrator for Org to request Access")}>
-                    <CardActionArea>
-                        <div style={{ padding: 10, display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-                            <img src={thumbnail} style={{ width: 100, height: 100, margin: 20 }} />
-                            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', marginRight: 10 }}>
-                                <div style={{ marginBottom: 15 }}>
-                                    <Chip label={accessType} variant="outlined" />
-                                    {/* right now there is no favorite functionality <BookmarkBorderIcon style={{ marginLeft: 10 }} /> */}
-                                </div>
-                                <Typography variant='h3'>{organization.name}</Typography>
-                            </div>
-                        </div>
-                    </CardActionArea>
-                </Card>
+            <div key={organization._id}>
+                <OrganizationCard  organization={organization} canClick={canClick} accessType={accessType} />
             </div>
+
         ))
     }
 
