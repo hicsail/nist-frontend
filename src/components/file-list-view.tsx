@@ -31,7 +31,7 @@ const getObjectsForPath = async (s3Client: S3Client, bucket: string, path: strin
     }
 
     // Don't include the path itself
-    if (key == path) {
+    if (key == path || path == `/${key}`) {
       return false;
     }
 

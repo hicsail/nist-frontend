@@ -44,7 +44,6 @@ const FileBreadcrumbs: FC<{ path: string}> = ({ path }) => {
       </div>
       {
         components.map((path, index) => {
-          console.log('Path: ', path);
           return (
             <div style={{ alignItems: 'center', display: 'flex' }} key={index + 1}>
               <FolderIcon />{path}
@@ -69,7 +68,7 @@ export const Organization: FC = () => {
 
   // Determine the file path to visualize
   const splat = useParams()['*'];
-  const [path, setPath] = useState(`/`);
+  const [path, setPath] = useState(`/${splat}`);
 
   useEffect(() => {
     setPath(`/${splat}`);
