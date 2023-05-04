@@ -61,15 +61,15 @@ export default function Dashboard() {
     // Get and populate the organization information
     const orgQuery = useGetOrganizationsQuery();
     useEffect(() => {
-      if (orgQuery.data) {
-        const organizations = orgQuery.data.getOriganizations;
-        setAdminOrganizations(filterOrgsByPermission(organizations, 'admin'));
-        setAccessOrganizations(filterOrgsByPermission(organizations, 'access'));
-        setNoAccessOrganizations(filterOrgsByPermission(organizations, 'noAccess'));
-      }
-      if (orgQuery.error) {
-        console.error(orgQuery.error);
-      }
+        if (orgQuery.data) {
+            const organizations = orgQuery.data.getOriganizations;
+            setAdminOrganizations(filterOrgsByPermission(organizations, 'admin'));
+            setAccessOrganizations(filterOrgsByPermission(organizations, 'access'));
+            setNoAccessOrganizations(filterOrgsByPermission(organizations, 'noAccess'));
+        }
+        if (orgQuery.error) {
+            console.error(orgQuery.error);
+        }
     }, [orgQuery.data, orgQuery.error, permissions]);
 
     const routeToOrganization = (organization: Organization) => {
@@ -80,27 +80,37 @@ export default function Dashboard() {
     useEffect(() => {
         // if set path has been added to global context from app
         if (path) {
-          // if the path is not the same as the current path
+            // if the path is not the same as the current path
             // set the path to the current path
             setPath([{ name: 'Dashboard', path: '/dashboard' }]);
         }
-      }, []);
+    }, []);
 
+    const categoryBlockStyle = {
+        margin: '10px',
+        padding: '10px',
+    };
 
     return (
         <div>
             <Typography variant='h1'>Institutions</Typography>
-            <Typography variant='h3'>My Organizations</Typography>
-            <div style={{ display: 'flex' }}>
-                {renderOrganizations(adminOrganizations, true)}
+            <div style={categoryBlockStyle}>
+                <Typography variant='h3'>My Organizations</Typography>
+                <div style={{ display: 'flex' }}>
+                    {renderOrganizations(adminOrganizations, true)}
+                </div>
             </div>
-            <Typography variant='h3'>Organizations with Access</Typography>
-            <div style={{ display: 'flex' }}>
-                {renderOrganizations(accessOrganizations, true)}
+            <div style={categoryBlockStyle}>
+                <Typography variant='h3'>Organizations with Access</Typography>
+                <div style={{ display: 'flex' }}>
+                    {renderOrganizations(accessOrganizations, true)}
+                </div>
             </div>
-            <Typography variant='h3'>All Organizations</Typography>
-            <div style={{ display: 'flex' }}>
-                {renderOrganizations(noAccessOrganizations, false)}
+            <div style={categoryBlockStyle}>
+                <Typography variant='h3'>All Organizations</Typography>
+                <div style={{ display: 'flex' }}>
+                    {renderOrganizations(noAccessOrganizations, false)}
+                </div>
             </div>
         </div>
     )

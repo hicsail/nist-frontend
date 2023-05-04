@@ -31,7 +31,7 @@ export default function Access() {
 
   // set organizationsWithAdminAccess to all organizations that the user has admin access to
   const getOrganizationsWithAdminAccess = () => {
-    console.log(permissions);
+    
     const organizationsWithAdminAccess = permissions.filter((permission: any) => permission.admin);
     setOrganizationsWithAdminAccess(organizationsWithAdminAccess);
   };
@@ -59,9 +59,7 @@ export default function Access() {
   useEffect(() => {
     getOrganizationsWithAdminAccess();
     if (organizationsWithAdminAccess.length > 0) {
-      console.log(organizationsWithAdminAccess);
       setCurrentOrganization(organizationsWithAdminAccess[0].bucket);
-      console.log(currentOrganization);
     }
   }, [userPermissions]);
 
