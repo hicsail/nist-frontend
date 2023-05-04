@@ -19,7 +19,8 @@ export const MuiThemeProvider: FC<ThemeProviderProps> = (props) => {
       h4: {
         fontSize: 15
       }
-    }
+    },
+    spacing: 2
   });
 
   return (

@@ -3,18 +3,19 @@ import { useLocation } from 'react-router-dom';
 import { createFolder, getOrganizationContents } from '../aws-client';
 import FileUploader from '../components/FileUploader';
 import {
-Button,
-Dialog,
-DialogTitle,
-DialogContent,
-DialogActions,
-TextField,
-CircularProgress,
-Snackbar,
-Breadcrumbs,
-Link,
-Typography,
-Box
+  Button,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  TextField,
+  CircularProgress,
+  Snackbar,
+  Breadcrumbs,
+  Link,
+  Typography,
+  Box,
+  Grid
 } from '@mui/material';
 import { Alert } from '@mui/material';
 import S3Display from '../components/S3Display';
@@ -25,6 +26,8 @@ import { UIContext } from '../contexts/UI';
 import { CargoPermissions } from '../graphql/graphql';
 import HomeIcon from '@mui/icons-material/Home';
 import FolderIcon from '@mui/icons-material/Folder';
+import { IconButton } from '@mui/material';
+import FilterListIcon from '@mui/icons-material/FilterList';
 
 export default function Organization(props: any) {
   const location = useLocation();
@@ -90,7 +93,7 @@ export default function Organization(props: any) {
   }, [organization]);
 
   return (
-    <Box sx={{ display: 'flex', width: '100%' }}>
+    <Box sx={{ justifyContent: 'space-between', display: 'flex', alignItems: 'center' }}>
       <Breadcrumbs separator='›' aria-label="breadcrumb">
         <div style={{ alignItems: 'center', display: 'flex' }}><HomeIcon />{organization.name}</div>
         <div style={{ alignItems: 'center', display: 'flex' }}><FolderIcon />Folder 1</div>
@@ -98,8 +101,15 @@ export default function Organization(props: any) {
       </Breadcrumbs>
 
       <Box>
-        <TextField placeholder='Keyword' />
-        <TextField placeholder='Property' />
+        <Grid container spacing={2}>
+          <Grid item><TextField placeholder='Keyword' /></Grid>
+          <Grid item><TextField placeholder='Property' /></Grid>
+          <Grid item>
+            <IconButton style={{ borderRadius: '100px', border: '1px solid #000000', padding: '12px' }}>
+              <FilterListIcon />
+            </IconButton>
+          </Grid>
+        </Grid>
       </Box>
     </Box>
   );
