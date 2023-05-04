@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useContext, ReactNode, FC } from 'react'
-import { useLocation } from 'react-router-dom';
+import { useLocation, useParams } from 'react-router-dom';
 import { createFolder, getOrganizationContents } from '../aws-client';
 import FileUploader from '../components/FileUploader';
 import {
@@ -31,23 +31,23 @@ import { IconButton } from '@mui/material';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import AddIcon from '@mui/icons-material/Add';
 import { FileListView } from '../components/file-list-view';
-
-
+import { OrganizationContext } from '../contexts/organization.context';
 
 const FileBreadcrumbs: FC<{ path: string}> = ({ path }) => {
-  const organization = useLocation().state;
+  const { organization } = useContext(OrganizationContext);
   const components = path.split('/').filter((path) => path != '');
 
   return (
     <Breadcrumbs separator='›' aria-label="breadcrumb">
       <div style={{ alignItems: 'center', display: 'flex' }} key={0}>
-        <HomeIcon />{organization.name}
+        <HomeIcon />{organization?.name || ''}
       </div>
       {
         components.map((path, index) => {
+          console.log('Path: ', path);
           return (
-            <div style={{ alignItems: 'center', display: 'flex' }} key={index}>
-              {index == 0 ? <HomeIcon /> : <FolderIcon />}{path}
+            <div style={{ alignItems: 'center', display: 'flex' }} key={index + 1}>
+              <FolderIcon />{path}
             </div>
           );
         })
@@ -57,8 +57,7 @@ const FileBreadcrumbs: FC<{ path: string}> = ({ path }) => {
 }
 
 export const Organization: FC = () => {
-  const location = useLocation();
-  const organization = location.state;
+  const { organization } = useContext(OrganizationContext);
   const [userPermissions, setUserPermissions] = useState<any>();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [folderName, setFolderName] = useState('');
@@ -67,21 +66,28 @@ export const Organization: FC = () => {
   const [files, setFiles] = useState<any[]>([]);
   const [error, setError] = useState(null);
   const s3Client = useContext(S3Context);
-  const [path, setPath] = useState('/');
+
+  // Determine the file path to visualize
+  const splat = useParams()['*'];
+  const [path, setPath] = useState(`/`);
+
+  useEffect(() => {
+    setPath(`/${splat}`);
+  }, [splat]);
 
   const handleFolderNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setFolderName(event.target.value);
   };
 
   async function fetchS3Contents() {
-    const contents = await getOrganizationContents(s3Client, organization.bucket);
+    const contents = await getOrganizationContents(s3Client, organization!.bucket);
     setFiles(contents);
   }
 
   const handleCreateFolder = async () => {
     setIsCreatingFolder(true);
     try {
-      await createFolder(s3Client, organization.bucket, folderName);
+      await createFolder(s3Client, organization!.bucket, folderName);
       setHasCreatedFolder(true);
       fetchS3Contents();
     } catch (error: any) {
@@ -99,7 +105,7 @@ export const Organization: FC = () => {
   };
 
   useEffect(() => {
-    if (permissions) {
+    if (permissions && organization) {
       const permissions = getPermissionsForOrganization(organization.bucket);
       setUserPermissions(permissions)
     }
@@ -137,9 +143,7 @@ export const Organization: FC = () => {
         <Button variant='contained'><AddIcon />New</Button>
       </Box>
 
-      <FileListView path={path} setPath={setPath}/>
-
-
+      <FileListView path={path} bucket={organization?.bucket || null}/>
     </Box>
   );
 

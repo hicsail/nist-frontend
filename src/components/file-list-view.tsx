@@ -5,7 +5,7 @@ import {
   TableCell,
   TableRow,
   Table,
-  Typography,
+  TableBody,
   Button
 } from '@mui/material';
 import { FC, useContext, useState, useEffect, ReactNode, Dispatch, SetStateAction } from 'react';
@@ -13,8 +13,8 @@ import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import DeleteIcon from '@mui/icons-material/Delete';
 import FolderIcon from '@mui/icons-material/Folder';
 import { S3Context } from '../contexts/s3.context';
-import { ListObjectsCommand, PutObjectCommand, S3Client, _Object as S3Object } from '@aws-sdk/client-s3';
-import { useLocation } from 'react-router-dom';
+import { ListObjectsCommand, S3Client, _Object as S3Object } from '@aws-sdk/client-s3';
+import {useLocation, useNavigate} from 'react-router-dom';
 
 // TODO: Handle when there are more then 1000 objects
 const getObjectsForPath = async (s3Client: S3Client, bucket: string, path: string): Promise<S3Object[]> => {
@@ -58,12 +58,13 @@ const formatBytes = (size: number | undefined): string => {
 
 interface FileRowProps {
   object: S3Object;
-  setPath: Dispatch<SetStateAction<string>>;
 }
 
-const FileRowView: FC<FileRowProps> = ({ object, setPath }) => {
+const FileRowView: FC<FileRowProps> = ({ object }) => {
   const fileComponents = object.Key!.split('/');
   const isFolder = fileComponents[fileComponents.length - 1] == '';
+  const navigate = useNavigate();
+  const location = useLocation();
 
   // Get the name which is the last element in the path split on '/' or the
   // second to last in the case of a folder
@@ -75,7 +76,7 @@ const FileRowView: FC<FileRowProps> = ({ object, setPath }) => {
   if (isFolder) {
     fileNameView = (
       <Button variant='text'
-        onClick={() => setPath(object.Key!)}
+        onClick={() => navigate(`${location.pathname}${name}/`)}
         style={{
           alignItems: 'center',
           display: 'flex',
@@ -99,7 +100,7 @@ const FileRowView: FC<FileRowProps> = ({ object, setPath }) => {
   }
 
   return (
-    <TableRow>
+    <TableRow key={name}>
       <TableCell>
         {fileNameView}
       </TableCell>
@@ -110,15 +111,20 @@ const FileRowView: FC<FileRowProps> = ({ object, setPath }) => {
   );
 };
 
-export const FileListView: FC<{ path: string, setPath: Dispatch<SetStateAction<string>>}> = ({ path, setPath }) => {
+export interface FileListViewProps {
+  path: string;
+  bucket: string | null;
+}
+
+export const FileListView: FC<FileListViewProps> = ({ path, bucket }) => {
   const s3Client = useContext(S3Context);
-  const location = useLocation();
-  const organization = location.state;
   const [objects, setObjects] = useState<S3Object[]>([]);
 
   useEffect(() => {
-    getObjectsForPath(s3Client, organization.bucket, path).then((objs) => setObjects(objs));
-  }, [path]);
+    if (bucket) {
+      getObjectsForPath(s3Client, bucket, path).then((objs) => setObjects(objs));
+    }
+  }, [path, bucket]);
 
   return (
     <TableContainer component={Paper} sx={{ minWidth: 650 }}>
@@ -131,8 +137,9 @@ export const FileListView: FC<{ path: string, setPath: Dispatch<SetStateAction<s
             <TableCell></TableCell>
           </TableRow>
         </TableHead>
-
-        {objects.map((object) => <FileRowView object={object} setPath={setPath} />)}
+        <TableBody>
+          {objects.map((object) => <FileRowView object={object} />)}
+        </TableBody>
 
       </Table>
     </TableContainer>

@@ -3,7 +3,7 @@ import './App.css'
 import { SideNav } from './components/SideNav'
 import { Outlet, useNavigate } from "react-router-dom";
 import { ApolloClient, InMemoryCache, ApolloProvider, HttpLink } from '@apollo/client';
-import { Box, Grid, Typography } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import { AuthContext } from './contexts/Auth';
 import { PermissionsProvider } from './contexts/Permissions';
 import { setContext } from '@apollo/client/link/context';
@@ -11,12 +11,15 @@ import jwtDecode from 'jwt-decode';
 import { UIContext } from './contexts/UI';
 import {MuiThemeProvider} from './contexts/theme.providers';
 import { S3Provider } from './contexts/s3.context';
+import { OrganizationContext, OrganizationProvider } from './contexts/organization.context';
+import {Organization} from './graphql/graphql';
 
 function App() {
 
   const [token, setToken] = useState<string | null>(null);
   const [path, setPath] = useState<any[]>([]);
   const [isAuthenticated, setIsAuthenticated] = React.useState(false);
+  const [organization, setOrganization] = React.useState<Organization | null>(null);
   const navigate = useNavigate();
   const uri = `${import.meta.env.VITE_AUTH_URL}/graphql`;
 
@@ -96,12 +99,14 @@ function App() {
               {
                 isAuthenticated ? (
                     <PermissionsProvider>
-                      <Box sx={{ display: 'flex' }}>
-                        <SideNav />
-                        <Box sx={{ flexGrow: 1, p: 3 }}>
-                          <Outlet />
+                      <OrganizationProvider setOrganization={setOrganization}>
+                        <Box sx={{ display: 'flex' }}>
+                          <SideNav />
+                          <Box sx={{ flexGrow: 1, p: 3 }}>
+                            <Outlet />
+                          </Box>
                         </Box>
-                      </Box>
+                      </OrganizationProvider>
                     </PermissionsProvider>
                 ) : (
                   <div>

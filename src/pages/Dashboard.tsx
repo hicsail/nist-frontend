@@ -8,9 +8,11 @@ import { useGetOrganizationsQuery } from '../graphql/organization/organization';
 import { Organization } from '../graphql/graphql';
 import thumbnail from '../assets/thumbnail.png';
 import OrganizationCard from '../components/OrganizationCard';
+import {OrganizationContext} from '../contexts/organization.context';
 
 export default function Dashboard() {
 
+    const { organization, setOrganization } = useContext(OrganizationContext);
     const [adminOrganizations, setAdminOrganizations] = useState<any>([]);
     const [accessOrganizations, setAccessOrganizations] = useState<any>([]);
     const [noAccessOrganizations, setNoAccessOrganizations] = useState<any>([]);
@@ -73,7 +75,9 @@ export default function Dashboard() {
 
     const routeToOrganization = (organization: Organization) => {
         // route to path /organization/:orgId and pass organization as props
-        navigate(`/organization/${organization._id}`, { state: organization });
+        setOrganization(organization);
+        window.localStorage.setItem('organization', JSON.stringify(organization));
+        navigate(`/organization/`);
     }
 
     useEffect(() => {

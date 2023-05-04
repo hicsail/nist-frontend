@@ -38,7 +38,7 @@ const appRouter = createBrowserRouter([
         element: <AccessManager />,
       },
       {
-        path: "/organization/:orgId",
+        path: "/organization/*",
         element: <Organization />,
       },
       {
