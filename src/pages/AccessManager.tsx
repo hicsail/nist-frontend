@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext } from 'react';
+import React, { useEffect, useState, useContext, useMemo } from 'react';
 import {
     TextField,
     MenuItem,
@@ -13,6 +13,8 @@ import {
     Checkbox,
     Snackbar,
     Button,
+    Paper,
+    TablePagination
 } from '@mui/material';
 import { useQuery, gql } from '@apollo/client';
 import { PermissionsContext } from '../contexts/Permissions';
@@ -53,13 +55,16 @@ const AccessManager = () => {
     const [updateMessage, setUpdateMessage] = useState('');
     const [snackbarOpen, setSnackbarOpen] = useState(false);
 
+    const [page, setPage] = useState(0);
+    const [rowsPerPage, setRowsPerPage] = useState(5);
+
     const permissions = useContext(PermissionsContext);
     const { path, setPath } = useContext(UIContext);
 
     const { loading, error, data } = useQuery(CARGO_GET_ALL_BUCKET_PERMISSIONS, {
         variables: { bucket: currentOrganization },
         onCompleted: (data) => {
-            console.log(data);
+            setUserPermissions(data?.cargoGetAllBucketPermissions);
         }
     });
 
@@ -72,9 +77,9 @@ const AccessManager = () => {
         }
     }, [permissions]);
 
-    useEffect(() => {
-        setUserPermissions(data?.cargoGetAllBucketPermissions);
-    }, [data]);
+    // useEffect(() => {
+    //     setUserPermissions(data?.cargoGetAllBucketPermissions);
+    // }, [data]);
 
     useEffect(() => {
         if (path){
@@ -93,9 +98,24 @@ const AccessManager = () => {
         const updatedPermission = {
             ...updatedPermissions[index],
             [permissionType]: isChecked,
-        };    
+        };
+
+        if (isChecked && permissionType === 'admin') {
+            updatedPermission.read = isChecked;
+            updatedPermission.write = isChecked;
+            updatedPermission.delete = isChecked;   
+        }
         updatedPermissions[index] = updatedPermission;
         setUserPermissions(updatedPermissions);
+    };
+
+    const handleChangePage = (event: any, newPage: number) => {
+        setPage(newPage);
+    };
+
+    const handleChangeRowsPerPage = (event: any) => {
+        setRowsPerPage(parseInt(event.target.value, 10));
+        setPage(0);
     };
 
     const handleCloseSnackbar = () => {
@@ -105,6 +125,12 @@ const AccessManager = () => {
     const filteredUserPermissions = userPermissions ? userPermissions.filter((userPermission: any) =>
         userPermission.user.email.toLowerCase().includes(searchText.toLowerCase())
     ) : [];
+
+    const visibleUserPermissions = useMemo(() => {
+        const firstPageIndex = page * rowsPerPage;
+        const lastPageIndex = firstPageIndex + rowsPerPage;
+        return filteredUserPermissions.slice(firstPageIndex, lastPageIndex);
+    }, [page, rowsPerPage, filteredUserPermissions]); 
 
     if (error) {
         return <p>Error fetching access manager: {error.message}</p>;
@@ -156,7 +182,7 @@ const AccessManager = () => {
                                 </TableRow>
                             </TableHead>
                             <TableBody>
-                                {filteredUserPermissions.map((userPermission: any, index: number) => (
+                                {visibleUserPermissions.map((userPermission: any, index: number) => (
                                     <TableRow key={userPermission._id}>
                                         <TableCell>{userPermission.user.email}</TableCell>
                                         <TableCell>
@@ -199,6 +225,15 @@ const AccessManager = () => {
                             </TableBody>
                         </Table>
                     </TableContainer>
+                    <TablePagination 
+                        rowsPerPageOptions={[5, 10, 25]}
+                        component="div"
+                        count={filteredUserPermissions.length}
+                        rowsPerPage={rowsPerPage}
+                        page={page}
+                        onPageChange={handleChangePage}
+                        onRowsPerPageChange={handleChangeRowsPerPage}
+                    />
                     <Snackbar
                         open={snackbarOpen}
                         message={updateMessage}
