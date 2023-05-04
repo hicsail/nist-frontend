@@ -18,23 +18,19 @@ export default function ({ organization, canClick, accessType }: OrganizationCar
     navigate(`/organization/${organization._id}`, { state: organization });
   }
   return (
-    <div>
-      <div key={organization.name} style={{ margin: 20 }}>
-        <Card onClick={() => canClick ? routeToOrganization(organization) : alert("Contact Administrator for Org to request Access")}>
-          <CardActionArea>
-            <div style={{ padding: 10, display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-              <img src={thumbnail} style={{ width: 100, height: 100, margin: 20 }} />
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', marginRight: 10 }}>
-                <div style={{ marginBottom: 15 }}>
-                  <Chip label={accessType} variant="outlined" />
-                  {/* right now there is no favorite functionality <BookmarkBorderIcon style={{ marginLeft: 10 }} /> */}
-                </div>
-                <Typography variant='h3'>{organization.name}</Typography>
-              </div>
+    <Card onClick={() => canClick ? routeToOrganization(organization) : alert("Contact Administrator for Org to request Access")}>
+      <CardActionArea>
+        <div style={{ padding: 10, display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+          <img src={thumbnail} style={{ width: 100, height: 100, margin: 20 }} />
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', marginRight: 10 }}>
+            <div style={{ marginBottom: 15 }}>
+              <Chip label={accessType} variant="outlined" />
+              {/* right now there is no favorite functionality <BookmarkBorderIcon style={{ marginLeft: 10 }} /> */}
             </div>
-          </CardActionArea>
-        </Card>
-      </div>
-    </div>
+            <Typography variant='h3'>{organization.name}</Typography>
+          </div>
+        </div>
+      </CardActionArea>
+    </Card>
   )
 }

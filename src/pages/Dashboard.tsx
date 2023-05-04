@@ -23,7 +23,7 @@ export default function Dashboard() {
         // card for each organization that show cases organization name and thumbnail image
         return organizations.map((organization: Organization) => (
             <div key={organization._id}>
-                <OrganizationCard  organization={organization} canClick={canClick} accessType={accessType} />
+                <OrganizationCard organization={organization} canClick={canClick} accessType={accessType} />
             </div>
 
         ))
@@ -84,39 +84,39 @@ export default function Dashboard() {
             setPath([{ name: 'Dashboard', path: '/dashboard' }]);
         }
     }, []);
-    
+
     return (
         <div>
-            <Typography variant='h1' style={{marginBottom: 20}}>Institutions</Typography>
+            <Typography variant='h1' style={{ marginBottom: 20 }}>Institutions</Typography>
             {
-                adminOrganizations.length > 0 ?
+                adminOrganizations.length > 0 &&
                 <>
                     <Typography variant='h3'>My Organizations</Typography>
                     <div style={{ display: 'flex' }}>
                         {renderOrganizations(adminOrganizations, true, 'Admin')}
                     </div>
                 </>
-                : null
+
             }
             {
-                accessOrganizations.length > 0 ?
-                    <>
-                        <Typography variant='h3'>Organizations with Access</Typography>
-                        <div style={{ display: 'flex' }}>
-                            {renderOrganizations(accessOrganizations, true, 'Can View')}
-                        </div>
-                    </>
-                    : null
+                accessOrganizations.length > 0 &&
+                <>
+                    <Typography variant='h3'>Organizations with Access</Typography>
+                    <div style={{ display: 'flex' }}>
+                        {renderOrganizations(accessOrganizations, true, 'Can View')}
+                    </div>
+                </>
+
             }
             {
-                noAccessOrganizations.length > 0 ? (
+                noAccessOrganizations.length > 0 && (
                     <>
                         <Typography variant='h3'>All Organizations</Typography>
                         <div style={{ display: 'flex' }}>
                             {renderOrganizations(noAccessOrganizations, false, 'No Access')}
                         </div>
                     </>
-                ) : null
+                )
             }
 
         </div>
