@@ -40,7 +40,7 @@ const FileBreadcrumbs: FC = () => {
       {
         path.map((path, index) => {
           return (
-            <div style={{ alignItems: 'center', display: 'flex' }}>
+            <div style={{ alignItems: 'center', display: 'flex' }} key={index}>
               {index == 0 ? <HomeIcon /> : <FolderIcon />}{path.name}
             </div>
           );
