@@ -6,7 +6,6 @@ export default function Callback() {
 
     const navigate = useNavigate();
     const {setToken, setIsAuthenticated} = useContext(AuthContext);
-
     useEffect(() => {
         const token = new URLSearchParams(window.location.search).get('token');
         if (token) {

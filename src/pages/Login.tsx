@@ -7,10 +7,12 @@ export default function Login() {
     const navigate = useNavigate();
     const { isAuthenticated } = useContext(AuthContext);
     const projectId = import.meta.env.VITE_PROJECT_ID;
+    const loginUrl = `https://test-auth.sail.codes?projectId=${projectId}&redirectUrl=${encodeURIComponent(window.location.origin + '/auth/callback')}`;
     useEffect(() => {
         console.log('executing login');
         if (isAuthenticated) navigate('/dashboard');
-        else window.location.href = `https://test-auth.sail.codes/?projectId=${projectId}`;
+        //`https://test-auth.sail.codes/?projectId=${projectId}`;
+        else window.location.href = loginUrl;
     }, [isAuthenticated]);
 
     return (
