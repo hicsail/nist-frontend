@@ -25,25 +25,17 @@ export function HandleUpdate({ user }: any) {
         },
         user: user.user.id,
         bucket: user.bucket
+      }, onCompleted: () => {
+        let message = 'Permissions updated';
+        setUpdateMessage(message);
+        setSnackbarOpen(true);
+      }, onError: (error) => {
+        let message = 'Failed to update permissions';
+        setUpdateMessage(message);
+        setSnackbarOpen(true);
       }
     });
   }
-
-  useEffect(() => {
-    // If still loading, do nothing
-    if (loading) {
-      return;
-    }
-
-    // Determine if message is success or failure
-    let message = 'Permissions updated';
-    if (error) {
-      message = 'Failed to update permissions'
-    }
-
-    setUpdateMessage(message);
-    setSnackbarOpen(true);
-  }, [loading, error]);
 
   return (
     <>
