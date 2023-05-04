@@ -2,7 +2,20 @@ import React, { useEffect, useState, useContext } from 'react'
 import { useLocation } from 'react-router-dom';
 import { createFolder, getOrganizationContents } from '../aws-client';
 import FileUploader from '../components/FileUploader';
-import { Button, Dialog, DialogTitle, DialogContent, DialogActions, TextField, CircularProgress, Snackbar, Breadcrumbs, Link, Typography } from '@mui/material';
+import {
+Button,
+Dialog,
+DialogTitle,
+DialogContent,
+DialogActions,
+TextField,
+CircularProgress,
+Snackbar,
+Breadcrumbs,
+Link,
+Typography,
+Box
+} from '@mui/material';
 import { Alert } from '@mui/material';
 import S3Display from '../components/S3Display';
 import { PermissionsContext } from "../contexts/Permissions";
@@ -10,6 +23,8 @@ import Chip from '@mui/material/Chip';
 import { S3Context } from '../contexts/s3.context';
 import { UIContext } from '../contexts/UI';
 import { CargoPermissions } from '../graphql/graphql';
+import HomeIcon from '@mui/icons-material/Home';
+import FolderIcon from '@mui/icons-material/Folder';
 
 export default function Organization(props: any) {
   const location = useLocation();
@@ -74,7 +89,22 @@ export default function Organization(props: any) {
 
   }, [organization]);
 
+  return (
+    <Box sx={{ display: 'flex', width: '100%' }}>
+      <Breadcrumbs separator='›' aria-label="breadcrumb">
+        <div style={{ alignItems: 'center', display: 'flex' }}><HomeIcon />{organization.name}</div>
+        <div style={{ alignItems: 'center', display: 'flex' }}><FolderIcon />Folder 1</div>
+        <div style={{ alignItems: 'center', display: 'flex' }}><FolderIcon />Folder 2</div>
+      </Breadcrumbs>
 
+      <Box>
+        <TextField placeholder='Keyword' />
+        <TextField placeholder='Property' />
+      </Box>
+    </Box>
+  );
+
+  /*
   return (
     <div>
       <Breadcrumbs separator="›" aria-label="breadcrumb">
@@ -141,4 +171,5 @@ export default function Organization(props: any) {
       }
     </div>
   )
+  */
 }
