@@ -15,7 +15,8 @@ import {
   Link,
   Typography,
   Box,
-  Grid
+  Grid,
+  Divider
 } from '@mui/material';
 import { Alert } from '@mui/material';
 import S3Display from '../components/S3Display';
@@ -28,6 +29,7 @@ import HomeIcon from '@mui/icons-material/Home';
 import FolderIcon from '@mui/icons-material/Folder';
 import { IconButton } from '@mui/material';
 import FilterListIcon from '@mui/icons-material/FilterList';
+import AddIcon from '@mui/icons-material/Add';
 
 export default function Organization(props: any) {
   const location = useLocation();
@@ -94,7 +96,7 @@ export default function Organization(props: any) {
 
   return (
     <Box>
-      <Box sx={{ justifyContent: 'space-between', display: 'flex', alignItems: 'center' }}>
+      <Box sx={{ justifyContent: 'space-between', display: 'flex', alignItems: 'center', paddingBottom: 15 }}>
 
         <Breadcrumbs separator='›' aria-label="breadcrumb">
           <div style={{ alignItems: 'center', display: 'flex' }}><HomeIcon />{organization.name}</div>
@@ -115,7 +117,14 @@ export default function Organization(props: any) {
         </Box>
       </Box>
 
-      <S3Display s3BucketName={location.state.bucket} files={files} loadFiles={fetchS3Contents}></S3Display>
+      <Divider />
+
+      <Box sx={{ justifyContent: 'space-between', display: 'flex', alignItems: 'center', paddingTop: 10 }}>
+        <Typography variant='h1'>Folder Name</Typography>
+        <Button variant='contained'><AddIcon />New</Button>
+      </Box>
+
+
     </Box>
   );
 
