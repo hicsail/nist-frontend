@@ -110,11 +110,10 @@ const FileRowView: FC<FileRowProps> = ({ object, setPath }) => {
   );
 };
 
-export const FileListView: FC = () => {
+export const FileListView: FC<{ path: string, setPath: Dispatch<SetStateAction<string>>}> = ({ path, setPath }) => {
   const s3Client = useContext(S3Context);
   const location = useLocation();
   const organization = location.state;
-  const [path, setPath] = useState('/');
   const [objects, setObjects] = useState<S3Object[]>([]);
 
   useEffect(() => {

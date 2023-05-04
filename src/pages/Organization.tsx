@@ -32,16 +32,22 @@ import FilterListIcon from '@mui/icons-material/FilterList';
 import AddIcon from '@mui/icons-material/Add';
 import { FileListView } from '../components/file-list-view';
 
-const FileBreadcrumbs: FC = () => {
-  const { path } = useContext(UIContext);
+
+
+const FileBreadcrumbs: FC<{ path: string}> = ({ path }) => {
+  const organization = useLocation().state;
+  const components = path.split('/').filter((path) => path != '');
 
   return (
     <Breadcrumbs separator='›' aria-label="breadcrumb">
+      <div style={{ alignItems: 'center', display: 'flex' }} key={0}>
+        <HomeIcon />{organization.name}
+      </div>
       {
-        path.map((path, index) => {
+        components.map((path, index) => {
           return (
             <div style={{ alignItems: 'center', display: 'flex' }} key={index}>
-              {index == 0 ? <HomeIcon /> : <FolderIcon />}{path.name}
+              {index == 0 ? <HomeIcon /> : <FolderIcon />}{path}
             </div>
           );
         })
@@ -61,7 +67,7 @@ export const Organization: FC = () => {
   const [files, setFiles] = useState<any[]>([]);
   const [error, setError] = useState(null);
   const s3Client = useContext(S3Context);
-  const { path, setPath } = useContext(UIContext);
+  const [path, setPath] = useState('/');
 
   const handleFolderNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setFolderName(event.target.value);
@@ -101,14 +107,6 @@ export const Organization: FC = () => {
 
   useEffect(() => {
 
-    // if set path has been added to global context from app
-    if (path) {
-       setPath([{ name: organization.name, path: `/organization/${organization._id}` }]);
-    }
-  }, []);
-
-  useEffect(() => {
-
     fetchS3Contents();
 
   }, [organization]);
@@ -117,7 +115,7 @@ export const Organization: FC = () => {
     <Box>
       <Box sx={{ justifyContent: 'space-between', display: 'flex', alignItems: 'center', paddingBottom: 15 }}>
 
-        <FileBreadcrumbs />
+        <FileBreadcrumbs path={path} />
 
         <Box>
           <Grid container spacing={2}>
@@ -139,7 +137,7 @@ export const Organization: FC = () => {
         <Button variant='contained'><AddIcon />New</Button>
       </Box>
 
-      <FileListView />
+      <FileListView path={path} setPath={setPath}/>
 
 
     </Box>
