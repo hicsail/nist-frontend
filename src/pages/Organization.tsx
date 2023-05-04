@@ -2,7 +2,7 @@ import React, { useEffect, useState, useContext } from 'react'
 import { useLocation } from 'react-router-dom';
 import { createFolder, getOrganizationContents } from '../aws-client';
 import FileUploader from '../components/FileUploader';
-import { Button, Dialog, DialogTitle, DialogContent, DialogActions, TextField, CircularProgress, Snackbar, Breadcrumbs, Link } from '@mui/material';
+import { Button, Dialog, DialogTitle, DialogContent, DialogActions, TextField, CircularProgress, Snackbar, Breadcrumbs, Link, Typography } from '@mui/material';
 import { Alert } from '@mui/material';
 import S3Display from '../components/S3Display';
 import { PermissionsContext } from "../contexts/Permissions";
@@ -88,7 +88,7 @@ export default function Organization(props: any) {
           })
         }
       </Breadcrumbs>
-      <h2>{organization.name}</h2>
+      <Typography variant='h2'>{organization.name}</Typography>
       <div style={{ padding: 10, margin: 10 }}>
         {
           (userPermissions && userPermissions.admin) ? <Chip label="Admin" color="success" /> : null

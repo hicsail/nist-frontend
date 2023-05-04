@@ -109,9 +109,9 @@ function App() {
                     </PermissionsProvider>
                 ) : (
                   <div>
-                    <h2>
+                    <Typography variant='h2'>
                       Please login
-                    </h2>
+                    </Typography>
                     <Outlet />
                   </div>
                 )

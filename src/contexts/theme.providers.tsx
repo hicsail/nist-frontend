@@ -8,7 +8,18 @@ export interface ThemeProviderProps {
 
 export const MuiThemeProvider: FC<ThemeProviderProps> = (props) => {
   const theme = createTheme({
-
+    typography: {
+      fontFamily: 'Poppins',
+      h1: {
+        fontSize: 34
+      },
+      h3: {
+        fontSize: 20
+      },
+      h4: {
+        fontSize: 15
+      }
+    }
   });
 
   return (
