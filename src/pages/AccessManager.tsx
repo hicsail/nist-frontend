@@ -14,7 +14,8 @@ import {
     Snackbar,
     Button,
     Paper,
-    TablePagination
+    TablePagination,
+    Typography
 } from '@mui/material';
 import { PermissionsContext } from '../contexts/Permissions';
 import { HandleUpdate } from '../components/UpdatePermissionsButton';
@@ -110,7 +111,7 @@ const AccessManager = () => {
 
     return (
         <div>
-            <h1>Manage Access</h1>
+            <Typography variant='h1'>Manage Access</Typography>
             {organizationsWithAdminAccess.length === 0 ? (
                 <p>You have no organizations with admin access.</p>
             ) : (

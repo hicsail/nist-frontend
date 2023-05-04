@@ -3,7 +3,7 @@ import './App.css'
 import SideNav from './components/SideNav'
 import { Outlet, useNavigate } from "react-router-dom";
 import { ApolloClient, InMemoryCache, ApolloProvider, HttpLink } from '@apollo/client';
-import { Grid } from '@mui/material';
+import { Grid, Typography } from '@mui/material';
 import { AuthContext } from './contexts/Auth';
 import { PermissionsProvider } from './contexts/Permissions';
 import { setContext } from '@apollo/client/link/context';
@@ -109,9 +109,9 @@ function App() {
                     </PermissionsProvider>
                 ) : (
                   <div>
-                    <h2>
+                    <Typography variant='h2'>
                       Please login
-                    </h2>
+                    </Typography>
                     <Outlet />
                   </div>
                 )

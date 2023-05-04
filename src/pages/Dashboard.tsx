@@ -1,5 +1,5 @@
 import { useState, useContext, useEffect } from 'react'
-import { IconButton } from '@mui/material';
+import { IconButton, Typography } from '@mui/material';
 import FolderOpenOutlinedIcon from '@mui/icons-material/FolderOpenOutlined';
 import { useNavigate } from 'react-router-dom';
 import { PermissionsContext } from '../contexts/Permissions';
@@ -89,16 +89,16 @@ export default function Dashboard() {
 
     return (
         <div>
-            <h1>Institutions</h1>
-            <h4>My Organizations</h4>
+            <Typography variant='h1'>Institutions</Typography>
+            <Typography variant='h3'>My Organizations</Typography>
             <div style={{ display: 'flex' }}>
                 {renderOrganizations(adminOrganizations, true)}
             </div>
-            <h4>Organizations with Access</h4>
+            <Typography variant='h3'>Organizations with Access</Typography>
             <div style={{ display: 'flex' }}>
                 {renderOrganizations(accessOrganizations, true)}
             </div>
-            <h4>All Organizations</h4>
+            <Typography variant='h3'>All Organizations</Typography>
             <div style={{ display: 'flex' }}>
                 {renderOrganizations(noAccessOrganizations, false)}
             </div>
