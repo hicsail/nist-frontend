@@ -1,11 +1,13 @@
 import { useState, useContext, useEffect } from 'react'
-import { IconButton, Typography } from '@mui/material';
+import { Card, CardActionArea, Chip, IconButton, Typography } from '@mui/material';
 import FolderOpenOutlinedIcon from '@mui/icons-material/FolderOpenOutlined';
 import { useNavigate } from 'react-router-dom';
 import { PermissionsContext } from '../contexts/Permissions';
 import { UIContext } from '../contexts/UI';
 import { useGetOrganizationsQuery } from '../graphql/organization/organization';
 import { Organization } from '../graphql/graphql';
+import thumbnail from '../assets/thumbnail.png';
+import OrganizationCard from '../components/OrganizationCard';
 
 export default function Dashboard() {
 
@@ -16,17 +18,14 @@ export default function Dashboard() {
     const permissions = useContext(PermissionsContext);
     const { path, setPath } = useContext(UIContext);
 
-    // function that takes in a list of organizations and returns a list of JSX elements with folder icon and organization name
-    const renderOrganizations = (organizations: Organization[], canClick: boolean) => {
+    // function that takes in a list of organizations and returns a list of JSX elements with folder icon and organization name along with a placeholder icon to mark as favorite
+    const renderOrganizations = (organizations: Organization[], canClick: boolean, accessType: string) => {
+        // card for each organization that show cases organization name and thumbnail image
         return organizations.map((organization: Organization) => (
-            <div key={organization.name}>
-                <div>
-                    <IconButton aria-label="delete" size="large" onClick={() => canClick ? routeToOrganization(organization) : alert("Contact Administrator for Org to request Access")}>
-                        <FolderOpenOutlinedIcon fontSize='large' />
-                        {organization.name}
-                    </IconButton>
-                </div>
+            <div key={organization._id}>
+                <OrganizationCard organization={organization} canClick={canClick} accessType={accessType} />
             </div>
+
         ))
     }
 
@@ -43,7 +42,7 @@ export default function Dashboard() {
             if (permission === 'access') {
                 // get permission for org from permissions
                 const orgPermission = permissions.find((orgPermission: any) => orgPermission.bucket === organization.bucket);
-                if (orgPermission && orgPermission.read && !orgPermission.admin) {
+                if (orgPermission && (orgPermission.read || orgPermission.write || orgPermission.delete) && !orgPermission.admin) {
                     orgs.push(organization);
                 }
             }
@@ -86,32 +85,40 @@ export default function Dashboard() {
         }
     }, []);
 
-    const categoryBlockStyle = {
-        margin: '10px',
-        padding: '10px',
-    };
-
     return (
         <div>
-            <Typography variant='h1'>Institutions</Typography>
-            <div style={categoryBlockStyle}>
-                <Typography variant='h3'>My Organizations</Typography>
-                <div style={{ display: 'flex' }}>
-                    {renderOrganizations(adminOrganizations, true)}
-                </div>
-            </div>
-            <div style={categoryBlockStyle}>
-                <Typography variant='h3'>Organizations with Access</Typography>
-                <div style={{ display: 'flex' }}>
-                    {renderOrganizations(accessOrganizations, true)}
-                </div>
-            </div>
-            <div style={categoryBlockStyle}>
-                <Typography variant='h3'>All Organizations</Typography>
-                <div style={{ display: 'flex' }}>
-                    {renderOrganizations(noAccessOrganizations, false)}
-                </div>
-            </div>
+            <Typography variant='h1' style={{ marginBottom: 20 }}>Institutions</Typography>
+            {
+                adminOrganizations.length > 0 &&
+                <>
+                    <Typography variant='h3'>My Organizations</Typography>
+                    <div style={{ display: 'flex' }}>
+                        {renderOrganizations(adminOrganizations, true, 'Admin')}
+                    </div>
+                </>
+
+            }
+            {
+                accessOrganizations.length > 0 &&
+                <>
+                    <Typography variant='h3'>Organizations with Access</Typography>
+                    <div style={{ display: 'flex' }}>
+                        {renderOrganizations(accessOrganizations, true, 'Can View')}
+                    </div>
+                </>
+
+            }
+            {
+                noAccessOrganizations.length > 0 && (
+                    <>
+                        <Typography variant='h3'>All Organizations</Typography>
+                        <div style={{ display: 'flex' }}>
+                            {renderOrganizations(noAccessOrganizations, false, 'No Access')}
+                        </div>
+                    </>
+                )
+            }
+
         </div>
     )
 }
