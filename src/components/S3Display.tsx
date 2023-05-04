@@ -92,7 +92,6 @@ function FolderItem({
   const handleExpand = async () => {
     if (!expanded) {
       const contents = await getFolderContents(s3Client, s3BucketName, folderKey);
-      console.log(contents);
       setFolderContents(contents);
     }
     setExpanded(!expanded);
@@ -222,7 +221,6 @@ export default function ({ s3BucketName, files, loadFiles }: { s3BucketName: str
   const handleFilter = (event: any) => {
     const searchQuery = event.target.value;
     const filteredFiles = files.filter((file: any) => file.Key.includes(searchQuery));
-    console.log(filteredFiles);
     setFilteredFiles(filteredFiles);
   };
 

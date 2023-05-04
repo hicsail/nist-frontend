@@ -17,11 +17,9 @@ type S3Object = {
 
 export const getOrganizationContents = async (client: S3Client, bucketName: string): Promise<S3Object[]> => {
   const command = new ListObjectsCommand({ Bucket: bucketName });
-  console.log("getting org contents");
   // Execute the command and handle the response
   try {
     const data = await client.send(command);
-    console.log("Success", data);
     // get info from data.Contents
     const contents = data.Contents;
     if (!contents) {
@@ -56,7 +54,6 @@ export const uploadToS3 = async (client: S3Client, { Bucket, Key, Body }: any): 
   try {
     const command = new PutObjectCommand(params);
     await client.send(command);
-    console.log(`File uploaded to S3 bucket "${Bucket}" with key "${Key}".`);
     return true;
   } catch (error) {
     console.error("Error uploading file:", error);
@@ -98,7 +95,7 @@ export const createFolder = async (client: S3Client, bucketName: string, folderN
 
   try {
     await client.send(command);
-    console.log(`Successfully created folder ${folderName} in bucket ${bucketName}`);
+    
   } catch (err) {
     console.log(`Error creating folder: ${err}`);
   }
@@ -119,7 +116,6 @@ export const listFolders = async (client: S3Client, bucketName: string, prefix =
       throw new Error("No folders found");
     }
     const folders = response.CommonPrefixes.map((prefix) => prefix.Prefix);
-    console.log(`Folders in ${bucketName}/${prefix}:`, folders);
     return folders;
   } catch (err) {
     console.log(`Error listing folders: ${err}`);
@@ -132,7 +128,6 @@ export const getFolderContents = async (
   bucketName: string,
   folderKey: string
 ): Promise<any[]> => {
-  console.log("getting folder contents");
   const command = new ListObjectsCommand({
     Bucket: bucketName,
     Prefix: folderKey,
