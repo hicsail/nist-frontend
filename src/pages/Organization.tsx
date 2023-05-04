@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext } from 'react'
+import React, { useEffect, useState, useContext, ReactNode } from 'react'
 import { useLocation } from 'react-router-dom';
 import { createFolder, getOrganizationContents } from '../aws-client';
 import FileUploader from '../components/FileUploader';
@@ -94,14 +94,26 @@ export default function Organization(props: any) {
 
   }, [organization]);
 
+  const generatePathItems = (path: { name: string, path: string }[]): ReactNode[] => {
+    const pathItems: ReactNode[] = [];
+    for (let index = 0; index < path.length; index++) {
+      // Determin the icon to display
+      const icon = index == 0 ? <HomeIcon /> : <FolderIcon />;
+      pathItems.push(
+        <div style={{ alignItems: 'center', display: 'flex' }}>
+          {icon}{path[index].name}
+        </div>
+      );
+    }
+    return pathItems;
+  };
+
   return (
     <Box>
       <Box sx={{ justifyContent: 'space-between', display: 'flex', alignItems: 'center', paddingBottom: 15 }}>
 
         <Breadcrumbs separator='›' aria-label="breadcrumb">
-          <div style={{ alignItems: 'center', display: 'flex' }}><HomeIcon />{organization.name}</div>
-          <div style={{ alignItems: 'center', display: 'flex' }}><FolderIcon />Folder 1</div>
-          <div style={{ alignItems: 'center', display: 'flex' }}><FolderIcon />Folder 2</div>
+          {generatePathItems(path)}
         </Breadcrumbs>
 
         <Box>
