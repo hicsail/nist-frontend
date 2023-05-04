@@ -8,7 +8,7 @@ import {
 } from "react-router-dom";
 import ErrorPage from './pages/error-route';
 import Dashboard from './pages/Dashboard';
-import Organization from './pages/Organization';
+import { Organization } from './pages/Organization';
 import Access from './pages/Access';
 import Login from './pages/Login';
 import Callback from './pages/Callback';
@@ -24,7 +24,7 @@ const appRouter = createBrowserRouter([
         path: "/",
         element: <Dashboard />,
       },
-      
+
       {
         path: "/dashboard",
         element: <Dashboard />,

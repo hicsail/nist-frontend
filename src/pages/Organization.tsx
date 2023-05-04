@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext, ReactNode } from 'react'
+import React, { useEffect, useState, useContext, ReactNode, FC } from 'react'
 import { useLocation } from 'react-router-dom';
 import { createFolder, getOrganizationContents } from '../aws-client';
 import FileUploader from '../components/FileUploader';
@@ -31,7 +31,25 @@ import { IconButton } from '@mui/material';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import AddIcon from '@mui/icons-material/Add';
 
-export default function Organization(props: any) {
+const FileBreadcrumbs: FC = () => {
+  const { path } = useContext(UIContext);
+
+  return (
+    <Breadcrumbs separator='›' aria-label="breadcrumb">
+      {
+        path.map((path, index) => {
+          return (
+            <div style={{ alignItems: 'center', display: 'flex' }}>
+              {index == 0 ? <HomeIcon /> : <FolderIcon />}{path.name}
+            </div>
+          );
+        })
+      }
+    </Breadcrumbs>
+  );
+}
+
+export const Organization: FC<any> = (props: any) => {
   const location = useLocation();
   const organization = location.state;
   const [userPermissions, setUserPermissions] = useState<any>();
@@ -94,27 +112,11 @@ export default function Organization(props: any) {
 
   }, [organization]);
 
-  const generatePathItems = (path: { name: string, path: string }[]): ReactNode[] => {
-    const pathItems: ReactNode[] = [];
-    for (let index = 0; index < path.length; index++) {
-      // Determin the icon to display
-      const icon = index == 0 ? <HomeIcon /> : <FolderIcon />;
-      pathItems.push(
-        <div style={{ alignItems: 'center', display: 'flex' }}>
-          {icon}{path[index].name}
-        </div>
-      );
-    }
-    return pathItems;
-  };
-
   return (
     <Box>
       <Box sx={{ justifyContent: 'space-between', display: 'flex', alignItems: 'center', paddingBottom: 15 }}>
 
-        <Breadcrumbs separator='›' aria-label="breadcrumb">
-          {generatePathItems(path)}
-        </Breadcrumbs>
+        <FileBreadcrumbs />
 
         <Box>
           <Grid container spacing={2}>
