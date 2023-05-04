@@ -16,43 +16,17 @@ import {
     Paper,
     TablePagination
 } from '@mui/material';
-import { useQuery, gql } from '@apollo/client';
 import { PermissionsContext } from '../contexts/Permissions';
 import { HandleUpdate } from '../components/UpdatePermissionsButton';
 import { UIContext } from '../contexts/UI';
-
-const CARGO_GET_ALL_BUCKET_PERMISSIONS = gql`
-    query CargoGetAllBucketPermissions($bucket: String!) {
-      cargoGetAllBucketPermissions(bucket: $bucket) {
-        _id
-        user {
-          id
-          email
-        }
-        bucket
-        read
-        write
-        delete
-        admin
-      }
-    }
-  `;
-
-type User = {
-    id: number;
-    name: string;
-    read: boolean;
-    write: boolean;
-    delete: boolean;
-    admin: boolean;
-};
+import { useCargoGetAllBucketPermissionsQuery } from '../graphql/permissions/permissions';
 
 const AccessManager = () => {
     const [userPermissions, setUserPermissions] = useState<any>([]);
     const [searchText, setSearchText] = useState('');
     const [organizationsWithAdminAccess, setOrganizationsWithAdminAccess] = useState<any[]>([]);
     const [currentOrganization, setCurrentOrganization] = useState('');
-    const [updateMessage, setUpdateMessage] = useState('');
+    const [updateMessage, _setUpdateMessage] = useState('');
     const [snackbarOpen, setSnackbarOpen] = useState(false);
 
     const [page, setPage] = useState(0);
@@ -61,12 +35,7 @@ const AccessManager = () => {
     const permissions = useContext(PermissionsContext);
     const { path, setPath } = useContext(UIContext);
 
-    const { loading, error, data } = useQuery(CARGO_GET_ALL_BUCKET_PERMISSIONS, {
-        variables: { bucket: currentOrganization },
-        onCompleted: (data) => {
-            setUserPermissions(data?.cargoGetAllBucketPermissions);
-        }
-    });
+    const { loading, error, data } = useCargoGetAllBucketPermissionsQuery({ variables: { bucket: currentOrganization } });
 
     useEffect(() => {
         const organizationsWithAdminAccess = permissions.filter((permission) => permission.admin);
@@ -77,9 +46,9 @@ const AccessManager = () => {
         }
     }, [permissions]);
 
-    // useEffect(() => {
-    //     setUserPermissions(data?.cargoGetAllBucketPermissions);
-    // }, [data]);
+    useEffect(() => {
+      setUserPermissions(data?.cargoGetAllBucketPermissions);
+    }, [data]);
 
     useEffect(() => {
         if (path){
@@ -99,11 +68,10 @@ const AccessManager = () => {
             ...updatedPermissions[index],
             [permissionType]: isChecked,
         };
-
         if (isChecked && permissionType === 'admin') {
             updatedPermission.read = isChecked;
             updatedPermission.write = isChecked;
-            updatedPermission.delete = isChecked;   
+            updatedPermission.delete = isChecked;
         }
         updatedPermissions[index] = updatedPermission;
         setUserPermissions(updatedPermissions);
@@ -130,7 +98,7 @@ const AccessManager = () => {
         const firstPageIndex = page * rowsPerPage;
         const lastPageIndex = firstPageIndex + rowsPerPage;
         return filteredUserPermissions.slice(firstPageIndex, lastPageIndex);
-    }, [page, rowsPerPage, filteredUserPermissions]); 
+    }, [page, rowsPerPage, filteredUserPermissions]);
 
     if (error) {
         return <p>Error fetching access manager: {error.message}</p>;
@@ -225,7 +193,7 @@ const AccessManager = () => {
                             </TableBody>
                         </Table>
                     </TableContainer>
-                    <TablePagination 
+                    <TablePagination
                         rowsPerPageOptions={[5, 10, 25]}
                         component="div"
                         count={filteredUserPermissions.length}

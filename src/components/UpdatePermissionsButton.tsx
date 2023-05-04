@@ -1,70 +1,59 @@
-import React from 'react';
-import { gql, useMutation } from '@apollo/client';
 import { Snackbar } from '@mui/material';
 import Button from '@mui/material/Button';
-import { useState } from 'react';
-
-const CARGO_UPDATE_BUCKET_PERMISSIONS = gql`
-  mutation cargoChangePermissions($change : CargoPermissionChange!, $user: String!, $bucket: String!) {
-    cargoChangePermissions(change: $change, user: $user, bucket: $bucket) {
-      _id
-      user {
-        id
-        email
-      }
-      bucket
-      read
-      write
-      delete
-      admin
-    }
-  }
-`;
+import { useEffect, useState } from 'react';
+import { useCargoChangePermissionsMutation } from '../graphql/permissions/permissions';
 
 export function HandleUpdate({ user }: any) {
-    
-    const [snackbarOpen, setSnackbarOpen] = useState(false);
-    const [updateMessage, setUpdateMessage] = useState('');
-    const handleCloseSnackbar = () => {
-        setSnackbarOpen(false);
-    };
-    // update mutation
-    const [cargoUpdateBucketPermission] = useMutation(CARGO_UPDATE_BUCKET_PERMISSIONS, {
-        variables: {
-            change: {
-                read: user.read,
-                write: user.write,
-                delete: user.delete,
-                admin: user.admin
-            },
-            user: user.user.id,
-            bucket: user.bucket
-        },
-        onCompleted: (data) => {
-            setUpdateMessage('Permissions updated');
-            setSnackbarOpen(true);
-        },
-        onError: (error) => {
-            setUpdateMessage(error.message);
-            setSnackbarOpen(true);
-        }
-    });
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [updateMessage, setUpdateMessage] = useState('');
+  const handleCloseSnackbar = () => {
+      setSnackbarOpen(false);
+  };
 
-    const handleUpdate = () => {
-        cargoUpdateBucketPermission();
+  // GraphQL mutation query
+  const [cargoChangePermissions, { error, loading }] = useCargoChangePermissionsMutation();
+
+  // On submit, change the user permissions
+  const handleUpdate = () => {
+    cargoChangePermissions({
+      variables: {
+        change: {
+          read: user.read,
+          write: user.write,
+          delete: user.delete,
+          admin: user.admin
+        },
+        user: user.user.id,
+        bucket: user.bucket
+      }
+    });
+  }
+
+  useEffect(() => {
+    // If still loading, do nothing
+    if (loading) {
+      return;
     }
 
-    return (
-        <>
-            <Button onClick={handleUpdate}>
-                Update
-            </Button>
-            <Snackbar
-                open={snackbarOpen}
-                message={updateMessage}
-                autoHideDuration={3000}
-                onClose={handleCloseSnackbar}
-            />
-        </>
-    );
+    // Determine if message is success or failure
+    let message = 'Permissions updated';
+    if (error) {
+      message = 'Failed to update permissions'
+    }
+
+    setUpdateMessage(message);
+    setSnackbarOpen(true);
+  }, [loading, error]);
+
+  return (
+    <>
+      <Button onClick={handleUpdate}>Update</Button>
+      <Snackbar
+          open={snackbarOpen}
+          message={updateMessage}
+          autoHideDuration={3000}
+          onClose={handleCloseSnackbar}
+      />
+    </>
+  );
 }

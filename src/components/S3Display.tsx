@@ -27,6 +27,7 @@ import { useDropzone } from "react-dropzone";
 import ArticleOutlinedIcon from '@mui/icons-material/ArticleOutlined';
 import DeleteIcon from '@mui/icons-material/Delete';
 import GetAppIcon from '@mui/icons-material/GetApp';
+import {PermissionsContext} from "../contexts/Permissions";
 
 function formatBytes(size: number): string {
   const units = ['B', 'KB', 'MB', 'GB', 'TB'];
