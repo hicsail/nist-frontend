@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useContext, ReactNode, FC } from 'react'
-import { useLocation, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { createFolder, getOrganizationContents } from '../aws-client';
 import FileUploader from '../components/FileUploader';
 import {
@@ -36,18 +36,28 @@ import { OrganizationContext } from '../contexts/organization.context';
 const FileBreadcrumbs: FC<{ path: string}> = ({ path }) => {
   const { organization } = useContext(OrganizationContext);
   const components = path.split('/').filter((path) => path != '');
+  const buttonStyle = {
+    alignItems: 'center',
+    display: 'flex',
+    color: 'black',
+    outline: 'none'
+  }
+  const navigate = useNavigate();
 
   return (
     <Breadcrumbs separator='›' aria-label="breadcrumb">
-      <div style={{ alignItems: 'center', display: 'flex' }} key={0}>
+      <Button variant='text' style={buttonStyle} key={0} onClick={() => navigate('/organization/')}>
         <HomeIcon />{organization?.name || ''}
-      </div>
+      </Button>
       {
         components.map((path, index) => {
           return (
-            <div style={{ alignItems: 'center', display: 'flex' }} key={index + 1}>
+            <Button variant='text' style={buttonStyle} key={index + 1} onClick={() => {
+              const fullPath = `/organization/${components.splice(0, index + 1).join('/')}/`;
+              navigate(fullPath);
+            }}>
               <FolderIcon />{path}
-            </div>
+            </Button>
           );
         })
       }
