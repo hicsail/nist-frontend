@@ -26,6 +26,11 @@ jobs:
         run: npm install
       - name: Build
         run: npm run build
+        env:
+          VITE_AWS_KEY: ${{ secrets.VITE_AWS_KEY }}
+          VITE_AWS_SECRET: ${{ secrets.VITE_AWS_SECRET }}
+          VITE_AUTH_URL: ${{ secrets.VITE_AUTH_URL }}
+          VITE_PROJECT_ID: ${{ secrets.VITE_PROJECT_ID }}
       - name: Login to Docker Hub
         uses: docker/login-action@v2
         with:
