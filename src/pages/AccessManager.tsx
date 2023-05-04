@@ -46,9 +46,9 @@ const AccessManager = () => {
         }
     }, [permissions]);
 
-    // useEffect(() => {
-    //     setUserPermissions(data?.cargoGetAllBucketPermissions);
-    // }, [data]);
+    useEffect(() => {
+      setUserPermissions(data?.cargoGetAllBucketPermissions);
+    }, [data]);
 
     useEffect(() => {
         if (path){
