@@ -93,24 +93,29 @@ export default function Organization(props: any) {
   }, [organization]);
 
   return (
-    <Box sx={{ justifyContent: 'space-between', display: 'flex', alignItems: 'center' }}>
-      <Breadcrumbs separator='›' aria-label="breadcrumb">
-        <div style={{ alignItems: 'center', display: 'flex' }}><HomeIcon />{organization.name}</div>
-        <div style={{ alignItems: 'center', display: 'flex' }}><FolderIcon />Folder 1</div>
-        <div style={{ alignItems: 'center', display: 'flex' }}><FolderIcon />Folder 2</div>
-      </Breadcrumbs>
+    <Box>
+      <Box sx={{ justifyContent: 'space-between', display: 'flex', alignItems: 'center' }}>
 
-      <Box>
-        <Grid container spacing={2}>
-          <Grid item><TextField placeholder='Keyword' /></Grid>
-          <Grid item><TextField placeholder='Property' /></Grid>
-          <Grid item>
-            <IconButton style={{ borderRadius: '100px', border: '1px solid #000000', padding: '12px' }}>
-              <FilterListIcon />
-            </IconButton>
+        <Breadcrumbs separator='›' aria-label="breadcrumb">
+          <div style={{ alignItems: 'center', display: 'flex' }}><HomeIcon />{organization.name}</div>
+          <div style={{ alignItems: 'center', display: 'flex' }}><FolderIcon />Folder 1</div>
+          <div style={{ alignItems: 'center', display: 'flex' }}><FolderIcon />Folder 2</div>
+        </Breadcrumbs>
+
+        <Box>
+          <Grid container spacing={2}>
+            <Grid item><TextField placeholder='Keyword' /></Grid>
+            <Grid item><TextField placeholder='Property' /></Grid>
+            <Grid item>
+              <IconButton style={{ borderRadius: '100px', border: '1px solid #000000', padding: '12px' }}>
+                <FilterListIcon />
+              </IconButton>
+            </Grid>
           </Grid>
-        </Grid>
+        </Box>
       </Box>
+
+      <S3Display s3BucketName={location.state.bucket} files={files} loadFiles={fetchS3Contents}></S3Display>
     </Box>
   );
 
