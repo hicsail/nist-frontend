@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import './App.css'
-import SideNav from './components/SideNav'
+import { SideNav } from './components/SideNav'
 import { Outlet, useNavigate } from "react-router-dom";
 import { ApolloClient, InMemoryCache, ApolloProvider, HttpLink } from '@apollo/client';
-import { Grid, Typography } from '@mui/material';
+import { Box, Grid, Typography } from '@mui/material';
 import { AuthContext } from './contexts/Auth';
 import { PermissionsProvider } from './contexts/Permissions';
 import { setContext } from '@apollo/client/link/context';
@@ -96,16 +96,12 @@ function App() {
               {
                 isAuthenticated ? (
                     <PermissionsProvider>
-                      <Grid container>
-                        <Grid item xs={12} sm={3}>
-                          <SideNav />
-                        </Grid>
-                        <Grid item xs={12} sm={9}>
-                          <div id='detail'>
-                            <Outlet />
-                          </div>
-                        </Grid>
-                      </Grid>
+                      <Box sx={{ display: 'flex' }}>
+                        <SideNav />
+                        <Box sx={{ flexGrow: 1, p: 3 }}>
+                          <Outlet />
+                        </Box>
+                      </Box>
                     </PermissionsProvider>
                 ) : (
                   <div>
