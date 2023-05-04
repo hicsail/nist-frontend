@@ -30,6 +30,11 @@ const getObjectsForPath = async (s3Client: S3Client, bucket: string, path: strin
       return false;
     }
 
+    // Don't include the path itself
+    if (key == path) {
+      return false;
+    }
+
     // Trim off the path from the begining of the key, then check to see
     // if the object represents a folder or a file at the top level
     const pathRemainder = key.substring(path.length).split('/');
@@ -83,6 +88,16 @@ const FileRowView: FC<FileRowProps> = ({ object, setPath }) => {
     );
   }
 
+  let operations = (
+    <div>
+      <FileDownloadIcon />
+      <DeleteIcon />
+    </div>
+  );
+  if (isFolder) {
+    operations = <></>;
+  }
+
   return (
     <TableRow>
       <TableCell>
@@ -90,6 +105,7 @@ const FileRowView: FC<FileRowProps> = ({ object, setPath }) => {
       </TableCell>
       <TableCell>{object.LastModified ? object.LastModified.toLocaleDateString() : ''}</TableCell>
       <TableCell>{formatBytes(object.Size)}</TableCell>
+      <TableCell>{operations}</TableCell>
     </TableRow>
   );
 };
