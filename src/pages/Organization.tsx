@@ -1,6 +1,6 @@
 import { useEffect, useState, useContext, FC } from 'react'
 import { useNavigate, useParams } from 'react-router-dom';
-import { getOrganizationContents, uploadToS3 } from '../aws-client';
+import { getOrganizationContents, uploadToS3, createFolder } from '../aws-client';
 import {
   Button,
   TextField,
@@ -73,6 +73,7 @@ export const Organization: FC = () => {
   const [shouldReload, setShouldReload] = useState<boolean>(true);
   const [dialogOpen, setDialogOpen] = useState<boolean>(false);
   const [folderName, setFolderName] = useState<string>('');
+  const [creatingFolder, setCreatingFolder] = useState<boolean>(false);
 
   // Determine the file path to visualize
   const splat = useParams()['*'];
@@ -132,7 +133,23 @@ export const Organization: FC = () => {
   };
 
   const newFolderHandler = async() => {
+    setCreatingFolder(true);
 
+    const key = `${path.substring(1)}${folderName.replaceAll('/', '')}`
+
+    // Try to make the folder
+    try {
+      await createFolder(s3Client, organization!.bucket, key);
+      setSnackBarSettings({ message: 'Folder created successfully', open: true, severity: 'success' });
+      setShouldReload(true);
+    } catch (error: any) {
+      setSnackBarSettings({ message: 'Failed to create folder', open: true, severity: 'error' });
+    }
+
+    // Clear the folder name and close the dialog
+    setFolderName('');
+    setCreatingFolder(false);
+    setDialogOpen(false);
   };
 
   return (
@@ -179,7 +196,7 @@ export const Organization: FC = () => {
                     fullWidth />
                 </DialogContent>
                 <DialogActions>
-                  <Button disabled={!folderName || folderName == ''} onClick={newFolderHandler}>Create</Button>
+                  <Button disabled={folderName == '' || creatingFolder} onClick={newFolderHandler}>Create</Button>
                   <Button onClick={() => { setFolderName(''); setDialogOpen(false) }}>Cancel</Button>
                 </DialogActions>
               </Dialog>
