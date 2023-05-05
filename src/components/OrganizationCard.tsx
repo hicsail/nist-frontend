@@ -1,8 +1,9 @@
 import { Card, CardActionArea, Chip, Typography } from '@mui/material'
-import React from 'react'
+import React, {useContext} from 'react'
 import { Organization } from '../graphql/graphql'
 import { useNavigate } from 'react-router';
 import thumbnail from '../assets/thumbnail.png';
+import {OrganizationContext} from '../contexts/organization.context';
 
 type OrganizationCardProps = {
   organization: Organization,
@@ -13,9 +14,14 @@ type OrganizationCardProps = {
 export default function ({ organization, canClick, accessType }: OrganizationCardProps) {
 
   const navigate = useNavigate();
+  const { setOrganization } = useContext(OrganizationContext);
+
   const routeToOrganization = (organization: Organization) => {
-    // route to path /organization/:orgId and pass organization as props
-    navigate(`/organization/${organization._id}`, { state: organization });
+    // Set the current organization and route to that organization's file
+    // view
+    setOrganization(organization);
+    window.localStorage.setItem('organization', JSON.stringify(organization));
+    navigate(`/organization/`);
   }
   return (
     <Card onClick={() => canClick ? routeToOrganization(organization) : alert("Contact Administrator for Org to request Access")} style={{width: 330, margin: 10}}>
