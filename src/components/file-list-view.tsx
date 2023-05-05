@@ -124,7 +124,7 @@ const FileRowView: FC<FileRowProps> = ({ object, setShouldReload, setSnackBarSet
   }
 
   return (
-    <TableRow key={name}>
+    <TableRow>
       <TableCell>
         {fileNameView}
       </TableCell>
@@ -182,7 +182,7 @@ export const FileListView: FC<FileListViewProps> = (props) => {
         </TableHead>
         <TableBody>
           {objects.map((object) =>
-            <FileRowView object={object} setShouldReload={props.setShouldReload} setSnackBarSettings={props.setSnackBarSettings} />)
+            <FileRowView object={object} setShouldReload={props.setShouldReload} setSnackBarSettings={props.setSnackBarSettings} key={object.Key!}/>)
           }
         </TableBody>
       </Table>
