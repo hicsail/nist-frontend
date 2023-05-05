@@ -18,7 +18,7 @@ export default function ({ organization, canClick, accessType }: OrganizationCar
     navigate(`/organization/${organization._id}`, { state: organization });
   }
   return (
-    <Card onClick={() => canClick ? routeToOrganization(organization) : alert("Contact Administrator for Org to request Access")}>
+    <Card onClick={() => canClick ? routeToOrganization(organization) : alert("Contact Administrator for Org to request Access")} style={{width: 330, margin: 10}}>
       <CardActionArea>
         <div style={{ padding: 10, display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
           <img src={thumbnail} style={{ width: 100, height: 100, margin: 20 }} />
