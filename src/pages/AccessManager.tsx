@@ -15,7 +15,15 @@ import {
     Button,
     Paper,
     TablePagination,
-    Typography
+    Typography,
+    Tooltip,
+    IconButton,
+    Menu,
+    Divider,
+    Box,
+    List,
+    ListItem,
+    FormControl
 } from '@mui/material';
 import { PermissionsContext } from '../contexts/Permissions';
 import { HandleUpdate } from '../components/UpdatePermissionsButton';
@@ -23,6 +31,8 @@ import { UIContext } from '../contexts/UI';
 import { useCargoGetAllBucketPermissionsQuery } from '../graphql/permissions/permissions';
 import { OrganizationContext } from '../contexts/organization.context';
 import { useGetOrganizationsQuery } from '../graphql/organization/organization';
+import { Clear, Delete, FilterList } from '@mui/icons-material';
+import FilterItem from '../components/FilterItem';
 
 const AccessManager = () => {
     const [userPermissions, setUserPermissions] = useState<any>([]);
@@ -31,6 +41,12 @@ const AccessManager = () => {
     const [currentOrganization, setCurrentOrganization] = useState('');
     const [updateMessage, _setUpdateMessage] = useState('');
     const [snackbarOpen, setSnackbarOpen] = useState(false);
+    const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+    const [availableFilters, setAvailableFilters] = useState<string[]>(["Admin", "Read", "Write", "Delete"].sort());
+    const [selectedFilters, setSelectedFilters] = useState<string[]>([]);
+    
+    const [currentFilter, setCurrentFilter] = useState<any>({});
+
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(5);
     const [organizations, setOrganizations] = useState<any>([]);
@@ -55,7 +71,6 @@ const AccessManager = () => {
 
     useEffect(() => {
         const organizationsWithAdminAccess = permissions.filter((permission) => permission.admin);
-
         setOrganizationsWithAdminAccess(organizationsWithAdminAccess);
 
         if (organizationsWithAdminAccess.length > 0) {
@@ -93,6 +108,57 @@ const AccessManager = () => {
         setUserPermissions(updatedPermissions);
     };
 
+    const handleRemoveFilter = (event: React.MouseEvent<HTMLButtonElement>) => {
+        const filter = event.currentTarget.value;
+        setAvailableFilters((prevState: string[]) => [...prevState, filter].sort());
+        setSelectedFilters((prevState: string[]) => prevState.filter((item) => item !== filter).sort());
+        setCurrentFilter((prevState: any) => {
+            const newCurrentFilter = { ...prevState };
+            delete newCurrentFilter[filter];
+        
+            return newCurrentFilter;
+        });
+    };
+    
+      const handleAddFilter = () => {
+        const filter = availableFilters[0];
+        setCurrentFilter((prevState: any) => {
+            const newCurrentFilter = { ...prevState };
+            newCurrentFilter[filter] = false;
+
+            return newCurrentFilter;
+        });
+    
+        setSelectedFilters((prevState: string[]) => [...prevState, filter].sort());
+        setAvailableFilters((prevState: string[]) => prevState.slice(1));
+    };
+
+    const handleFilterClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+        setAnchorEl(event.currentTarget);
+    };
+    
+    const handleFilterClose = () => {
+        setAnchorEl(null);
+    };
+
+    const changeSelectedFilter = (oldFilter: string, newFilter: string, newFilterValue: boolean) => {
+        setCurrentFilter((prevState: any) => {
+            const newCurrentFilter = { ...prevState };
+            delete newCurrentFilter[oldFilter];
+            newCurrentFilter[newFilter] = newFilterValue;
+        
+            return newCurrentFilter;
+        });
+    
+        setAvailableFilters((prevState: string[]) => {
+            return [...prevState.filter((item) => item !== newFilter), oldFilter].sort();
+        });
+    
+        setSelectedFilters((prevState: string[]) => {
+            return [...prevState.filter((item) => item !== oldFilter), newFilter].sort();
+        });
+    };
+
     const handleChangePage = (event: any, newPage: number) => {
         setPage(newPage);
     };
@@ -124,6 +190,10 @@ const AccessManager = () => {
         return <p>Loading...</p>;
     }
 
+    console.log(`availableFilters: ${availableFilters}`);
+    console.log(`selectedFilters: ${selectedFilters}`);
+    console.log(`currentFilter: ${JSON.stringify(currentFilter)}`);
+
     return (
         <div>
             <Typography variant='h1'>Manage Access</Typography>
@@ -139,22 +209,57 @@ const AccessManager = () => {
                         value={searchText}
                         onChange={handleSearchChange}
                     />
-                    <InputLabel id="select-organization-label" style={{ marginTop: 20 }}>Choose an Organization</InputLabel>
-                    <Select
-                        style={{ width: 300 }}
-                        id="select-organization"
-                        label="Select an Organization"
-                        value={currentOrganization}
-                        onChange={(event) => setCurrentOrganization(event.target.value)}
-                    >
-                        {organizationsWithAdminAccess.map(({ bucket }) => (
-                            <MenuItem value={bucket} key={bucket}>
-                                {
-                                    organizations.find((organization: any) => organization.bucket === bucket)?.name
-                                }
-                            </MenuItem>
-                        ))}
-                    </Select>
+                    {/* TODO: create a generic filter component */}
+                    <div>
+                        <Tooltip title="Filter">
+                            <IconButton onClick={handleFilterClick}>
+                                <FilterList />
+                            </IconButton>
+                        </Tooltip>
+                        <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleFilterClose}>
+                            <Box sx={{ my: 3, mx: 2 }}>
+                                <InputLabel id="select-organization-label" style={{ marginTop: 20 }}>Choose an Organization</InputLabel>
+                                <Select
+                                    style={{ width: 300 }}
+                                    id="select-organization"
+                                    label="Select an Organization"
+                                    value={currentOrganization}
+                                    onChange={(event) => setCurrentOrganization(event.target.value)}
+                                >
+                                    {organizationsWithAdminAccess.map(({ bucket }) => (
+                                        <MenuItem value={bucket} key={bucket}>
+                                            {
+                                                organizations.find((organization: any) => organization.bucket === bucket)?.name
+                                            }
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                            </Box>
+                            <Divider variant="middle" />
+                            <Box sx={{ my: 3, mx: 2 }}>
+                                <List>
+                                    {selectedFilters.map((filter) => (
+                                        <ListItem key={filter}>
+                                            <Tooltip title="delete">
+                                                <IconButton value={filter} onClick={handleRemoveFilter}>
+                                                    <Clear />
+                                                </IconButton>
+                                            </Tooltip>
+                                            <FilterItem
+                                                selected={filter}
+                                                availableItems={availableFilters}
+                                                onChangeSelectedFilter={changeSelectedFilter}
+                                            />
+                                            <Checkbox />
+                                        </ListItem>
+                                    ))}
+                                </List>
+                                <Button variant="text" onClick={handleAddFilter} disabled={availableFilters.length <= 0}>
+                                    add filter
+                                </Button>
+                            </Box>
+                        </Menu>
+                    </div>
                     <TableContainer style={{ marginTop: 50 }}>
                         <Table>
                             <TableHead>
