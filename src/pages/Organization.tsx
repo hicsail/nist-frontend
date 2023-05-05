@@ -55,8 +55,8 @@ const FileBreadcrumbs: FC<{ path: string}> = ({ path }) => {
 
 export const Organization: FC = () => {
   const { organization } = useContext(OrganizationContext);
-  const [setUserPermissions] = useState<any>();
-  const [_, setFiles] = useState<any[]>([]);
+  const [_userPermissions, setUserPermissions] = useState<any>();
+  const [_files, setFiles] = useState<any[]>([]);
   const s3Client = useContext(S3Context);
 
   // Determine the file path to visualize
