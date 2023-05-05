@@ -44,6 +44,7 @@ jobs:
             VITE_PROJECT_ID=${{ secrets.VITE_PROJECT_ID }}
             VITE_CARGO_ENDPOINT=${{ secrets.VITE_CARGO_ENDPOINT }}
             VITE_S3_ENDPOINT=${{ secrets.VITE_S3_ENDPOINT }}
+            VITE_AUTHSERVICE_URL=${{ secrets.VITE_AUTHSERVICE_URL }}
       - name: Push to Staging
         uses: fjogeleit/http-request-action@v1
         if: github.ref == 'refs/heads/main'
