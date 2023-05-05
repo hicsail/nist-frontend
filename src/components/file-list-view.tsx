@@ -7,7 +7,10 @@ import {
   Table,
   TableBody,
   Button,
-  IconButton
+  IconButton,
+  Snackbar,
+  Alert,
+  AlertColor
 } from '@mui/material';
 import { FC, useContext, useState, useEffect, ReactNode } from 'react';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
@@ -70,6 +73,11 @@ const FileRowView: FC<FileRowProps> = ({ object }) => {
   const location = useLocation();
   const s3Client = useContext(S3Context);
   const { organization } = useContext(OrganizationContext);
+  const [snackBarSettings, setSnackBarSettings] = useState<{ message: string, open: boolean, severity: AlertColor}>({
+    message: '',
+    open: false,
+    severity: 'success'
+  });
 
   // Get the name which is the last element in the path split on '/' or the
   // second to last in the case of a folder
@@ -94,12 +102,24 @@ const FileRowView: FC<FileRowProps> = ({ object }) => {
     );
   }
 
+  // Delete the file and open a snackbar to display the result
+  const deleteFileHandler = async () => {
+    const deleteResult = await deleteFile(s3Client, organization!.bucket, object.Key!);
+    const snackBarSettings = { message: 'File deleted successfully', open: true, severity: 'success' as AlertColor };
+    if (!deleteResult) {
+      snackBarSettings.message = 'Failed to delete file';
+      snackBarSettings.severity = 'error';
+    }
+
+    setSnackBarSettings(snackBarSettings);
+  };
+
   let operations = (
     <div>
       <IconButton onClick={() => downloadFile(s3Client, organization!.bucket, object.Key!)}>
         <FileDownloadIcon />
       </IconButton>
-      <IconButton onClick={() => deleteFile(s3Client, organization!.bucket, object.Key!)}>
+      <IconButton onClick={deleteFileHandler}>
         <DeleteIcon />
       </IconButton>
     </div>
@@ -116,6 +136,15 @@ const FileRowView: FC<FileRowProps> = ({ object }) => {
       <TableCell>{object.LastModified ? object.LastModified.toLocaleDateString() : ''}</TableCell>
       <TableCell>{formatBytes(object.Size)}</TableCell>
       <TableCell>{operations}</TableCell>
+      <Snackbar
+        open={snackBarSettings.open}
+        autoHideDuration={6000}
+        onClose={() => setSnackBarSettings({ message: '', open: false, severity: 'success' })}
+      >
+        <Alert severity={snackBarSettings.severity} sx={{ width: '100%' }}>
+          {snackBarSettings.message}
+        </Alert>
+      </Snackbar>
     </TableRow>
   );
 };
