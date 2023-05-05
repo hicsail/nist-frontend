@@ -21,6 +21,8 @@ import { PermissionsContext } from '../contexts/Permissions';
 import { HandleUpdate } from '../components/UpdatePermissionsButton';
 import { UIContext } from '../contexts/UI';
 import { useCargoGetAllBucketPermissionsQuery } from '../graphql/permissions/permissions';
+import { OrganizationContext } from '../contexts/organization.context';
+import { useGetOrganizationsQuery } from '../graphql/organization/organization';
 
 const AccessManager = () => {
     const [userPermissions, setUserPermissions] = useState<any>([]);
@@ -29,17 +31,31 @@ const AccessManager = () => {
     const [currentOrganization, setCurrentOrganization] = useState('');
     const [updateMessage, _setUpdateMessage] = useState('');
     const [snackbarOpen, setSnackbarOpen] = useState(false);
-
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(5);
+    const [organizations, setOrganizations] = useState<any>([]);
 
     const permissions = useContext(PermissionsContext);
     const { path, setPath } = useContext(UIContext);
 
+
     const { loading, error, data } = useCargoGetAllBucketPermissionsQuery({ variables: { bucket: currentOrganization } });
+    
+    useGetOrganizationsQuery(
+        {
+            onCompleted: (data) => {
+                console.log(data);
+                setOrganizations(data.getOriganizations);
+            },
+            onError: (error) => {
+                console.log(error);
+            },
+        },
+    );
 
     useEffect(() => {
         const organizationsWithAdminAccess = permissions.filter((permission) => permission.admin);
+
         setOrganizationsWithAdminAccess(organizationsWithAdminAccess);
 
         if (organizationsWithAdminAccess.length > 0) {
@@ -55,7 +71,6 @@ const AccessManager = () => {
         if (path){
             setPath([]);
         }
-
     },[]);
 
     const handleSearchChange = (event: any) => {
@@ -134,7 +149,9 @@ const AccessManager = () => {
                     >
                         {organizationsWithAdminAccess.map(({ bucket }) => (
                             <MenuItem value={bucket} key={bucket}>
-                                {bucket}
+                                {
+                                    organizations.find((organization: any) => organization.bucket === bucket)?.name
+                                }
                             </MenuItem>
                         ))}
                     </Select>
