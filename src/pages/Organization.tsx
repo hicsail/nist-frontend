@@ -11,7 +11,11 @@ import {
   Divider,
   AlertColor,
   Snackbar,
-  Alert
+  Alert,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions
 } from '@mui/material';
 import { PermissionsContext } from "../contexts/Permissions";
 import { S3Context } from '../contexts/s3.context';
@@ -67,6 +71,8 @@ export const Organization: FC = () => {
     severity: 'success'
   });
   const [shouldReload, setShouldReload] = useState<boolean>(true);
+  const [dialogOpen, setDialogOpen] = useState<boolean>(false);
+  const [folderName, setFolderName] = useState<string>('');
 
   // Determine the file path to visualize
   const splat = useParams()['*'];
@@ -113,15 +119,20 @@ export const Organization: FC = () => {
       Body: file
     };
 
-    console.log(uploadOptions);
-
+    // Attempt to upload to S3
     const success = await uploadToS3(s3Client, uploadOptions);
+
+    // Report on success/failure and reload files accordingly
     if (success) {
       setSnackBarSettings({ message: 'File uploaded successfully', open: true, severity: 'success' });
       setShouldReload(true);
     } else {
       setSnackBarSettings({ message: 'Failed to upload file', open: true, severity: 'error' });
     }
+  };
+
+  const newFolderHandler = async() => {
+
   };
 
   return (
@@ -156,7 +167,22 @@ export const Organization: FC = () => {
               </Button>
             </Grid>
             <Grid item>
-              <Button variant='contained'><FolderIcon />New Folder</Button>
+              <Button variant='contained' onClick={() => setDialogOpen(true)}><FolderIcon />New Folder</Button>
+              <Dialog open={dialogOpen}>
+                <DialogTitle>Create New Folder</DialogTitle>
+                <DialogContent>
+                  <TextField
+                    style={{ marginTop: '10px' }}
+                    label='Folder Name'
+                    value={folderName}
+                    onChange={(event: any) => setFolderName(event.target.value)}
+                    fullWidth />
+                </DialogContent>
+                <DialogActions>
+                  <Button disabled={!folderName || folderName == ''} onClick={newFolderHandler}>Create</Button>
+                  <Button onClick={() => { setFolderName(''); setDialogOpen(false) }}>Cancel</Button>
+                </DialogActions>
+              </Dialog>
             </Grid>
           </Grid>
         </Box>
