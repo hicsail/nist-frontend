@@ -8,11 +8,10 @@ import {
   TableBody,
   Button,
   IconButton,
-  Snackbar,
-  Alert,
-  AlertColor
+  AlertColor,
+  Container
 } from '@mui/material';
-import { FC, useContext, useState, useEffect, ReactNode } from 'react';
+import { FC, useContext, useState, useEffect, ReactNode, Dispatch, SetStateAction } from 'react';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import DeleteIcon from '@mui/icons-material/Delete';
 import FolderIcon from '@mui/icons-material/Folder';
@@ -64,21 +63,17 @@ const formatBytes = (size: number | undefined): string => {
 
 interface FileRowProps {
   object: S3Object;
+  setShouldReload: Dispatch<SetStateAction<boolean>>;
+  setSnackBarSettings: Dispatch<SetStateAction<{ message: string, open: boolean, severity: AlertColor }>>;
 }
 
-const FileRowView: FC<FileRowProps> = ({ object }) => {
+const FileRowView: FC<FileRowProps> = ({ object, setShouldReload, setSnackBarSettings }) => {
   const fileComponents = object.Key!.split('/');
   const isFolder = fileComponents[fileComponents.length - 1] == '';
   const navigate = useNavigate();
   const location = useLocation();
   const s3Client = useContext(S3Context);
   const { organization } = useContext(OrganizationContext);
-  const [snackBarSettings, setSnackBarSettings] = useState<{ message: string, open: boolean, severity: AlertColor}>({
-    message: '',
-    open: false,
-    severity: 'success'
-  });
-
   // Get the name which is the last element in the path split on '/' or the
   // second to last in the case of a folder
   const name = fileComponents[isFolder ? fileComponents.length - 2 : fileComponents.length - 1];
@@ -111,6 +106,7 @@ const FileRowView: FC<FileRowProps> = ({ object }) => {
       snackBarSettings.severity = 'error';
     }
 
+    setShouldReload(true);
     setSnackBarSettings(snackBarSettings);
   };
 
@@ -136,15 +132,6 @@ const FileRowView: FC<FileRowProps> = ({ object }) => {
       <TableCell>{object.LastModified ? object.LastModified.toLocaleDateString() : ''}</TableCell>
       <TableCell>{formatBytes(object.Size)}</TableCell>
       <TableCell>{operations}</TableCell>
-      <Snackbar
-        open={snackBarSettings.open}
-        autoHideDuration={6000}
-        onClose={() => setSnackBarSettings({ message: '', open: false, severity: 'success' })}
-      >
-        <Alert severity={snackBarSettings.severity} sx={{ width: '100%' }}>
-          {snackBarSettings.message}
-        </Alert>
-      </Snackbar>
     </TableRow>
   );
 };
@@ -152,17 +139,20 @@ const FileRowView: FC<FileRowProps> = ({ object }) => {
 export interface FileListViewProps {
   path: string;
   bucket: string | null;
+  setSnackBarSettings: Dispatch<SetStateAction<{ message: string, open: boolean, severity: AlertColor }>>;
 }
 
-export const FileListView: FC<FileListViewProps> = ({ path, bucket }) => {
+export const FileListView: FC<FileListViewProps> = ({ path, bucket, setSnackBarSettings }) => {
   const s3Client = useContext(S3Context);
   const [objects, setObjects] = useState<S3Object[]>([]);
+  const [shouldReload, setShouldReload] = useState<boolean>(true);
 
   useEffect(() => {
-    if (bucket) {
+    if (shouldReload && bucket) {
       getObjectsForPath(s3Client, bucket, path).then((objs) => setObjects(objs));
+      setShouldReload(false);
     }
-  }, [path, bucket]);
+  }, [path, bucket, shouldReload]);
 
   return (
     <TableContainer component={Paper} sx={{ minWidth: 650 }}>
@@ -176,7 +166,7 @@ export const FileListView: FC<FileListViewProps> = ({ path, bucket }) => {
           </TableRow>
         </TableHead>
         <TableBody>
-          {objects.map((object) => <FileRowView object={object} />)}
+          {objects.map((object) => <FileRowView object={object} setShouldReload={setShouldReload} setSnackBarSettings={setSnackBarSettings} />)}
         </TableBody>
 
       </Table>

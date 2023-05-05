@@ -8,7 +8,10 @@ import {
   Typography,
   Box,
   Grid,
-  Divider
+  Divider,
+  AlertColor,
+  Snackbar,
+  Alert
 } from '@mui/material';
 import { PermissionsContext } from "../contexts/Permissions";
 import { S3Context } from '../contexts/s3.context';
@@ -58,6 +61,11 @@ export const Organization: FC = () => {
   const [_userPermissions, setUserPermissions] = useState<any>();
   const [_files, setFiles] = useState<any[]>([]);
   const s3Client = useContext(S3Context);
+  const [snackBarSettings, setSnackBarSettings] = useState<{ message: string, open: boolean, severity: AlertColor}>({
+    message: '',
+    open: false,
+    severity: 'success'
+  });
 
   // Determine the file path to visualize
   const splat = useParams()['*'];
@@ -116,7 +124,16 @@ export const Organization: FC = () => {
         <Button variant='contained'><AddIcon />New</Button>
       </Box>
 
-      <FileListView path={path} bucket={organization?.bucket || null}/>
+      <FileListView path={path} bucket={organization?.bucket || null} setSnackBarSettings={setSnackBarSettings}/>
+      <Snackbar
+        open={snackBarSettings.open}
+        autoHideDuration={6000}
+        onClose={() => setSnackBarSettings({ message: '', open: false, severity: 'success' })}
+      >
+        <Alert severity={snackBarSettings.severity} sx={{ width: '100%' }}>
+          {snackBarSettings.message}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 }
