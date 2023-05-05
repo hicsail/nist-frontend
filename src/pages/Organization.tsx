@@ -103,7 +103,9 @@ export const Organization: FC = () => {
   }, [permissions]);
 
   useEffect(() => {
-    fetchS3Contents();
+    if (organization) {
+      fetchS3Contents();
+    }
   }, [organization]);
 
   const fileUploadHandler = async (event: any) => {
