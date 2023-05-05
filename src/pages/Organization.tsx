@@ -1,6 +1,6 @@
 import { useEffect, useState, useContext, FC } from 'react'
 import { useNavigate, useParams } from 'react-router-dom';
-import { getOrganizationContents } from '../aws-client';
+import { getOrganizationContents, uploadToS3 } from '../aws-client';
 import {
   Button,
   TextField,
@@ -66,6 +66,7 @@ export const Organization: FC = () => {
     open: false,
     severity: 'success'
   });
+  const [shouldReload, setShouldReload] = useState<boolean>(true);
 
   // Determine the file path to visualize
   const splat = useParams()['*'];
@@ -98,6 +99,31 @@ export const Organization: FC = () => {
     fetchS3Contents();
   }, [organization]);
 
+  const fileUploadHandler = async (event: any) => {
+    const file = event.target.files[0];
+    if (!file) {
+      return;
+    }
+
+    // Get the key, cannot include the leading '/'
+    const key = `${path.substring(1)}${file.name}`;
+    const uploadOptions = {
+      Bucket: organization!.bucket,
+      Key: key,
+      Body: file
+    };
+
+    console.log(uploadOptions);
+
+    const success = await uploadToS3(s3Client, uploadOptions);
+    if (success) {
+      setSnackBarSettings({ message: 'File uploaded successfully', open: true, severity: 'success' });
+      setShouldReload(true);
+    } else {
+      setSnackBarSettings({ message: 'Failed to upload file', open: true, severity: 'error' });
+    }
+  };
+
   return (
     <Box>
       <Box sx={{ justifyContent: 'space-between', display: 'flex', alignItems: 'center', paddingBottom: 15 }}>
@@ -124,7 +150,10 @@ export const Organization: FC = () => {
         <Box>
           <Grid container spacing={2}>
             <Grid item>
-              <Button variant='contained'><AddIcon />Upload File</Button>
+              <Button variant='contained' component='label'>
+                <AddIcon />Upload File
+                <input hidden multiple type="file" onChange={fileUploadHandler}/>
+              </Button>
             </Grid>
             <Grid item>
               <Button variant='contained'><FolderIcon />New Folder</Button>
@@ -133,7 +162,13 @@ export const Organization: FC = () => {
         </Box>
       </Box>
 
-      <FileListView path={path} bucket={organization?.bucket || null} setSnackBarSettings={setSnackBarSettings}/>
+      <FileListView
+        path={path}
+        bucket={organization?.bucket || null}
+        setSnackBarSettings={setSnackBarSettings}
+        shouldReload={shouldReload}
+        setShouldReload={setShouldReload}
+      />
       <Snackbar
         open={snackBarSettings.open}
         autoHideDuration={6000}

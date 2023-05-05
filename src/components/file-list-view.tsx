@@ -139,19 +139,35 @@ export interface FileListViewProps {
   path: string;
   bucket: string | null;
   setSnackBarSettings: Dispatch<SetStateAction<{ message: string, open: boolean, severity: AlertColor }>>;
+  shouldReload: boolean,
+  setShouldReload: Dispatch<SetStateAction<boolean>>;
 }
 
-export const FileListView: FC<FileListViewProps> = ({ path, bucket, setSnackBarSettings }) => {
+export const FileListView: FC<FileListViewProps> = (props) => {
   const s3Client = useContext(S3Context);
   const [objects, setObjects] = useState<S3Object[]>([]);
-  const [shouldReload, setShouldReload] = useState<boolean>(true);
+
+  const loadFiles = async () => {
+    const objs = await getObjectsForPath(s3Client, props.bucket!, props.path);
+    setObjects(objs);
+  };
+
+
+  // TODO: Condense these two use effects into one. Currently exists so
+  // loading on path change is independent of manual reloading (such as new
+  // file being uploaded)
+  useEffect(() => {
+    if (props.shouldReload && props.bucket) {
+      loadFiles();
+      props.setShouldReload(false);
+    }
+  }, [props.bucket, props.shouldReload]);
 
   useEffect(() => {
-    if (shouldReload && bucket) {
-      getObjectsForPath(s3Client, bucket, path).then((objs) => setObjects(objs));
-      setShouldReload(false);
+    if (props.bucket) {
+      loadFiles();
     }
-  }, [path, bucket, shouldReload]);
+  }, [props.bucket, props.path]);
 
   return (
     <TableContainer component={Paper} sx={{ minWidth: 650 }}>
@@ -165,7 +181,9 @@ export const FileListView: FC<FileListViewProps> = ({ path, bucket, setSnackBarS
           </TableRow>
         </TableHead>
         <TableBody>
-          {objects.map((object) => <FileRowView object={object} setShouldReload={setShouldReload} setSnackBarSettings={setSnackBarSettings} />)}
+          {objects.map((object) =>
+            <FileRowView object={object} setShouldReload={props.setShouldReload} setSnackBarSettings={props.setSnackBarSettings} />)
+          }
         </TableBody>
       </Table>
     </TableContainer>
