@@ -6,7 +6,8 @@ import {
   TableRow,
   Table,
   TableBody,
-  Button
+  Button,
+  IconButton
 } from '@mui/material';
 import { FC, useContext, useState, useEffect, ReactNode } from 'react';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
@@ -14,7 +15,9 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import FolderIcon from '@mui/icons-material/Folder';
 import { S3Context } from '../contexts/s3.context';
 import { ListObjectsCommand, S3Client, _Object as S3Object } from '@aws-sdk/client-s3';
-import {useLocation, useNavigate} from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { deleteFile, downloadFile } from '../aws-client';
+import { OrganizationContext } from '../contexts/organization.context';
 
 // TODO: Handle when there are more then 1000 objects
 const getObjectsForPath = async (s3Client: S3Client, bucket: string, path: string): Promise<S3Object[]> => {
@@ -65,6 +68,8 @@ const FileRowView: FC<FileRowProps> = ({ object }) => {
   const isFolder = fileComponents[fileComponents.length - 1] == '';
   const navigate = useNavigate();
   const location = useLocation();
+  const s3Client = useContext(S3Context);
+  const { organization } = useContext(OrganizationContext);
 
   // Get the name which is the last element in the path split on '/' or the
   // second to last in the case of a folder
@@ -91,8 +96,12 @@ const FileRowView: FC<FileRowProps> = ({ object }) => {
 
   let operations = (
     <div>
-      <FileDownloadIcon />
-      <DeleteIcon />
+      <IconButton onClick={() => downloadFile(s3Client, organization!.bucket, object.Key!)}>
+        <FileDownloadIcon />
+      </IconButton>
+      <IconButton onClick={() => deleteFile(s3Client, organization!.bucket, object.Key!)}>
+        <DeleteIcon />
+      </IconButton>
     </div>
   );
   if (isFolder) {
