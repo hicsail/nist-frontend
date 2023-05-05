@@ -1,12 +1,10 @@
 import { useState, useContext, useEffect } from 'react'
-import { Card, CardActionArea, Chip, IconButton, Typography } from '@mui/material';
-import FolderOpenOutlinedIcon from '@mui/icons-material/FolderOpenOutlined';
+import { Typography } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { PermissionsContext } from '../contexts/Permissions';
 import { UIContext } from '../contexts/UI';
 import { useGetOrganizationsQuery } from '../graphql/organization/organization';
 import { Organization } from '../graphql/graphql';
-import thumbnail from '../assets/thumbnail.png';
 import OrganizationCard from '../components/OrganizationCard';
 import {OrganizationContext} from '../contexts/organization.context';
 
@@ -95,9 +93,11 @@ export default function Dashboard() {
             {
                 adminOrganizations.length > 0 &&
                 <>
+                <div style={{marginTop: 20, marginBottom: 20}}>
                     <Typography variant='h3'>My Organizations</Typography>
-                    <div style={{ display: 'flex' }}>
+                    <div style={{ display: 'flex', marginTop: 10 }}>
                         {renderOrganizations(adminOrganizations, true, 'Admin')}
+                    </div>
                     </div>
                 </>
 
@@ -105,9 +105,11 @@ export default function Dashboard() {
             {
                 accessOrganizations.length > 0 &&
                 <>
-                    <Typography variant='h3'>Organizations with Access</Typography>
-                    <div style={{ display: 'flex' }}>
-                        {renderOrganizations(accessOrganizations, true, 'Can View')}
+                    <div style={{marginTop: 20, marginBottom: 20}}>
+                        <Typography variant='h3'>Organizations with Access</Typography>
+                        <div style={{ display: 'flex', marginTop: 10 }}>
+                            {renderOrganizations(accessOrganizations, true, 'Can View')}
+                        </div>
                     </div>
                 </>
 
@@ -115,9 +117,11 @@ export default function Dashboard() {
             {
                 noAccessOrganizations.length > 0 && (
                     <>
+                    <div style={{marginTop: 20, marginBottom: 20}}>
                         <Typography variant='h3'>All Organizations</Typography>
-                        <div style={{ display: 'flex' }}>
+                        <div style={{ display: 'flex', marginTop:10 }}>
                             {renderOrganizations(noAccessOrganizations, false, 'No Access')}
+                        </div>
                         </div>
                     </>
                 )
