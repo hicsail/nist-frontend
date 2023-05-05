@@ -8,8 +8,7 @@ import {
   TableBody,
   Button,
   IconButton,
-  AlertColor,
-  Container
+  AlertColor
 } from '@mui/material';
 import { FC, useContext, useState, useEffect, ReactNode, Dispatch, SetStateAction } from 'react';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
@@ -168,7 +167,6 @@ export const FileListView: FC<FileListViewProps> = ({ path, bucket, setSnackBarS
         <TableBody>
           {objects.map((object) => <FileRowView object={object} setShouldReload={setShouldReload} setSnackBarSettings={setSnackBarSettings} />)}
         </TableBody>
-
       </Table>
     </TableContainer>
   );

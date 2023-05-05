@@ -121,7 +121,16 @@ export const Organization: FC = () => {
 
       <Box sx={{ justifyContent: 'space-between', display: 'flex', alignItems: 'center', paddingTop: 10 }}>
         <Typography variant='h1'>Folder Name</Typography>
-        <Button variant='contained'><AddIcon />New</Button>
+        <Box>
+          <Grid container spacing={2}>
+            <Grid item>
+              <Button variant='contained'><AddIcon />Upload File</Button>
+            </Grid>
+            <Grid item>
+              <Button variant='contained'><FolderIcon />New Folder</Button>
+            </Grid>
+          </Grid>
+        </Box>
       </Box>
 
       <FileListView path={path} bucket={organization?.bucket || null} setSnackBarSettings={setSnackBarSettings}/>
