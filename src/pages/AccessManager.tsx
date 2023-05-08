@@ -23,6 +23,9 @@ import { UIContext } from '../contexts/UI';
 import { useCargoGetAllBucketPermissionsQuery } from '../graphql/permissions/permissions';
 import { OrganizationContext } from '../contexts/organization.context';
 import { useGetOrganizationsQuery } from '../graphql/organization/organization';
+import EnhancedTableHead from '../components/EnhancedTableHead';
+
+type Order = 'asc' | 'desc';
 
 const AccessManager = () => {
     const [userPermissions, setUserPermissions] = useState<any>([]);
@@ -34,6 +37,17 @@ const AccessManager = () => {
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(5);
     const [organizations, setOrganizations] = useState<any>([]);
+
+    const columns = [
+        { label: 'Email', id: 'email' },
+        { label: 'Read', id: 'read' },
+        { label: 'Write', id: 'write' },
+        { label: 'Delete', id: 'delete' },
+        { label: 'Admin', id: 'admin' },
+        { label: 'Action', id: 'action' }
+    ];
+    const [order, setOrder] = useState<Order>('asc');
+    const [orderBy, setOrderBy] = useState<string>('email');
 
     const permissions = useContext(PermissionsContext);
     const { path, setPath } = useContext(UIContext);
@@ -64,14 +78,27 @@ const AccessManager = () => {
     }, [permissions]);
 
     useEffect(() => {
-      setUserPermissions(data?.cargoGetAllBucketPermissions);
-    }, [data]);
+        const orderedPermissions = data?.cargoGetAllBucketPermissions.slice().sort((a: any, b: any) => {
+            if (order === 'asc') {
+                return a.user[orderBy] > b.user[orderBy] ? 1 : -1;
+            } else {
+                return a.user[orderBy] > b.user[orderBy] ? -1 : 1;
+            }
+        });
+        setUserPermissions(orderedPermissions);
+    }, [data, order, orderBy]);
 
     useEffect(() => {
         if (path){
             setPath([]);
         }
     },[]);
+
+    const handleRequestSort = (event: React.MouseEvent<unknown>, property: string) => {
+        const isAsc = orderBy === property && order === 'asc';
+        setOrder(isAsc ? 'desc' : 'asc');
+        setOrderBy(property);
+    };
 
     const handleSearchChange = (event: any) => {
         setSearchText(event.target.value);
@@ -158,16 +185,13 @@ const AccessManager = () => {
                     </Select>
                     <TableContainer style={{ marginTop: 50 }}>
                         <Table>
-                            <TableHead>
-                                <TableRow>
-                                    <TableCell>Email</TableCell>
-                                    <TableCell>Read</TableCell>
-                                    <TableCell>Write</TableCell>
-                                    <TableCell>Delete</TableCell>
-                                    <TableCell>Admin</TableCell>
-                                    <TableCell>Action</TableCell>
-                                </TableRow>
-                            </TableHead>
+                            <EnhancedTableHead
+                                onRequestSort={handleRequestSort}
+                                columns={columns}
+                                sortableIds={['email']}
+                                order={order}
+                                orderBy={orderBy}
+                            />
                             <TableBody>
                                 {visibleUserPermissions.map((userPermission: any, index: number) => (
                                     <TableRow key={userPermission._id}>
