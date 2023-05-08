@@ -95,7 +95,7 @@ export const createFolder = async (client: S3Client, bucketName: string, folderN
 
   try {
     await client.send(command);
-    
+
   } catch (err) {
     console.log(`Error creating folder: ${err}`);
   }
@@ -162,11 +162,13 @@ export const getFile = async (client: S3Client, bucketName: string, key: string)
 
 export const downloadFile = async (client: S3Client, bucketName: string, key: string): Promise<void> => {
   const getObjectCommand = new GetObjectCommand({ Bucket: bucketName, Key: key });
+  const components = key.split('/');
+  const filename = components[components.length - 1];
 
   try {
     const response: GetObjectOutput = await client.send(getObjectCommand);
     const fileData: string = await streamToString(response.Body as ReadableStream<Uint8Array>);
-    downloadData(fileData, key);
+    downloadData(fileData, filename);
   } catch (err) {
     console.error(err);
   }

@@ -1,6 +1,6 @@
 import { useEffect, useState, useContext, FC } from 'react'
 import { useNavigate, useParams } from 'react-router-dom';
-import { getOrganizationContents } from '../aws-client';
+import { getOrganizationContents, uploadToS3, createFolder } from '../aws-client';
 import {
   Button,
   TextField,
@@ -8,7 +8,14 @@ import {
   Typography,
   Box,
   Grid,
-  Divider
+  Divider,
+  AlertColor,
+  Snackbar,
+  Alert,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions
 } from '@mui/material';
 import { PermissionsContext } from "../contexts/Permissions";
 import { S3Context } from '../contexts/s3.context';
@@ -58,6 +65,15 @@ export const Organization: FC = () => {
   const [_userPermissions, setUserPermissions] = useState<any>();
   const [_files, setFiles] = useState<any[]>([]);
   const s3Client = useContext(S3Context);
+  const [snackBarSettings, setSnackBarSettings] = useState<{ message: string, open: boolean, severity: AlertColor}>({
+    message: '',
+    open: false,
+    severity: 'success'
+  });
+  const [shouldReload, setShouldReload] = useState<boolean>(true);
+  const [dialogOpen, setDialogOpen] = useState<boolean>(false);
+  const [folderName, setFolderName] = useState<string>('');
+  const [creatingFolder, setCreatingFolder] = useState<boolean>(false);
 
   // Determine the file path to visualize
   const splat = useParams()['*'];
@@ -87,8 +103,56 @@ export const Organization: FC = () => {
   }, [permissions]);
 
   useEffect(() => {
-    fetchS3Contents();
+    if (organization) {
+      fetchS3Contents();
+    }
   }, [organization]);
+
+  const fileUploadHandler = async (event: any) => {
+    const file = event.target.files[0];
+    if (!file) {
+      return;
+    }
+
+    // Get the key, cannot include the leading '/'
+    const key = `${path.substring(1)}${file.name}`;
+    const uploadOptions = {
+      Bucket: organization!.bucket,
+      Key: key,
+      Body: file
+    };
+
+    // Attempt to upload to S3
+    const success = await uploadToS3(s3Client, uploadOptions);
+
+    // Report on success/failure and reload files accordingly
+    if (success) {
+      setSnackBarSettings({ message: 'File uploaded successfully', open: true, severity: 'success' });
+      setShouldReload(true);
+    } else {
+      setSnackBarSettings({ message: 'Failed to upload file', open: true, severity: 'error' });
+    }
+  };
+
+  const newFolderHandler = async() => {
+    setCreatingFolder(true);
+
+    const key = `${path.substring(1)}${folderName.replaceAll('/', '')}`
+
+    // Try to make the folder
+    try {
+      await createFolder(s3Client, organization!.bucket, key);
+      setSnackBarSettings({ message: 'Folder created successfully', open: true, severity: 'success' });
+      setShouldReload(true);
+    } catch (error: any) {
+      setSnackBarSettings({ message: 'Failed to create folder', open: true, severity: 'error' });
+    }
+
+    // Clear the folder name and close the dialog
+    setFolderName('');
+    setCreatingFolder(false);
+    setDialogOpen(false);
+  };
 
   return (
     <Box>
@@ -113,10 +177,52 @@ export const Organization: FC = () => {
 
       <Box sx={{ justifyContent: 'space-between', display: 'flex', alignItems: 'center', paddingTop: 10 }}>
         <Typography variant='h1'>Folder Name</Typography>
-        <Button variant='contained'><AddIcon />New</Button>
+        <Box>
+          <Grid container spacing={2}>
+            <Grid item>
+              <Button variant='contained' component='label'>
+                <AddIcon />Upload File
+                <input hidden multiple type="file" onChange={fileUploadHandler}/>
+              </Button>
+            </Grid>
+            <Grid item>
+              <Button variant='contained' onClick={() => setDialogOpen(true)}><FolderIcon />New Folder</Button>
+              <Dialog open={dialogOpen}>
+                <DialogTitle>Create New Folder</DialogTitle>
+                <DialogContent>
+                  <TextField
+                    style={{ marginTop: '10px' }}
+                    label='Folder Name'
+                    value={folderName}
+                    onChange={(event: any) => setFolderName(event.target.value)}
+                    fullWidth />
+                </DialogContent>
+                <DialogActions>
+                  <Button disabled={folderName == '' || creatingFolder} onClick={newFolderHandler}>Create</Button>
+                  <Button onClick={() => { setFolderName(''); setDialogOpen(false) }}>Cancel</Button>
+                </DialogActions>
+              </Dialog>
+            </Grid>
+          </Grid>
+        </Box>
       </Box>
 
-      <FileListView path={path} bucket={organization?.bucket || null}/>
+      <FileListView
+        path={path}
+        bucket={organization?.bucket || null}
+        setSnackBarSettings={setSnackBarSettings}
+        shouldReload={shouldReload}
+        setShouldReload={setShouldReload}
+      />
+      <Snackbar
+        open={snackBarSettings.open}
+        autoHideDuration={6000}
+        onClose={() => setSnackBarSettings({ message: '', open: false, severity: 'success' })}
+      >
+        <Alert severity={snackBarSettings.severity} sx={{ width: '100%' }}>
+          {snackBarSettings.message}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 }

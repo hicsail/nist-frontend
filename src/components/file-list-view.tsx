@@ -6,15 +6,19 @@ import {
   TableRow,
   Table,
   TableBody,
-  Button
+  Button,
+  IconButton,
+  AlertColor
 } from '@mui/material';
-import { FC, useContext, useState, useEffect, ReactNode } from 'react';
+import { FC, useContext, useState, useEffect, ReactNode, Dispatch, SetStateAction } from 'react';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import DeleteIcon from '@mui/icons-material/Delete';
 import FolderIcon from '@mui/icons-material/Folder';
 import { S3Context } from '../contexts/s3.context';
 import { ListObjectsCommand, S3Client, _Object as S3Object } from '@aws-sdk/client-s3';
-import {useLocation, useNavigate} from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { deleteFile, downloadFile } from '../aws-client';
+import { OrganizationContext } from '../contexts/organization.context';
 
 // TODO: Handle when there are more then 1000 objects
 const getObjectsForPath = async (s3Client: S3Client, bucket: string, path: string): Promise<S3Object[]> => {
@@ -58,14 +62,17 @@ const formatBytes = (size: number | undefined): string => {
 
 interface FileRowProps {
   object: S3Object;
+  setShouldReload: Dispatch<SetStateAction<boolean>>;
+  setSnackBarSettings: Dispatch<SetStateAction<{ message: string, open: boolean, severity: AlertColor }>>;
 }
 
-const FileRowView: FC<FileRowProps> = ({ object }) => {
+const FileRowView: FC<FileRowProps> = ({ object, setShouldReload, setSnackBarSettings }) => {
   const fileComponents = object.Key!.split('/');
   const isFolder = fileComponents[fileComponents.length - 1] == '';
   const navigate = useNavigate();
   const location = useLocation();
-
+  const s3Client = useContext(S3Context);
+  const { organization } = useContext(OrganizationContext);
   // Get the name which is the last element in the path split on '/' or the
   // second to last in the case of a folder
   const name = fileComponents[isFolder ? fileComponents.length - 2 : fileComponents.length - 1];
@@ -89,10 +96,27 @@ const FileRowView: FC<FileRowProps> = ({ object }) => {
     );
   }
 
+  // Delete the file and open a snackbar to display the result
+  const deleteFileHandler = async () => {
+    const deleteResult = await deleteFile(s3Client, organization!.bucket, object.Key!);
+    const snackBarSettings = { message: 'File deleted successfully', open: true, severity: 'success' as AlertColor };
+    if (!deleteResult) {
+      snackBarSettings.message = 'Failed to delete file';
+      snackBarSettings.severity = 'error';
+    }
+
+    setShouldReload(true);
+    setSnackBarSettings(snackBarSettings);
+  };
+
   let operations = (
     <div>
-      <FileDownloadIcon />
-      <DeleteIcon />
+      <IconButton onClick={() => downloadFile(s3Client, organization!.bucket, object.Key!)}>
+        <FileDownloadIcon />
+      </IconButton>
+      <IconButton onClick={deleteFileHandler}>
+        <DeleteIcon />
+      </IconButton>
     </div>
   );
   if (isFolder) {
@@ -100,7 +124,7 @@ const FileRowView: FC<FileRowProps> = ({ object }) => {
   }
 
   return (
-    <TableRow key={name}>
+    <TableRow>
       <TableCell>
         {fileNameView}
       </TableCell>
@@ -114,17 +138,36 @@ const FileRowView: FC<FileRowProps> = ({ object }) => {
 export interface FileListViewProps {
   path: string;
   bucket: string | null;
+  setSnackBarSettings: Dispatch<SetStateAction<{ message: string, open: boolean, severity: AlertColor }>>;
+  shouldReload: boolean,
+  setShouldReload: Dispatch<SetStateAction<boolean>>;
 }
 
-export const FileListView: FC<FileListViewProps> = ({ path, bucket }) => {
+export const FileListView: FC<FileListViewProps> = (props) => {
   const s3Client = useContext(S3Context);
   const [objects, setObjects] = useState<S3Object[]>([]);
 
+  const loadFiles = async () => {
+    const objs = await getObjectsForPath(s3Client, props.bucket!, props.path);
+    setObjects(objs);
+  };
+
+
+  // TODO: Condense these two use effects into one. Currently exists so
+  // loading on path change is independent of manual reloading (such as new
+  // file being uploaded)
   useEffect(() => {
-    if (bucket) {
-      getObjectsForPath(s3Client, bucket, path).then((objs) => setObjects(objs));
+    if (props.shouldReload && props.bucket) {
+      loadFiles();
+      props.setShouldReload(false);
     }
-  }, [path, bucket]);
+  }, [props.bucket, props.shouldReload]);
+
+  useEffect(() => {
+    if (props.bucket) {
+      loadFiles();
+    }
+  }, [props.bucket, props.path]);
 
   return (
     <TableContainer component={Paper} sx={{ minWidth: 650 }}>
@@ -138,9 +181,10 @@ export const FileListView: FC<FileListViewProps> = ({ path, bucket }) => {
           </TableRow>
         </TableHead>
         <TableBody>
-          {objects.map((object) => <FileRowView object={object} />)}
+          {objects.map((object) =>
+            <FileRowView object={object} setShouldReload={props.setShouldReload} setSnackBarSettings={props.setSnackBarSettings} key={object.Key!}/>)
+          }
         </TableBody>
-
       </Table>
     </TableContainer>
   );
