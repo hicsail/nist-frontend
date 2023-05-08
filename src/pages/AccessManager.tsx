@@ -79,9 +79,10 @@ const AccessManager = () => {
 
     const handlePermissionChange = (index: number, permissionType: any, isChecked: boolean) => {
         // update permissions in state
+        const actualIndex = index + page * rowsPerPage;
         const updatedPermissions = [...userPermissions];
         const updatedPermission = {
-            ...updatedPermissions[index],
+            ...updatedPermissions[actualIndex],
             [permissionType]: isChecked,
         };
         if (isChecked && permissionType === 'admin') {
@@ -89,7 +90,7 @@ const AccessManager = () => {
             updatedPermission.write = isChecked;
             updatedPermission.delete = isChecked;
         }
-        updatedPermissions[index] = updatedPermission;
+        updatedPermissions[actualIndex] = updatedPermission;
         setUserPermissions(updatedPermissions);
     };
 
