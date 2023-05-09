@@ -11,7 +11,7 @@ import {
   AlertColor,
   Grid
 } from '@mui/material';
-import { FC, useContext, useState, useEffect, ReactNode, Dispatch, SetStateAction } from 'react';
+import { FC, useContext, useState, useEffect, ReactNode, Dispatch, SetStateAction, MouseEvent } from 'react';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import DeleteIcon from '@mui/icons-material/Delete';
 import FolderIcon from '@mui/icons-material/Folder';
@@ -20,6 +20,7 @@ import { ListObjectsCommand, S3Client, _Object as S3Object } from '@aws-sdk/clie
 import { useLocation, useNavigate } from 'react-router-dom';
 import { deleteFile, deleteFolder, downloadFile } from '../aws-client';
 import { OrganizationContext } from '../contexts/organization.context';
+import EnhancedTableHead, { Order } from './EnhancedTableHead';
 
 // TODO: Handle when there are more then 1000 objects
 const getObjectsForPath = async (s3Client: S3Client, bucket: string, path: string): Promise<S3Object[]> => {
@@ -77,6 +78,7 @@ const FileRowView: FC<FileRowProps> = ({ object, setShouldReload, setSnackBarSet
   // Get the name which is the last element in the path split on '/' or the
   // second to last in the case of a folder
   const name = fileComponents[isFolder ? fileComponents.length - 2 : fileComponents.length - 1];
+
 
   // Determine if the view of the file should just be the name or the
   // folder view
@@ -154,12 +156,20 @@ export interface FileListViewProps {
 export const FileListView: FC<FileListViewProps> = (props) => {
   const s3Client = useContext(S3Context);
   const [objects, setObjects] = useState<S3Object[]>([]);
+  const [order, setOrder] = useState<Order>('asc');
+  const [orderBy, setOrderBy] = useState<string>('Key');
+  const [orderedObjects, setOrderedObjects] = useState<S3Object[]>([]);
 
   const loadFiles = async () => {
     const objs = await getObjectsForPath(s3Client, props.bucket!, props.path);
     setObjects(objs);
   };
 
+  const handleRequestSort = (_event: MouseEvent<unknown>, property: string) => {
+    const isAsc = orderBy === property && order === 'asc';
+    setOrder(isAsc ? 'desc': 'asc');
+    setOrderBy(property);
+  };
 
   // TODO: Condense these two use effects into one. Currently exists so
   // loading on path change is independent of manual reloading (such as new
@@ -177,19 +187,33 @@ export const FileListView: FC<FileListViewProps> = (props) => {
     }
   }, [props.bucket, props.path]);
 
+  // Handle sorting the objects
+  useEffect(() => {
+    setOrderedObjects(objects.slice().sort((a: any, b: any) => {
+      const direction = order === 'asc' ? 1: -1;
+      return a[orderBy] > b[orderBy] ? direction: -direction;
+    }));
+  }, [objects, order, orderBy]);
+
+  const columns = [
+    { label: 'Name', id: 'Key' },
+    { label: 'Created Date', id: 'LastModified' },
+    { label: 'Size', id: 'Size' },
+    { label: '', id: 'Actions' }
+  ];
+
   return (
     <TableContainer component={Paper} sx={{ minWidth: 650 }}>
       <Table>
-        <TableHead>
-          <TableRow>
-            <TableCell>Name</TableCell>
-            <TableCell>Created Date</TableCell>
-            <TableCell>Size</TableCell>
-            <TableCell></TableCell>
-          </TableRow>
-        </TableHead>
+        <EnhancedTableHead
+          onRequestSort={handleRequestSort}
+          columns={columns}
+          sortableIds={['Key', 'LastModified', 'Size']}
+          order={order}
+          orderBy={orderBy}
+        />
         <TableBody>
-          {objects.map((object) =>
+          {orderedObjects.map((object) =>
             <FileRowView object={object} setShouldReload={props.setShouldReload} setSnackBarSettings={props.setSnackBarSettings} key={object.Key!}/>)
           }
         </TableBody>
