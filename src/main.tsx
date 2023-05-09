@@ -9,7 +9,6 @@ import {
 import ErrorPage from './pages/error-route';
 import Dashboard from './pages/Dashboard';
 import { Organization } from './pages/Organization';
-import Access from './pages/Access';
 import Login from './pages/Login';
 import Callback from './pages/Callback';
 import AccessManager from './pages/AccessManager';
@@ -28,10 +27,6 @@ const appRouter = createBrowserRouter([
       {
         path: "/dashboard",
         element: <Dashboard />,
-      },
-      {
-        path: "/access",
-        element: <Access />,
       },
       {
         path: "/access-manager",

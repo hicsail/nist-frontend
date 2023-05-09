@@ -54,11 +54,10 @@ const AccessManager = () => {
 
 
     const { loading, error, data } = useCargoGetAllBucketPermissionsQuery({ variables: { bucket: currentOrganization } });
-    
+
     useGetOrganizationsQuery(
         {
             onCompleted: (data) => {
-                console.log(data);
                 setOrganizations(data.getOriganizations);
             },
             onError: (error) => {
@@ -69,10 +68,9 @@ const AccessManager = () => {
 
     useEffect(() => {
         const organizationsWithAdminAccess = permissions.filter((permission) => permission.admin);
-
         setOrganizationsWithAdminAccess(organizationsWithAdminAccess);
 
-        if (organizationsWithAdminAccess.length > 0) {
+        if (organizationsWithAdminAccess.length === 1) {
             setCurrentOrganization(organizationsWithAdminAccess[0].bucket);
         }
     }, [permissions]);
@@ -89,10 +87,10 @@ const AccessManager = () => {
     }, [data, order, orderBy]);
 
     useEffect(() => {
-        if (path){
+        if (path) {
             setPath([]);
         }
-    },[]);
+    }, []);
 
     const handleRequestSort = (event: React.MouseEvent<unknown>, property: string) => {
         const isAsc = orderBy === property && order === 'asc';
@@ -144,11 +142,11 @@ const AccessManager = () => {
         return filteredUserPermissions.slice(firstPageIndex, lastPageIndex);
     }, [page, rowsPerPage, filteredUserPermissions]);
 
-    if (error) {
+    if (currentOrganization && error) {
         return <p>Error fetching access manager: {error.message}</p>;
     }
 
-    if (loading) {
+    if (currentOrganization && loading) {
         return <p>Loading...</p>;
     }
 
@@ -159,15 +157,7 @@ const AccessManager = () => {
                 <p>You have no organizations with admin access.</p>
             ) : (
                 <>
-                    <TextField
-                        id="outlined-basic"
-                        label="Search Users"
-                        variant="outlined"
-                        fullWidth
-                        value={searchText}
-                        onChange={handleSearchChange}
-                    />
-                    <InputLabel id="select-organization-label" style={{ marginTop: 20 }}>Choose an Organization</InputLabel>
+                    <InputLabel id="select-organization-label" style={{ marginTop: 40 }}>Select an Organization</InputLabel>
                     <Select
                         style={{ width: 300 }}
                         id="select-organization"
@@ -183,60 +173,72 @@ const AccessManager = () => {
                             </MenuItem>
                         ))}
                     </Select>
-                    <TableContainer style={{ marginTop: 50 }}>
-                        <Table>
-                            <EnhancedTableHead
-                                onRequestSort={handleRequestSort}
-                                columns={columns}
-                                sortableIds={['email']}
-                                order={order}
-                                orderBy={orderBy}
-                            />
-                            <TableBody>
-                                {visibleUserPermissions.map((userPermission: any, index: number) => (
-                                    <TableRow key={userPermission._id}>
-                                        <TableCell>{userPermission.user.email}</TableCell>
-                                        <TableCell>
-                                            <Checkbox
-                                                checked={userPermission.read}
-                                                onChange={(event) =>
-                                                    handlePermissionChange(index, 'read', event.target.checked)
-                                                }
-                                            />
-                                        </TableCell>
-                                        <TableCell>
-                                            <Checkbox
-                                                checked={userPermission.write}
-                                                onChange={(event) =>
-                                                    handlePermissionChange(index, 'write', event.target.checked)
-                                                }
-                                            />
-                                        </TableCell>
-                                        <TableCell>
-                                            <Checkbox
-                                                checked={userPermission.delete}
-                                                onChange={(event) =>
-                                                    handlePermissionChange(index, 'delete', event.target.checked)
-                                                }
-                                            />
-                                        </TableCell>
-                                        <TableCell>
-                                            <Checkbox
-                                                checked={userPermission.admin}
-                                                onChange={(event) =>
-                                                    handlePermissionChange(index, 'admin', event.target.checked)
-                                                }
-                                            />
-                                        </TableCell>
-                                        <TableCell>
-                                            <HandleUpdate user={userPermission} />
-                                        </TableCell>
-                                    </TableRow>
-                                ))}
-                            </TableBody>
-                        </Table>
-                    </TableContainer>
-                    <TablePagination
+                    { currentOrganization && <TextField
+                        id="outlined-basic"
+                        label="Search users by email"
+                        variant="outlined"
+                        fullWidth
+                        value={searchText}
+                        onChange={handleSearchChange}
+                        style={{ marginTop: 40 }}
+                    />}
+                    {
+                        currentOrganization ? (<TableContainer style={{ marginTop: 10 }}>
+                            <Table>
+                                <EnhancedTableHead
+                                    onRequestSort={handleRequestSort}
+                                    columns={columns}
+                                    sortableIds={['email']}
+                                    order={order}
+                                    orderBy={orderBy}
+                                />
+                                <TableBody>
+                                    {visibleUserPermissions.map((userPermission: any, index: number) => (
+                                        <TableRow key={userPermission._id}>
+                                            <TableCell>{userPermission.user.email}</TableCell>
+                                            <TableCell>
+                                                <Checkbox
+                                                    checked={userPermission.read}
+                                                    onChange={(event) =>
+                                                        handlePermissionChange(index, 'read', event.target.checked)
+                                                    }
+                                                />
+                                            </TableCell>
+                                            <TableCell>
+                                                <Checkbox
+                                                    checked={userPermission.write}
+                                                    onChange={(event) =>
+                                                        handlePermissionChange(index, 'write', event.target.checked)
+                                                    }
+                                                />
+                                            </TableCell>
+                                            <TableCell>
+                                                <Checkbox
+                                                    checked={userPermission.delete}
+                                                    onChange={(event) =>
+                                                        handlePermissionChange(index, 'delete', event.target.checked)
+                                                    }
+                                                />
+                                            </TableCell>
+                                            <TableCell>
+                                                <Checkbox
+                                                    checked={userPermission.admin}
+                                                    onChange={(event) =>
+                                                        handlePermissionChange(index, 'admin', event.target.checked)
+                                                    }
+                                                />
+                                            </TableCell>
+                                            <TableCell>
+                                                <HandleUpdate user={userPermission} />
+                                            </TableCell>
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
+                        </TableContainer>) : 
+                        <Typography variant='h3' style={{marginTop: 50}}>Select an Organization to Manage Access</Typography>
+                    }
+                    {currentOrganization && <TablePagination
                         rowsPerPageOptions={[5, 10, 25]}
                         component="div"
                         count={filteredUserPermissions.length}
@@ -244,7 +246,7 @@ const AccessManager = () => {
                         page={page}
                         onPageChange={handleChangePage}
                         onRowsPerPageChange={handleChangeRowsPerPage}
-                    />
+                    />}
                     <Snackbar
                         open={snackbarOpen}
                         message={updateMessage}
