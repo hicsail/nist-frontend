@@ -58,7 +58,6 @@ const AccessManager = () => {
     useGetOrganizationsQuery(
         {
             onCompleted: (data) => {
-                console.log(data);
                 setOrganizations(data.getOriganizations);
             },
             onError: (error) => {
