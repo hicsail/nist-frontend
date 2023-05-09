@@ -161,15 +161,7 @@ export const Organization: FC = () => {
         <FileBreadcrumbs path={path} />
 
         <Box>
-          <Grid container spacing={2}>
-            <Grid item><TextField placeholder='Keyword' /></Grid>
-            <Grid item><TextField placeholder='Property' /></Grid>
-            <Grid item>
-              <IconButton style={{ borderRadius: '100px', border: '1px solid #000000', padding: '12px' }}>
-                <FilterListIcon />
-              </IconButton>
-            </Grid>
-          </Grid>
+            <TextField placeholder='Keyword' />
         </Box>
       </Box>
 
