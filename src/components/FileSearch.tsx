@@ -1,13 +1,33 @@
 import { FC, useContext, useState, SyntheticEvent } from 'react';
-import { Autocomplete, TextField } from '@mui/material';
+import { Autocomplete, TextField, Grid } from '@mui/material';
 import { S3Context } from '../contexts/s3.context';
 import { getOrganizationContents } from '../aws-client';
 import { OrganizationContext } from '../contexts/organization.context';
 import { useNavigate } from 'react-router-dom';
+import FolderIcon from '@mui/icons-material/Folder';
 
 type FileOptions = {
   label: string,
   id: string
+};
+
+export const FileOption: FC<{ option: FileOptions }> = (props) => {
+  // TODO: By introducing the concept of a file type can reduce some of this
+  // duplicated logic for determining if the object is a folder
+  const fileComponents = props.option.id.split('/');
+  const isFolder = fileComponents[fileComponents.length - 1] == '';
+
+
+  return (
+    <Grid container key={props.option.id}>
+      <Grid item xs={2}>
+        {isFolder ? <FolderIcon /> : <></>}
+      </Grid>
+      <Grid item xs={2}>
+        {props.option.label}
+      </Grid>
+    </Grid>
+  );
 };
 
 export const FileSearch: FC = () => {
@@ -65,6 +85,7 @@ export const FileSearch: FC = () => {
       options={options}
       sx={{ width: 300 }}
       renderInput={(params) => <TextField {...params} label="File" />}
+      renderOption={(props, option) => <li {...props}><FileOption key={option.id} option={option} /></li>}
     />
   );
 };
