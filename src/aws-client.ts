@@ -6,6 +6,7 @@ import {
   ListObjectsV2Command,
   GetObjectCommand,
   GetObjectOutput,
+  DeleteObjectsCommand,
 } from "@aws-sdk/client-s3";
 
 //export const getAllBuckets = async () => {
@@ -205,4 +206,30 @@ export const deleteFile = async (client: S3Client, bucketName: string, key: stri
     console.error(err);
     return false;
   }
+};
+
+export const deleteFolder = async (client: S3Client, bucketName: string, key: string): Promise<boolean> => {
+  try {
+    // Get all the objects contained in the folder
+    const contained = await client.send(new ListObjectsCommand({ Bucket: bucketName, Prefix: key }));
+    if (!contained.Contents) {
+      return false;
+    }
+
+    // Delete all contained objects
+    await client.send(new DeleteObjectsCommand({
+      Bucket: bucketName,
+      Delete: {
+        // Since the objects are queried based on prefix, the key has to
+        // exist
+        Objects: (contained.Contents as { Key: string}[])
+      }
+    }));
+
+  } catch (err) {
+    console.error(err);
+    return false;
+  }
+
+  return true;
 };
