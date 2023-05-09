@@ -8,7 +8,8 @@ import {
   TableBody,
   Button,
   IconButton,
-  AlertColor
+  AlertColor,
+  Grid
 } from '@mui/material';
 import { FC, useContext, useState, useEffect, ReactNode, Dispatch, SetStateAction } from 'react';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
@@ -17,7 +18,7 @@ import FolderIcon from '@mui/icons-material/Folder';
 import { S3Context } from '../contexts/s3.context';
 import { ListObjectsCommand, S3Client, _Object as S3Object } from '@aws-sdk/client-s3';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { deleteFile, downloadFile } from '../aws-client';
+import { deleteFile, deleteFolder, downloadFile } from '../aws-client';
 import { OrganizationContext } from '../contexts/organization.context';
 
 // TODO: Handle when there are more then 1000 objects
@@ -96,32 +97,39 @@ const FileRowView: FC<FileRowProps> = ({ object, setShouldReload, setSnackBarSet
     );
   }
 
-  // Delete the file and open a snackbar to display the result
-  const deleteFileHandler = async () => {
-    const deleteResult = await deleteFile(s3Client, organization!.bucket, object.Key!);
-    const snackBarSettings = { message: 'File deleted successfully', open: true, severity: 'success' as AlertColor };
+  const deleteHandler = async () => {
+    const deleteFunction = isFolder ? deleteFolder : deleteFile;
+    const type = isFolder ? 'folder': 'file';
+    const deleteResult = await deleteFunction(s3Client, organization!.bucket, object.Key!);
+
+    const snackBarSettings = { message: `${type} deleted successfully`, open: true, severity: 'success' as AlertColor };
     if (!deleteResult) {
-      snackBarSettings.message = 'Failed to delete file';
+      snackBarSettings.message = `Failed to delete ${type}`;
       snackBarSettings.severity = 'error';
     }
 
     setShouldReload(true);
     setSnackBarSettings(snackBarSettings);
-  };
-
-  let operations = (
-    <div>
-      <IconButton onClick={() => downloadFile(s3Client, organization!.bucket, object.Key!)}>
-        <FileDownloadIcon />
-      </IconButton>
-      <IconButton onClick={deleteFileHandler}>
-        <DeleteIcon />
-      </IconButton>
-    </div>
-  );
-  if (isFolder) {
-    operations = <></>;
   }
+
+  const operations = (
+    <Grid container spacing={1} style={{ alignItems: 'center', display: 'flex'}}>
+      <Grid item xs={2}>
+        {
+          // Currently do not support downloading folder so just need a
+          // placeholder to maintain spacing
+          isFolder ?
+          <></> :
+          <IconButton onClick={() => downloadFile(s3Client, organization!.bucket, object.Key!)}><FileDownloadIcon /></IconButton>
+        }
+      </Grid>
+      <Grid item xs={2}>
+        <IconButton onClick={deleteHandler}>
+          <DeleteIcon />
+        </IconButton>
+      </Grid>
+    </Grid>
+  );
 
   return (
     <TableRow>
