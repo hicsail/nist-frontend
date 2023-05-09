@@ -1,6 +1,6 @@
 import { TableCell, TableHead, TableRow, TableSortLabel } from "@mui/material";
 
-type Order = 'asc' | 'desc';
+export type Order = 'asc' | 'desc';
 
 interface EnhancedTableProps {
     onRequestSort: (event: React.MouseEvent<unknown>, property: string) => void;
@@ -23,7 +23,7 @@ function EnhancedTableHead(props: EnhancedTableProps) {
             <TableRow>
                 {columns.map((column) => (
                     <TableCell key={column.id}>
-                        {sortableIdsSet.has(column.id) ? 
+                        {sortableIdsSet.has(column.id) ?
                             <TableSortLabel
                                 active={orderBy === column.id}
                                 direction={orderBy === column.id ? order : 'asc'}
