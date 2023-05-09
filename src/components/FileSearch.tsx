@@ -5,15 +5,24 @@ import { getOrganizationContents } from '../aws-client';
 import { OrganizationContext } from '../contexts/organization.context';
 import { useNavigate } from 'react-router-dom';
 
+type FileOptions = {
+  label: string,
+  id: string
+};
+
 export const FileSearch: FC = () => {
   const s3Client = useContext(S3Context);
   const { organization } = useContext(OrganizationContext);
-  const [options, setOptions] = useState<{ label: string, id: string }[]>([]);
+  const [options, setOptions] = useState<FileOptions[]>([]);
+  const [value, setValue] = useState<FileOptions | null>(null);
   const navigate = useNavigate();
 
   // Get all objects from S3 and represent them as options the user can
   // select from
   const loadOptions = async () => {
+    // Clear out the current value
+    setValue(null);
+
     const objects = await getOrganizationContents(s3Client, organization!.bucket);
 
     const options = objects.map((obj) => {
@@ -34,6 +43,7 @@ export const FileSearch: FC = () => {
     if (!value) {
       return;
     }
+    setValue(value);
 
     const fileComponents = value.id.split('/');
     const isFolder = fileComponents[fileComponents.length - 1] == '';
@@ -51,6 +61,7 @@ export const FileSearch: FC = () => {
     <Autocomplete
       onFocus={loadOptions}
       onChange={handleSelection}
+      value={value}
       options={options}
       sx={{ width: 300 }}
       renderInput={(params) => <TextField {...params} label="File" />}
