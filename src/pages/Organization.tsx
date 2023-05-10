@@ -137,6 +137,8 @@ export const Organization: FC = () => {
     } else {
       setSnackBarSettings({ message: 'Failed to upload file', open: true, severity: 'error' });
     }
+
+    event.target.value = null;
   };
 
   const newFolderHandler = async() => {
