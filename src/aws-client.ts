@@ -24,7 +24,7 @@ export const getOrganizationContents = async (client: S3Client, bucketName: stri
     // get info from data.Contents
     const contents = data.Contents;
     if (!contents) {
-      throw new Error("No contents found");
+      return [];
     }
 
     let s3Objects: S3Object[] = [];
