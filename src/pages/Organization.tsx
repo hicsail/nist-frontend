@@ -22,8 +22,6 @@ import { S3Context } from '../contexts/s3.context';
 import { CargoPermissions } from '../graphql/graphql';
 import HomeIcon from '@mui/icons-material/Home';
 import FolderIcon from '@mui/icons-material/Folder';
-import { IconButton } from '@mui/material';
-import FilterListIcon from '@mui/icons-material/FilterList';
 import AddIcon from '@mui/icons-material/Add';
 import { FileListView } from '../components/file-list-view';
 import { OrganizationContext } from '../contexts/organization.context';
@@ -74,6 +72,7 @@ export const Organization: FC = () => {
   const [dialogOpen, setDialogOpen] = useState<boolean>(false);
   const [folderName, setFolderName] = useState<string>('');
   const [creatingFolder, setCreatingFolder] = useState<boolean>(false);
+  const [currentFolder, setCurrentFolder] = useState<string>('');
 
   // Determine the file path to visualize
   const splat = useParams()['*'];
@@ -107,6 +106,12 @@ export const Organization: FC = () => {
       fetchS3Contents();
     }
   }, [organization]);
+
+  useEffect(() => {
+    const pathComponents = path.split('/');
+    const currentFolder = pathComponents[pathComponents.length - 2];
+    setCurrentFolder(currentFolder);
+  }, [path]);
 
   const fileUploadHandler = async (event: any) => {
     const file = event.target.files[0];
@@ -168,7 +173,7 @@ export const Organization: FC = () => {
       <Divider />
 
       <Box sx={{ justifyContent: 'space-between', display: 'flex', alignItems: 'center', paddingTop: 10 }}>
-        <Typography variant='h1'>Folder Name</Typography>
+        <Typography variant='h1'>{currentFolder}</Typography>
         <Box>
           <Grid container spacing={2}>
             <Grid item>
