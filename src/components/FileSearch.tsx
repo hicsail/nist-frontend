@@ -21,7 +21,7 @@ export const FileOption: FC<{ option: FileOptions }> = (props) => {
   return (
     <Grid container key={props.option.id}>
       <Grid item xs={2}>
-        {isFolder ? <FolderIcon /> : <></>}
+        {isFolder && <FolderIcon />}
       </Grid>
       <Grid item xs={2}>
         {props.option.label}
