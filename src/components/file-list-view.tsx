@@ -83,7 +83,8 @@ const FileRowView: FC<FileRowProps> = ({ object, setShouldReload, setSnackBarSet
   // second to last in the case of a folder
   const name = fileComponents[isFolder ? fileComponents.length - 2 : fileComponents.length - 1];
 
-  const isSeq = true;
+  // TODO: Should change to a better way to identify sequence files
+  const isSeq = object.Key!.endsWith('.gb') || object.Key!.endsWith('.fasta');
   const [open, setOpen] = useState(false);
   const [fileString, setFileString] = useState<string>('');
 
