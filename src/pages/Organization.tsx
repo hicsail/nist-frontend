@@ -1,6 +1,6 @@
 import { useEffect, useState, useContext, FC } from 'react'
 import { useNavigate, useParams } from 'react-router-dom';
-import { getOrganizationContents, uploadToS3, createFolder } from '../aws-client';
+import { uploadToS3, createFolder } from '../aws-client';
 import {
   Button,
   TextField,
@@ -22,6 +22,7 @@ import { S3Context } from '../contexts/s3.context';
 import { CargoPermissions } from '../graphql/graphql';
 import HomeIcon from '@mui/icons-material/Home';
 import FolderIcon from '@mui/icons-material/Folder';
+import { FileSearch } from '../components/FileSearch';
 import AddIcon from '@mui/icons-material/Add';
 import { FileListView } from '../components/file-list-view';
 import { OrganizationContext } from '../contexts/organization.context';
@@ -61,7 +62,6 @@ const FileBreadcrumbs: FC<{ path: string}> = ({ path }) => {
 export const Organization: FC = () => {
   const { organization } = useContext(OrganizationContext);
   const [_userPermissions, setUserPermissions] = useState<any>();
-  const [_files, setFiles] = useState<any[]>([]);
   const s3Client = useContext(S3Context);
   const [snackBarSettings, setSnackBarSettings] = useState<{ message: string, open: boolean, severity: AlertColor}>({
     message: '',
@@ -82,11 +82,6 @@ export const Organization: FC = () => {
     setPath(`/${splat}`);
   }, [splat]);
 
-  async function fetchS3Contents() {
-    const contents = await getOrganizationContents(s3Client, organization!.bucket);
-    setFiles(contents);
-  }
-
   const permissions = useContext(PermissionsContext);
 
   const getPermissionsForOrganization = (bucket: string) => {
@@ -100,12 +95,6 @@ export const Organization: FC = () => {
       setUserPermissions(permissions)
     }
   }, [permissions]);
-
-  useEffect(() => {
-    if (organization) {
-      fetchS3Contents();
-    }
-  }, [organization]);
 
   useEffect(() => {
     const pathComponents = path.split('/');
@@ -168,7 +157,7 @@ export const Organization: FC = () => {
         <FileBreadcrumbs path={path} />
 
         <Box>
-            <TextField placeholder='Keyword' />
+          <FileSearch />
         </Box>
       </Box>
 
