@@ -1,0 +1,10 @@
+version: "3"
+services:
+  nist-frontend:
+    container_name: nist-frontend-production
+    image: hicsail/nist-frontend:production
+    restart: always
+    ports:
+      - 3009:80
+    env_file:
+      - ../stack.env
