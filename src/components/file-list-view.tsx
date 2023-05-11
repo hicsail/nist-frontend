@@ -84,7 +84,7 @@ const FileRowView: FC<FileRowProps> = ({ object, setShouldReload, setSnackBarSet
   const name = fileComponents[isFolder ? fileComponents.length - 2 : fileComponents.length - 1];
 
   // TODO: Should change to a better way to identify sequence files
-  const isSeq = object.Key!.endsWith('.gb') || object.Key!.endsWith('.fasta');
+  const isSeq = object.Key!.endsWith('.gb') || object.Key!.endsWith('.fasta') || object.Key!.endsWith('.dna');
   const [open, setOpen] = useState(false);
   const [fileString, setFileString] = useState<string>('');
 
@@ -92,7 +92,7 @@ const FileRowView: FC<FileRowProps> = ({ object, setShouldReload, setSnackBarSet
   const handleVizOpen = async () => {
     const file = await getFile(s3Client, organization!.bucket, object.Key!);
     const fileString = await file.Body.transformToString();
-    
+
     setFileString(fileString);
     setOpen(true)
   };
