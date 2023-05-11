@@ -80,7 +80,6 @@ const AccessManager = () => {
         if (token) {
             const decodedToken = extractJwtPayload(token);
             if (decodedToken) {
-                console.log(decodedToken);
                 setUserId(decodedToken.id);
             }
         }
