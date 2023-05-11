@@ -12,6 +12,10 @@ import { useNavigate } from "react-router-dom";
 import { AuthContext } from '../contexts/Auth';
 import logo from '../assets/nist-logo.png';
 import StarIcon from '@mui/icons-material/Star';
+import biomadeLogo from '../assets/BIOMADE-LOGO.png';
+import buLogo from '../assets/bu-logo.png';
+import haririLogo from '../assets/Hariri_Institute_SAIL_Logotype_White_Web.png';
+import sailLogo from '../assets/sail-logo.png';
 
 export const SideNav: FC = () => {
   const drawerWidth = 256;
@@ -26,6 +30,8 @@ export const SideNav: FC = () => {
     navigate('/login');
   }
 
+
+  // TODO: Add icons to the side nav bu-logo Hariri Institute and Biomade
   return (
     <Drawer
       variant='permanent'
@@ -88,6 +94,29 @@ export const SideNav: FC = () => {
         </ListItemButton>
       </ListItem>
     </List>
+
+    <Box
+      component='img'
+      sx={{
+        height: 71,
+        width: drawerWidth,
+        marginTop: 'auto'
+      }}
+      alt='Biomade Logo'
+      src={biomadeLogo}
+    />
+
+    <Box
+      sx={{
+        display: 'flex',
+        justifyContent: 'center',
+        
+      }}
+    >
+     
+      <img src={buLogo} alt='Hariri Institute Logo' style={{background: 'black', height: 31, marginLeft: 20, marginBottom: 20}} />
+      <img src={sailLogo} alt='SAIL Logo' style={{background: 'black', height: 31, marginLeft: 20, marginBottom: 20}} />
+    </Box>
 
     </Drawer>
   );
