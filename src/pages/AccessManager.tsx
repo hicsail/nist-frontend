@@ -21,11 +21,16 @@ import { PermissionsContext } from '../contexts/Permissions';
 import { HandleUpdate } from '../components/UpdatePermissionsButton';
 import { UIContext } from '../contexts/UI';
 import { useCargoGetAllBucketPermissionsQuery } from '../graphql/permissions/permissions';
-import { OrganizationContext } from '../contexts/organization.context';
+import { AuthContext } from '../contexts/Auth';
 import { useGetOrganizationsQuery } from '../graphql/organization/organization';
 import EnhancedTableHead from '../components/EnhancedTableHead';
+import jwtDecode from 'jwt-decode';
 
 type Order = 'asc' | 'desc';
+
+interface JwtPayload {
+    [key: string]: any;
+}
 
 const AccessManager = () => {
     const [userPermissions, setUserPermissions] = useState<any>([]);
@@ -37,6 +42,7 @@ const AccessManager = () => {
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(5);
     const [organizations, setOrganizations] = useState<any>([]);
+    const [userId, setUserId] = useState<string>('');
 
     const columns = [
         { label: 'Email', id: 'email' },
@@ -51,6 +57,7 @@ const AccessManager = () => {
 
     const permissions = useContext(PermissionsContext);
     const { path, setPath } = useContext(UIContext);
+    const { token } = useContext(AuthContext);
 
 
     const { loading, error, data } = useCargoGetAllBucketPermissionsQuery({ variables: { bucket: currentOrganization } });
@@ -69,7 +76,13 @@ const AccessManager = () => {
     useEffect(() => {
         const organizationsWithAdminAccess = permissions.filter((permission) => permission.admin);
         setOrganizationsWithAdminAccess(organizationsWithAdminAccess);
-
+        // extract user id from token
+        if (token) {
+            const decodedToken = extractJwtPayload(token);
+            if (decodedToken) {
+                setUserId(decodedToken.id);
+            }
+        }
         if (organizationsWithAdminAccess.length === 1) {
             setCurrentOrganization(organizationsWithAdminAccess[0].bucket);
         }
@@ -91,6 +104,16 @@ const AccessManager = () => {
             setPath([]);
         }
     }, []);
+
+    const extractJwtPayload = (jwt: string): JwtPayload | null => {
+        try {
+            const decodedToken = jwtDecode<JwtPayload>(jwt);
+            return decodedToken;
+        } catch (error) {
+            console.error('Error decoding JWT:', error);
+            return null;
+        }
+    };
 
     const handleRequestSort = (event: React.MouseEvent<unknown>, property: string) => {
         const isAsc = orderBy === property && order === 'asc';
@@ -173,7 +196,7 @@ const AccessManager = () => {
                             </MenuItem>
                         ))}
                     </Select>
-                    { currentOrganization && <TextField
+                    {currentOrganization && <TextField
                         id="outlined-basic"
                         label="Search users by email"
                         variant="outlined"
@@ -194,49 +217,51 @@ const AccessManager = () => {
                                 />
                                 <TableBody>
                                     {visibleUserPermissions.map((userPermission: any, index: number) => (
-                                        <TableRow key={userPermission._id}>
-                                            <TableCell>{userPermission.user.email}</TableCell>
-                                            <TableCell>
-                                                <Checkbox
-                                                    checked={userPermission.read}
-                                                    onChange={(event) =>
-                                                        handlePermissionChange(index, 'read', event.target.checked)
-                                                    }
-                                                />
-                                            </TableCell>
-                                            <TableCell>
-                                                <Checkbox
-                                                    checked={userPermission.write}
-                                                    onChange={(event) =>
-                                                        handlePermissionChange(index, 'write', event.target.checked)
-                                                    }
-                                                />
-                                            </TableCell>
-                                            <TableCell>
-                                                <Checkbox
-                                                    checked={userPermission.delete}
-                                                    onChange={(event) =>
-                                                        handlePermissionChange(index, 'delete', event.target.checked)
-                                                    }
-                                                />
-                                            </TableCell>
-                                            <TableCell>
-                                                <Checkbox
-                                                    checked={userPermission.admin}
-                                                    onChange={(event) =>
-                                                        handlePermissionChange(index, 'admin', event.target.checked)
-                                                    }
-                                                />
-                                            </TableCell>
-                                            <TableCell>
-                                                <HandleUpdate user={userPermission} />
-                                            </TableCell>
-                                        </TableRow>
+                                            userPermission.user.id != userId && (
+                                                <TableRow key={userPermission._id}>
+                                                    <TableCell>{userPermission.user.email}</TableCell>
+                                                    <TableCell>
+                                                        <Checkbox
+                                                            checked={userPermission.read}
+                                                            onChange={(event) =>
+                                                                handlePermissionChange(index, 'read', event.target.checked)
+                                                            }
+                                                        />
+                                                    </TableCell>
+                                                    <TableCell>
+                                                        <Checkbox
+                                                            checked={userPermission.write}
+                                                            onChange={(event) =>
+                                                                handlePermissionChange(index, 'write', event.target.checked)
+                                                            }
+                                                        />
+                                                    </TableCell>
+                                                    <TableCell>
+                                                        <Checkbox
+                                                            checked={userPermission.delete}
+                                                            onChange={(event) =>
+                                                                handlePermissionChange(index, 'delete', event.target.checked)
+                                                            }
+                                                        />
+                                                    </TableCell>
+                                                    <TableCell>
+                                                        <Checkbox
+                                                            checked={userPermission.admin}
+                                                            onChange={(event) =>
+                                                                handlePermissionChange(index, 'admin', event.target.checked)
+                                                            }
+                                                        />
+                                                    </TableCell>
+                                                    <TableCell>
+                                                        <HandleUpdate user={userPermission} />
+                                                    </TableCell>
+                                                </TableRow>
+                                            ) 
                                     ))}
                                 </TableBody>
                             </Table>
-                        </TableContainer>) : 
-                        <Typography variant='h3' style={{marginTop: 50}}>Select an Organization to Manage Access</Typography>
+                        </TableContainer>) :
+                            <Typography variant='h3' style={{ marginTop: 50 }}>Select an Organization to Manage Access</Typography>
                     }
                     {currentOrganization && <TablePagination
                         rowsPerPageOptions={[5, 10, 25]}
