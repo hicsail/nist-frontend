@@ -1,8 +1,7 @@
-import { Box, Divider, IconButton, Paper, Typography } from "@mui/material";
+import { Divider, IconButton, Paper, Typography } from "@mui/material";
 import CloseIcon from '@mui/icons-material/Close';
 import SeqViz from "seqviz";
 import seqparse from "seqparse";
-import file from "../assets/file";
 import { useEffect, useState } from "react";
 
 const style = {
@@ -22,15 +21,16 @@ const style = {
 type SequenceVizProps = {
   title: string,
   onClose: () => void,
+  fileString: string,
   size?: { width: string, height: string },
 }
 
 export default function SequenceViz(props: SequenceVizProps) {
-  const { title, onClose, size } = props;
+  const { title, onClose, fileString, size } = props;
   const [ sequence, setSequence ] = useState<any>();
 
   useEffect(() => {
-    seqparse(file).then((seq) => setSequence(seq));
+    seqparse(fileString).then((seq) => setSequence(seq));
   }, []);
 
   if (size) {
