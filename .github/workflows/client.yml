@@ -50,22 +50,6 @@ jobs:
             VITE_S3_ENDPOINT=${{ secrets.VITE_S3_ENDPOINT }}
             VITE_AUTHSERVICE_URL=${{ secrets.VITE_AUTHSERVICE_URL }}
 
-      - name: Build & Push Docker Test Build
-        uses: docker/build-push-action@v4
-        if: github.ref == 'refs/heads/main'
-        with:
-          context: .
-          push: ${{ github.event_name != 'pull_request' }}
-          tags: hicsail/nist-frontend:test
-          build-args: |
-            VITE_AWS_KEY=${{ secrets.VITE_AWS_KEY }}
-            VITE_AWS_SECRET=${{ secrets.VITE_AWS_SECRET }}
-            VITE_AUTH_URL=${{ secrets.VITE_AUTH_URL }}
-            VITE_PROJECT_ID=${{ secrets.VITE_PROJECT_ID }}
-            VITE_CARGO_ENDPOINT=${{ secrets.VITE_CARGO_ENDPOINT }}
-            VITE_S3_ENDPOINT=${{ secrets.VITE_S3_ENDPOINT }}
-            VITE_AUTHSERVICE_URL=${{ secrets.VITE_AUTHSERVICE_URL }}
-
       - name: Build & Push Docker Production Build
         uses: docker/build-push-action@v4
         if: startsWith(github.ref, 'refs/tags/v')
