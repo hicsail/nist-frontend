@@ -20,10 +20,11 @@ import PreviewIcon from '@mui/icons-material/Preview';
 import { S3Context } from '../contexts/s3.context';
 import { ListObjectsCommand, S3Client, _Object as S3Object } from '@aws-sdk/client-s3';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { deleteFile, deleteFolder, downloadFile } from '../aws-client';
+import { deleteFile, deleteFolder, downloadFile, getFile } from '../aws-client';
 import { OrganizationContext } from '../contexts/organization.context';
 import EnhancedTableHead, { Order } from './EnhancedTableHead';
 import SequenceViz from './SequenceViz';
+import seqparse from "seqparse";
 
 // TODO: Handle when there are more then 1000 objects
 const getObjectsForPath = async (s3Client: S3Client, bucket: string, path: string): Promise<S3Object[]> => {
@@ -82,10 +83,18 @@ const FileRowView: FC<FileRowProps> = ({ object, setShouldReload, setSnackBarSet
   // second to last in the case of a folder
   const name = fileComponents[isFolder ? fileComponents.length - 2 : fileComponents.length - 1];
 
-
+  const isSeq = true;
   const [open, setOpen] = useState(false);
-  const handleVizOpen = () => setOpen(true);
+  const [fileString, setFileString] = useState<string>('');
+
   const handleVizClose = () => setOpen(false);
+  const handleVizOpen = async () => {
+    const file = await getFile(s3Client, organization!.bucket, object.Key!);
+    const fileString = await file.Body.transformToString();
+    
+    setFileString(fileString);
+    setOpen(true)
+  };
   const handleVizBackdropClose = (event: React.MouseEvent<HTMLElement>, reason: string) => {
     if (reason !== 'backdropClick') {
       setOpen(false);
@@ -144,14 +153,14 @@ const FileRowView: FC<FileRowProps> = ({ object, setShouldReload, setSnackBarSet
         </IconButton>
       </Grid>
       <Grid item xs={2}>
-        { !isFolder && 
+        { !isFolder && isSeq &&
           <IconButton onClick={handleVizOpen}>
             <PreviewIcon />
           </IconButton>
         }
       </Grid>
       <Modal open={open} onClose={handleVizBackdropClose}>
-        <SequenceViz title='Sequence Visualization' onClose={handleVizClose} />
+        <SequenceViz title='Sequence Visualization' fileString={fileString} onClose={handleVizClose} />
       </Modal>
     </Grid>
   );
