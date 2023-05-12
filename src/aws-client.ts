@@ -162,34 +162,19 @@ export const getFile = async (client: S3Client, bucketName: string, key: string)
 };
 
 export const downloadFile = async (client: S3Client, bucketName: string, key: string): Promise<void> => {
-  const getObjectCommand = new GetObjectCommand({ Bucket: bucketName, Key: key });
   const components = key.split('/');
   const filename = components[components.length - 1];
 
+  const url = `${import.meta.env.VITE_S3_ENDPOINT}${bucketName}/${encodeURIComponent(key)}`;
+
   try {
-    const response: GetObjectOutput = await client.send(getObjectCommand);
-    const fileData: string = await streamToString(response.Body as ReadableStream<Uint8Array>);
-    downloadData(fileData, filename);
+    downloadData(url, filename);
   } catch (err) {
     console.error(err);
   }
 };
 
-const streamToString = async (stream: ReadableStream<Uint8Array>): Promise<string> => {
-  const reader = stream.getReader();
-  const chunks: Uint8Array[] = [];
-  while (true) {
-    const { done, value } = await reader.read();
-    if (done) break;
-    if (value) chunks.push(value);
-  }
-  const decoder = new TextDecoder();
-  return chunks.map((chunk) => decoder.decode(chunk)).join("");
-};
-
-const downloadData = (data: string, filename: string): void => {
-  const blob = new Blob([data], { type: "application/octet-stream" });
-  const url = window.URL.createObjectURL(blob);
+const downloadData = (url: string, filename: string): void => {
   const a = document.createElement("a");
   a.href = url;
   a.download = filename;
