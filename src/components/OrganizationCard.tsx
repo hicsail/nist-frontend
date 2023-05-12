@@ -18,11 +18,11 @@ type OrganizationCardProps = {
 
 // TODO: Hard coded institutions for demo purposes. Should be deleted after demo.
 const emblemLookup = {
-  'nist-boston-university': emblemBU,
+  'nist-bu': emblemBU,
   'nist-uc-davis': emblemUCDavis,
-  'nist-john-hopkins': emblemJHU,
-  'nist-university-of-georgia': emblemUG,
-  'nist-university-of-texas-austin': emblemUTAustin,
+  'nist-johns-hopkins': emblemJHU,
+  'nist-u-georgia': emblemUG,
+  'nist-u-texas': emblemUTAustin,
   'nist-biomade': emblemBioMade
 }
 
