@@ -61,7 +61,7 @@ export default function Dashboard() {
                 { bucket: "john-hopkins", name: "John Hopkins University" },
                 { bucket: "biomade", name: "BioMade" },
                 { bucket: "university-of-georgia", name: "University of Georgia" },
-                { bucket: "university-of-texas", name: "University of Texas" },
+                { bucket: "university-of-texas-austin", name: "University of Texas at Austin" },
             ];
 
             const demoOrg: Organization[] = demoOrgInfo.map((org: any) => {
@@ -76,7 +76,7 @@ export default function Dashboard() {
 
             orgs = [...orgs, ...demoOrg];
         }
-        
+
         return orgs;
     }
 
