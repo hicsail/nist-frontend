@@ -55,28 +55,6 @@ export default function Dashboard() {
             }
         });
 
-        // TODO: Hard coded institutions for demo purposes. Should be deleted after demo.
-        if (permission === 'noAccess') {
-            const demoOrgInfo = [
-                { bucket: "john-hopkins", name: "John Hopkins University" },
-                { bucket: "biomade", name: "BioMade" },
-                { bucket: "university-of-georgia", name: "University of Georgia" },
-                { bucket: "university-of-texas-austin", name: "University of Texas at Austin" },
-            ];
-
-            const demoOrg: Organization[] = demoOrgInfo.map((org: any) => {
-                return {
-                    // generate random id
-                    _id: `${org.bucket}-${Math.random().toString(36)}`,
-                    name: org.name,
-                    bucket: `nist-${org.bucket}`,
-                    __typename: 'Organization'
-                }
-            });
-
-            orgs = [...orgs, ...demoOrg];
-        }
-
         return orgs;
     }
 
