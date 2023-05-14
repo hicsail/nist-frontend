@@ -126,8 +126,14 @@ const AccessManager = () => {
     };
 
     const handlePermissionChange = (index: number, permissionType: any, isChecked: boolean) => {
+        // TODO: temporary fix for change permission with search
+        let searchIndex = -1;
+        if (searchText.length > 0 && filteredUserPermissions.length !== userPermissions.length) {
+            searchIndex = userPermissions.findIndex((permission: any) => permission.user.id === filteredUserPermissions[index].user.id);
+        }
+
         // update permissions in state
-        const actualIndex = index + page * rowsPerPage;
+        const actualIndex = searchIndex >= 0 ? searchIndex : index + page * rowsPerPage;
         const updatedPermissions = [...userPermissions];
         const updatedPermission = {
             ...updatedPermissions[actualIndex],
