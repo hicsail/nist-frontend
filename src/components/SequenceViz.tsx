@@ -1,8 +1,8 @@
-import { Divider, IconButton, Paper, Typography } from "@mui/material";
+import { Divider, IconButton, Paper, Typography } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
-import SeqViz from "seqviz";
-import seqparse from "seqparse";
-import { useEffect, useState } from "react";
+import SeqViz from 'seqviz';
+import seqparse from 'seqparse';
+import { useEffect, useState } from 'react';
 
 const style = {
   position: 'absolute',
@@ -15,19 +15,19 @@ const style = {
   overflow: 'hidden',
   display: 'flex',
   flexDirection: 'column',
-  p: 4,
+  p: 4
 };
 
 type SequenceVizProps = {
-  title: string,
-  onClose: () => void,
-  fileString: string,
-  size?: { width: string, height: string },
-}
+  title: string;
+  onClose: () => void;
+  fileString: string;
+  size?: { width: string; height: string };
+};
 
 export default function SequenceViz(props: SequenceVizProps) {
   const { title, onClose, fileString, size } = props;
-  const [ sequence, setSequence ] = useState<any>();
+  const [sequence, setSequence] = useState<any>();
 
   useEffect(() => {
     seqparse(fileString).then((seq) => setSequence(seq));
@@ -40,19 +40,15 @@ export default function SequenceViz(props: SequenceVizProps) {
 
   return (
     <Paper sx={style}>
-      <Typography variant="h6" sx={{ m: 0, p: 2 }} >
+      <Typography variant="h6" sx={{ m: 0, p: 2 }}>
         {title}
         <IconButton onClick={onClose} aria-label="close" sx={{ position: 'absolute', right: 8, top: 8 }}>
           <CloseIcon />
         </IconButton>
       </Typography>
       <Divider sx={{ my: 2 }} />
-      <div style={{ flexGrow: 1 }} >
-        <SeqViz
-          name={sequence?.name}
-          seq={sequence?.seq}
-          annotations={sequence?.annotations}
-        />
+      <div style={{ flexGrow: 1 }}>
+        <SeqViz name={sequence?.name} seq={sequence?.seq} annotations={sequence?.annotations} />
       </div>
     </Paper>
   );

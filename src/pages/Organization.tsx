@@ -1,23 +1,8 @@
-import { useEffect, useState, useContext, FC } from 'react'
+import { useEffect, useState, useContext, FC } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { uploadToS3, createFolder } from '../aws-client';
-import {
-  Button,
-  TextField,
-  Breadcrumbs,
-  Typography,
-  Box,
-  Grid,
-  Divider,
-  AlertColor,
-  Snackbar,
-  Alert,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions
-} from '@mui/material';
-import { PermissionsContext } from "../contexts/Permissions";
+import { Button, TextField, Breadcrumbs, Typography, Box, Grid, Divider, AlertColor, Snackbar, Alert, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
+import { PermissionsContext } from '../contexts/Permissions';
 import { S3Context } from '../contexts/s3.context';
 import { CargoPermissions } from '../graphql/graphql';
 import HomeIcon from '@mui/icons-material/Home';
@@ -27,7 +12,7 @@ import AddIcon from '@mui/icons-material/Add';
 import { FileListView } from '../components/file-list-view';
 import { OrganizationContext } from '../contexts/organization.context';
 
-const FileBreadcrumbs: FC<{ path: string}> = ({ path }) => {
+const FileBreadcrumbs: FC<{ path: string }> = ({ path }) => {
   const { organization } = useContext(OrganizationContext);
   const components = path.split('/').filter((path) => path != '');
   const buttonStyle = {
@@ -35,35 +20,40 @@ const FileBreadcrumbs: FC<{ path: string}> = ({ path }) => {
     display: 'flex',
     color: 'black',
     outline: 'none'
-  }
+  };
   const navigate = useNavigate();
 
   return (
-    <Breadcrumbs separator='›' aria-label="breadcrumb">
-      <Button variant='text' style={buttonStyle} key={0} onClick={() => navigate('/organization/')}>
-        <HomeIcon />{organization?.name || ''}
+    <Breadcrumbs separator="›" aria-label="breadcrumb">
+      <Button variant="text" style={buttonStyle} key={0} onClick={() => navigate('/organization/')}>
+        <HomeIcon />
+        {organization?.name || ''}
       </Button>
-      {
-        components.map((path, index) => {
-          return (
-            <Button variant='text' style={buttonStyle} key={index + 1} onClick={() => {
+      {components.map((path, index) => {
+        return (
+          <Button
+            variant="text"
+            style={buttonStyle}
+            key={index + 1}
+            onClick={() => {
               const fullPath = `/organization/${components.splice(0, index + 1).join('/')}/`;
               navigate(fullPath);
-            }}>
-              <FolderIcon />{path}
-            </Button>
-          );
-        })
-      }
+            }}
+          >
+            <FolderIcon />
+            {path}
+          </Button>
+        );
+      })}
     </Breadcrumbs>
   );
-}
+};
 
 export const Organization: FC = () => {
   const { organization } = useContext(OrganizationContext);
   const [_userPermissions, setUserPermissions] = useState<any>();
   const s3Client = useContext(S3Context);
-  const [snackBarSettings, setSnackBarSettings] = useState<{ message: string, open: boolean, severity: AlertColor}>({
+  const [snackBarSettings, setSnackBarSettings] = useState<{ message: string; open: boolean; severity: AlertColor }>({
     message: '',
     open: false,
     severity: 'success'
@@ -92,7 +82,7 @@ export const Organization: FC = () => {
   useEffect(() => {
     if (permissions && organization) {
       const permissions = getPermissionsForOrganization(organization.bucket);
-      setUserPermissions(permissions)
+      setUserPermissions(permissions);
     }
   }, [permissions]);
 
@@ -130,10 +120,10 @@ export const Organization: FC = () => {
     event.target.value = null;
   };
 
-  const newFolderHandler = async() => {
+  const newFolderHandler = async () => {
     setCreatingFolder(true);
 
-    const key = `${path.substring(1)}${folderName.replaceAll('/', '')}`
+    const key = `${path.substring(1)}${folderName.replaceAll('/', '')}`;
 
     // Try to make the folder
     try {
@@ -153,7 +143,6 @@ export const Organization: FC = () => {
   return (
     <Box>
       <Box sx={{ justifyContent: 'space-between', display: 'flex', alignItems: 'center', paddingBottom: 15 }}>
-
         <FileBreadcrumbs path={path} />
 
         <Box>
@@ -164,30 +153,38 @@ export const Organization: FC = () => {
       <Divider />
 
       <Box sx={{ justifyContent: 'space-between', display: 'flex', alignItems: 'center', paddingTop: 10 }}>
-        <Typography variant='h1'>{currentFolder}</Typography>
+        <Typography variant="h1">{currentFolder}</Typography>
         <Box>
           <Grid container spacing={2}>
             <Grid item>
-              <Button variant='contained' component='label'>
-                <AddIcon />Upload File
-                <input hidden multiple type="file" onChange={fileUploadHandler}/>
+              <Button variant="contained" component="label">
+                <AddIcon />
+                Upload File
+                <input hidden multiple type="file" onChange={fileUploadHandler} />
               </Button>
             </Grid>
             <Grid item>
-              <Button variant='contained' onClick={() => setDialogOpen(true)}><FolderIcon />New Folder</Button>
+              <Button variant="contained" onClick={() => setDialogOpen(true)}>
+                <FolderIcon />
+                New Folder
+              </Button>
               <Dialog open={dialogOpen}>
                 <DialogTitle>Create New Folder</DialogTitle>
                 <DialogContent>
-                  <TextField
-                    style={{ marginTop: '10px' }}
-                    label='Folder Name'
-                    value={folderName}
-                    onChange={(event: any) => setFolderName(event.target.value)}
-                    fullWidth />
+                  <TextField style={{ marginTop: '10px' }} label="Folder Name" value={folderName} onChange={(event: any) => setFolderName(event.target.value)} fullWidth />
                 </DialogContent>
                 <DialogActions>
-                  <Button disabled={folderName == '' || creatingFolder} onClick={newFolderHandler}>Create</Button>
-                  <Button onClick={() => { setFolderName(''); setDialogOpen(false) }}>Cancel</Button>
+                  <Button disabled={folderName == '' || creatingFolder} onClick={newFolderHandler}>
+                    Create
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      setFolderName('');
+                      setDialogOpen(false);
+                    }}
+                  >
+                    Cancel
+                  </Button>
                 </DialogActions>
               </Dialog>
             </Grid>
@@ -195,22 +192,12 @@ export const Organization: FC = () => {
         </Box>
       </Box>
 
-      <FileListView
-        path={path}
-        bucket={organization?.bucket || null}
-        setSnackBarSettings={setSnackBarSettings}
-        shouldReload={shouldReload}
-        setShouldReload={setShouldReload}
-      />
-      <Snackbar
-        open={snackBarSettings.open}
-        autoHideDuration={6000}
-        onClose={() => setSnackBarSettings({ message: '', open: false, severity: 'success' })}
-      >
+      <FileListView path={path} bucket={organization?.bucket || null} setSnackBarSettings={setSnackBarSettings} shouldReload={shouldReload} setShouldReload={setShouldReload} />
+      <Snackbar open={snackBarSettings.open} autoHideDuration={6000} onClose={() => setSnackBarSettings({ message: '', open: false, severity: 'success' })}>
         <Alert severity={snackBarSettings.severity} sx={{ width: '100%' }}>
           {snackBarSettings.message}
         </Alert>
       </Snackbar>
     </Box>
   );
-}
+};

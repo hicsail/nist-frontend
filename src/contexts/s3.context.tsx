@@ -37,10 +37,13 @@ export const S3Provider: FC<S3ProviderProps> = (props) => {
   });
 
   // Register the Cargo middleware
-  registerMiddleware({
-    cargoEndpoint: props.cargoEndpoint,
-    jwtTokenProvider: getJWTToken
-  }, client.middlewareStack)
+  registerMiddleware(
+    {
+      cargoEndpoint: props.cargoEndpoint,
+      jwtTokenProvider: getJWTToken
+    },
+    client.middlewareStack
+  );
 
-  return <S3Context.Provider value={client}>{props.children}</S3Context.Provider>
-}
+  return <S3Context.Provider value={client}>{props.children}</S3Context.Provider>;
+};

@@ -7,8 +7,8 @@ import { useNavigate } from 'react-router-dom';
 import FolderIcon from '@mui/icons-material/Folder';
 
 type FileOptions = {
-  label: string,
-  id: string
+  label: string;
+  id: string;
 };
 
 export const FileOption: FC<{ option: FileOptions }> = (props) => {
@@ -16,7 +16,6 @@ export const FileOption: FC<{ option: FileOptions }> = (props) => {
   // duplicated logic for determining if the object is a folder
   const fileComponents = props.option.id.split('/');
   const isFolder = fileComponents[fileComponents.length - 1] == '';
-
 
   return (
     <Grid container key={props.option.id}>
@@ -57,9 +56,8 @@ export const FileSearch: FC = () => {
     setOptions(options);
   };
 
-
   // Get the selection and navigate to the top level folder
-  const handleSelection = (_event: SyntheticEvent<Element, Event>, value: { label: string, id: string } | null) => {
+  const handleSelection = (_event: SyntheticEvent<Element, Event>, value: { label: string; id: string } | null) => {
     if (!value) {
       return;
     }
@@ -85,7 +83,11 @@ export const FileSearch: FC = () => {
       options={options}
       sx={{ width: 300 }}
       renderInput={(params) => <TextField {...params} label="File" />}
-      renderOption={(props, option) => <li {...props}><FileOption key={option.id} option={option} /></li>}
+      renderOption={(props, option) => (
+        <li {...props}>
+          <FileOption key={option.id} option={option} />
+        </li>
+      )}
     />
   );
 };

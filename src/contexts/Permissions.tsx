@@ -18,5 +18,5 @@ export const PermissionsProvider: FC<PermissionsProviderProps> = (props) => {
     }
   }, [data]);
 
-  return <PermissionsContext.Provider value={permissions}>{props.children}</PermissionsContext.Provider>
-}
+  return <PermissionsContext.Provider value={permissions}>{props.children}</PermissionsContext.Provider>;
+};
