@@ -7,7 +7,7 @@ export function HandleUpdate({ user }: any) {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [updateMessage, setUpdateMessage] = useState('');
   const handleCloseSnackbar = () => {
-      setSnackbarOpen(false);
+    setSnackbarOpen(false);
   };
 
   // GraphQL mutation query
@@ -25,27 +25,24 @@ export function HandleUpdate({ user }: any) {
         },
         user: user.user.id,
         bucket: user.bucket
-      }, onCompleted: () => {
+      },
+      onCompleted: () => {
         let message = 'Permissions updated';
         setUpdateMessage(message);
         setSnackbarOpen(true);
-      }, onError: (error) => {
+      },
+      onError: (error) => {
         let message = 'Failed to update permissions';
         setUpdateMessage(message);
         setSnackbarOpen(true);
       }
     });
-  }
+  };
 
   return (
     <>
       <Button onClick={handleUpdate}>Update</Button>
-      <Snackbar
-          open={snackbarOpen}
-          message={updateMessage}
-          autoHideDuration={3000}
-          onClose={handleCloseSnackbar}
-      />
+      <Snackbar open={snackbarOpen} message={updateMessage} autoHideDuration={3000} onClose={handleCloseSnackbar} />
     </>
   );
 }

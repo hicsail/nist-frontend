@@ -1,7 +1,6 @@
 import { createContext, Dispatch, FC, ReactNode, SetStateAction, useEffect } from 'react';
 import { Organization } from '../graphql/graphql';
 
-
 interface OrganizationContextType {
   organization: Organization | null;
   setOrganization: Dispatch<SetStateAction<Organization | null>>;
@@ -25,9 +24,5 @@ export const OrganizationProvider: FC<OrganizationProviderProps> = (props) => {
     currentOrganization = JSON.parse(orgStr);
   }
 
-  return (
-    <OrganizationContext.Provider value={{ organization: currentOrganization, setOrganization: props.setOrganization }}>
-      {props.children}
-    </OrganizationContext.Provider>
-  );
-}
+  return <OrganizationContext.Provider value={{ organization: currentOrganization, setOrganization: props.setOrganization }}>{props.children}</OrganizationContext.Provider>;
+};

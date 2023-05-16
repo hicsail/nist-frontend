@@ -1,16 +1,4 @@
-import {
-  Paper,
-  TableContainer,
-  TableCell,
-  TableRow,
-  Table,
-  TableBody,
-  Button,
-  IconButton,
-  AlertColor,
-  Grid,
-  Modal
-} from '@mui/material';
+import { Paper, TableContainer, TableCell, TableRow, Table, TableBody, Button, IconButton, AlertColor, Grid, Modal } from '@mui/material';
 import { FC, useContext, useState, useEffect, ReactNode, Dispatch, SetStateAction, MouseEvent } from 'react';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -23,13 +11,15 @@ import { deleteFile, deleteFolder, downloadFile, getFile } from '../aws-client';
 import { OrganizationContext } from '../contexts/organization.context';
 import EnhancedTableHead, { Order } from './EnhancedTableHead';
 import SequenceViz from './SequenceViz';
-import seqparse from "seqparse";
+import seqparse from 'seqparse';
 
 // TODO: Handle when there are more then 1000 objects
 const getObjectsForPath = async (s3Client: S3Client, bucket: string, path: string): Promise<S3Object[]> => {
   // Get the files that match the given prefix
   const result = await s3Client.send(new ListObjectsCommand({ Bucket: bucket, Prefix: path }));
-  if (!result.Contents) { return []; }
+  if (!result.Contents) {
+    return [];
+  }
   let objects = result.Contents;
 
   // Filter out files that are not in the current "folder"
@@ -49,7 +39,7 @@ const getObjectsForPath = async (s3Client: S3Client, bucket: string, path: strin
     const pathRemainder = key.substring(path.length).split('/');
     return pathRemainder.length == 1 || (pathRemainder.length == 2 && pathRemainder[1] == '');
   });
-}
+};
 
 const formatBytes = (size: number | undefined): string => {
   if (!size || size == 0) {
@@ -68,7 +58,7 @@ const formatBytes = (size: number | undefined): string => {
 interface FileRowProps {
   object: S3Object;
   setShouldReload: Dispatch<SetStateAction<boolean>>;
-  setSnackBarSettings: Dispatch<SetStateAction<{ message: string, open: boolean, severity: AlertColor }>>;
+  setSnackBarSettings: Dispatch<SetStateAction<{ message: string; open: boolean; severity: AlertColor }>>;
 }
 
 const FileRowView: FC<FileRowProps> = ({ object, setShouldReload, setSnackBarSettings }) => {
@@ -93,28 +83,29 @@ const FileRowView: FC<FileRowProps> = ({ object, setShouldReload, setSnackBarSet
     const fileString = await file.Body.transformToString();
 
     setFileString(fileString);
-    setOpen(true)
+    setOpen(true);
   };
   const handleVizBackdropClose = (event: React.MouseEvent<HTMLElement>, reason: string) => {
     if (reason !== 'backdropClick') {
       setOpen(false);
     }
-  }
-
+  };
 
   // Determine if the view of the file should just be the name or the
   // folder view
   let fileNameView: ReactNode = name;
   if (isFolder) {
     fileNameView = (
-      <Button variant='text'
+      <Button
+        variant="text"
         onClick={() => navigate(`${location.pathname}${name}/`)}
         style={{
           alignItems: 'center',
           display: 'flex',
           color: 'black',
           outline: 'none'
-        }}>
+        }}
+      >
         <FolderIcon style={{ marginRight: 3 }} />
         {name}
       </Button>
@@ -123,7 +114,7 @@ const FileRowView: FC<FileRowProps> = ({ object, setShouldReload, setSnackBarSet
 
   const deleteHandler = async () => {
     const deleteFunction = isFolder ? deleteFolder : deleteFile;
-    const type = isFolder ? 'folder': 'file';
+    const type = isFolder ? 'folder' : 'file';
     const deleteResult = await deleteFunction(s3Client, organization!.bucket, object.Key!);
 
     const snackBarSettings = { message: `${type} deleted successfully`, open: true, severity: 'success' as AlertColor };
@@ -134,17 +125,21 @@ const FileRowView: FC<FileRowProps> = ({ object, setShouldReload, setSnackBarSet
 
     setShouldReload(true);
     setSnackBarSettings(snackBarSettings);
-  }
+  };
 
   const operations = (
-    <Grid container spacing={1} style={{ alignItems: 'center', display: 'flex'}}>
+    <Grid container spacing={1} style={{ alignItems: 'center', display: 'flex' }}>
       <Grid item xs={2}>
         {
           // Currently do not support downloading folder so just need a
           // placeholder to maintain spacing
-          isFolder ?
-          <></> :
-          <IconButton onClick={() => downloadFile(s3Client, organization!.bucket, object.Key!)}><FileDownloadIcon /></IconButton>
+          isFolder ? (
+            <></>
+          ) : (
+            <IconButton onClick={() => downloadFile(s3Client, organization!.bucket, object.Key!)}>
+              <FileDownloadIcon />
+            </IconButton>
+          )
         }
       </Grid>
       <Grid item xs={2}>
@@ -153,23 +148,21 @@ const FileRowView: FC<FileRowProps> = ({ object, setShouldReload, setSnackBarSet
         </IconButton>
       </Grid>
       <Grid item xs={2}>
-        { !isFolder && isSeq &&
+        {!isFolder && isSeq && (
           <IconButton onClick={handleVizOpen}>
             <PreviewIcon />
           </IconButton>
-        }
+        )}
       </Grid>
       <Modal open={open} onClose={handleVizBackdropClose}>
-        <SequenceViz title='Sequence Visualization' fileString={fileString} onClose={handleVizClose} />
+        <SequenceViz title="Sequence Visualization" fileString={fileString} onClose={handleVizClose} />
       </Modal>
     </Grid>
   );
 
   return (
     <TableRow>
-      <TableCell>
-        {fileNameView}
-      </TableCell>
+      <TableCell>{fileNameView}</TableCell>
       <TableCell>{object.LastModified ? object.LastModified.toLocaleDateString() : ''}</TableCell>
       <TableCell>{formatBytes(object.Size)}</TableCell>
       <TableCell>{operations}</TableCell>
@@ -180,8 +173,8 @@ const FileRowView: FC<FileRowProps> = ({ object, setShouldReload, setSnackBarSet
 export interface FileListViewProps {
   path: string;
   bucket: string | null;
-  setSnackBarSettings: Dispatch<SetStateAction<{ message: string, open: boolean, severity: AlertColor }>>;
-  shouldReload: boolean,
+  setSnackBarSettings: Dispatch<SetStateAction<{ message: string; open: boolean; severity: AlertColor }>>;
+  shouldReload: boolean;
   setShouldReload: Dispatch<SetStateAction<boolean>>;
 }
 
@@ -199,7 +192,7 @@ export const FileListView: FC<FileListViewProps> = (props) => {
 
   const handleRequestSort = (_event: MouseEvent<unknown>, property: string) => {
     const isAsc = orderBy === property && order === 'asc';
-    setOrder(isAsc ? 'desc': 'asc');
+    setOrder(isAsc ? 'desc' : 'asc');
     setOrderBy(property);
   };
 
@@ -221,10 +214,12 @@ export const FileListView: FC<FileListViewProps> = (props) => {
 
   // Handle sorting the objects
   useEffect(() => {
-    setOrderedObjects(objects.slice().sort((a: any, b: any) => {
-      const direction = order === 'asc' ? 1: -1;
-      return a[orderBy] > b[orderBy] ? direction: -direction;
-    }));
+    setOrderedObjects(
+      objects.slice().sort((a: any, b: any) => {
+        const direction = order === 'asc' ? 1 : -1;
+        return a[orderBy] > b[orderBy] ? direction : -direction;
+      })
+    );
   }, [objects, order, orderBy]);
 
   const columns = [
@@ -237,19 +232,13 @@ export const FileListView: FC<FileListViewProps> = (props) => {
   return (
     <TableContainer component={Paper} sx={{ minWidth: 650 }}>
       <Table>
-        <EnhancedTableHead
-          onRequestSort={handleRequestSort}
-          columns={columns}
-          sortableIds={['Key', 'LastModified', 'Size']}
-          order={order}
-          orderBy={orderBy}
-        />
+        <EnhancedTableHead onRequestSort={handleRequestSort} columns={columns} sortableIds={['Key', 'LastModified', 'Size']} order={order} orderBy={orderBy} />
         <TableBody>
-          {orderedObjects.map((object) =>
-            <FileRowView object={object} setShouldReload={props.setShouldReload} setSnackBarSettings={props.setSnackBarSettings} key={object.Key!}/>)
-          }
+          {orderedObjects.map((object) => (
+            <FileRowView object={object} setShouldReload={props.setShouldReload} setSnackBarSettings={props.setSnackBarSettings} key={object.Key!} />
+          ))}
         </TableBody>
       </Table>
     </TableContainer>
   );
-}
+};

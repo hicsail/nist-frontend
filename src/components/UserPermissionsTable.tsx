@@ -19,7 +19,7 @@ type CargoPermission = {
   write: boolean;
   delete: boolean;
   admin: boolean;
-}
+};
 
 type Props = {
   userPermissions: any[];
@@ -27,10 +27,7 @@ type Props = {
 
 // update cargo permissio
 
-
 function UserPermissionsTable({ userPermissions }: Props) {
-
-
   const [permissions, setPermissions] = useState<any[]>([]);
 
   useEffect(() => {
@@ -38,15 +35,17 @@ function UserPermissionsTable({ userPermissions }: Props) {
   }, [userPermissions]);
 
   function handleCheckboxChange(event: React.ChangeEvent<HTMLInputElement>, userId: string, permission: keyof User) {
-    setPermissions(permissions.map(user => {
-      if (user.user.id === userId) {
-        return {
-          ...user,
-          [permission]: event.target.checked,
-        };
-      }
-      return user;
-    }));
+    setPermissions(
+      permissions.map((user) => {
+        if (user.user.id === userId) {
+          return {
+            ...user,
+            [permission]: event.target.checked
+          };
+        }
+        return user;
+      })
+    );
   }
 
   return (
@@ -63,27 +62,28 @@ function UserPermissionsTable({ userPermissions }: Props) {
           </TableRow>
         </TableHead>
         <TableBody>
-          {permissions ? permissions.map(user => (
-            <TableRow key={user.user.id}>
-              <TableCell>{user.user.email}</TableCell>
-              <TableCell>
-                <Checkbox checked={user.read} onChange={(event: any) => handleCheckboxChange(event, user.user.id, 'read')} />
-              </TableCell>
-              <TableCell>
-                <Checkbox checked={user.write} onChange={(event: any) => handleCheckboxChange(event, user.user.id, 'write')} />
-              </TableCell>
-              <TableCell>
-                <Checkbox checked={user.delete} onChange={(event: any) => handleCheckboxChange(event, user.user.id, 'delete')} />
-              </TableCell>
-              <TableCell>
-                <Checkbox checked={user.admin} onChange={(event: any) => handleCheckboxChange(event, user.user.id, 'admin')} />
-              </TableCell>
-              <TableCell>
-                <HandleUpdate user={user} />
-              </TableCell>
-            </TableRow>
-          )) : null
-          }
+          {permissions
+            ? permissions.map((user) => (
+                <TableRow key={user.user.id}>
+                  <TableCell>{user.user.email}</TableCell>
+                  <TableCell>
+                    <Checkbox checked={user.read} onChange={(event: any) => handleCheckboxChange(event, user.user.id, 'read')} />
+                  </TableCell>
+                  <TableCell>
+                    <Checkbox checked={user.write} onChange={(event: any) => handleCheckboxChange(event, user.user.id, 'write')} />
+                  </TableCell>
+                  <TableCell>
+                    <Checkbox checked={user.delete} onChange={(event: any) => handleCheckboxChange(event, user.user.id, 'delete')} />
+                  </TableCell>
+                  <TableCell>
+                    <Checkbox checked={user.admin} onChange={(event: any) => handleCheckboxChange(event, user.user.id, 'admin')} />
+                  </TableCell>
+                  <TableCell>
+                    <HandleUpdate user={user} />
+                  </TableCell>
+                </TableRow>
+              ))
+            : null}
         </TableBody>
       </Table>
     </TableContainer>

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import './App.css'
-import { SideNav } from './components/SideNav'
-import { Outlet, useNavigate } from "react-router-dom";
+import './App.css';
+import { SideNav } from './components/SideNav';
+import { Outlet, useNavigate } from 'react-router-dom';
 import { ApolloClient, InMemoryCache, ApolloProvider, HttpLink } from '@apollo/client';
 import { Box, Typography } from '@mui/material';
 import { AuthContext } from './contexts/Auth';
@@ -9,13 +9,12 @@ import { PermissionsProvider } from './contexts/Permissions';
 import { setContext } from '@apollo/client/link/context';
 import jwtDecode from 'jwt-decode';
 import { UIContext } from './contexts/UI';
-import {MuiThemeProvider} from './contexts/theme.providers';
+import { MuiThemeProvider } from './contexts/theme.providers';
 import { S3Provider } from './contexts/s3.context';
 import { OrganizationContext, OrganizationProvider } from './contexts/organization.context';
-import {Organization} from './graphql/graphql';
+import { Organization } from './graphql/graphql';
 
 function App() {
-
   const [token, setToken] = useState<string | null>(null);
   const [path, setPath] = useState<any[]>([]);
   const [isAuthenticated, setIsAuthenticated] = React.useState(false);
@@ -25,7 +24,7 @@ function App() {
 
   const httpLink = new HttpLink({
     fetch: fetch,
-    uri: uri,
+    uri: uri
   });
 
   const authLogic = async (headers: any) => {
@@ -46,9 +45,9 @@ function App() {
       return {
         headers: {
           ...headers,
-          authorization: token ? `Bearer ${token}` : "",
+          authorization: token ? `Bearer ${token}` : ''
         }
-      }
+      };
     } else {
       setToken(null);
       setIsAuthenticated(false);
@@ -56,11 +55,11 @@ function App() {
       return {
         headers: {
           ...headers,
-          authorization: token ? `Bearer ${token}` : "",
+          authorization: token ? `Bearer ${token}` : ''
         }
-      }
+      };
     }
-  }
+  };
 
   const authLink = setContext((_, { headers }) => {
     return authLogic(headers);
@@ -69,9 +68,9 @@ function App() {
   const createNewClient = () => {
     return new ApolloClient({
       cache: new InMemoryCache(),
-      link: authLink.concat(httpLink),
+      link: authLink.concat(httpLink)
     });
-  }
+  };
 
   const client = createNewClient();
 
@@ -84,46 +83,39 @@ function App() {
     setIsAuthenticated,
     token,
     setToken
-  }
+  };
 
   return (
     <div className="App">
       <MuiThemeProvider>
-        <S3Provider
-          s3Endpoint={import.meta.env.VITE_S3_ENDPOINT}
-          cargoEndpoint={import.meta.env.VITE_CARGO_ENDPOINT}
-        >
+        <S3Provider s3Endpoint={import.meta.env.VITE_S3_ENDPOINT} cargoEndpoint={import.meta.env.VITE_CARGO_ENDPOINT}>
           <AuthContext.Provider value={authContext}>
             <ApolloProvider client={client}>
-            <UIContext.Provider value={{ path: path, setPath: setPath }}>
-              {
-                isAuthenticated ? (
-                    <PermissionsProvider>
-                      <OrganizationProvider setOrganization={setOrganization}>
-                        <Box sx={{ display: 'flex' }}>
-                          <SideNav />
-                          <Box sx={{ flexGrow: 1, p: 3 }}>
-                            <Outlet />
-                          </Box>
+              <UIContext.Provider value={{ path: path, setPath: setPath }}>
+                {isAuthenticated ? (
+                  <PermissionsProvider>
+                    <OrganizationProvider setOrganization={setOrganization}>
+                      <Box sx={{ display: 'flex' }}>
+                        <SideNav />
+                        <Box sx={{ flexGrow: 1, p: 3 }}>
+                          <Outlet />
                         </Box>
-                      </OrganizationProvider>
-                    </PermissionsProvider>
+                      </Box>
+                    </OrganizationProvider>
+                  </PermissionsProvider>
                 ) : (
                   <div>
-                    <Typography variant='h2'>
-                      Please login
-                    </Typography>
+                    <Typography variant="h2">Please login</Typography>
                     <Outlet />
                   </div>
-                )
-              }
+                )}
               </UIContext.Provider>
             </ApolloProvider>
           </AuthContext.Provider>
         </S3Provider>
       </MuiThemeProvider>
     </div>
-  )
+  );
 }
 
-export default App
+export default App;
