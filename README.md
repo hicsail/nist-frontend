@@ -1,43 +1,41 @@
 # NIST Frontend
 
-This repository contains client side code for a React application that serves as the frontend for the NIST project.
+## Introduction
 
-# Getting Started 
+The NIST-Racer project is an effort to provide a platform for working on the COVID-19 Antigen across many research groups. This repository contains client side code for a React application that serves as the frontend for this project.
 
-Available Scripts
-In the project directory, you can run:
+## Getting Started
 
-npm start
-Runs the app in the development mode.
-Open http://localhost:3000 to view it in your browser.
-
-The page will reload when you make changes.
-You may also see any lint errors in the console.
-
-npm test
-Launches the test runner in the interactive watch mode.
-See the section about running tests for more information.
-
-npm run build
-Builds the app for production to the build folder.
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.
-Your app is ready to be deployed!
-
-See the section about deployment for more information.
-
-npm run eject
-Note: this is a one-way operation. Once you eject, you can't go back!
-
-If you aren't satisfied with the build tool and configuration choices, you can eject at any time. This command will remove the single build dependency from your project.
-
-## Installation & Usage
+### Installation
 
 ```
-cd nist-frontend
 npm install
-npm 
 ```
 
-## License
+### Configuration
+
+There are a few environment variables needed in order to make the application running properly. For running locally, you can create a `.env` file to store them. Required environment variables are the following:
+
+- `VITE_AUTH_URL`
+- `VITE_PROJECT_ID`
+- `VITE_AUTHSERVICE_URL`
+- `VITE_S3_ENDPOINT`
+- `VITE_CARGO_ENDPOINT`
+
+### Build
+
+This step is necessary for deployment. If you are running it on local machine, you can skip this step.
+
+```
+npm run build
+```
+
+### Running the App
+
+```
+npm run dev
+```
+
+This command will run the application in development mode. By default, it should be running at http://localhost:5173. At first, you will be redirected to the authentication page. You will need an account to access the dashboard. By default, new user will not have access to any bucket. Please contact admin for permissions.
+
+To stop the application, press <kbd>CTRL</kbd>+<kbd>C</kbd> at the console.
