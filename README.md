@@ -38,4 +38,4 @@ npm run dev
 
 This command will run the application in development mode. By default, it should be running at http://localhost:5173. At first, you will be redirected to the authentication page. You will need an account to access the dashboard. By default, new user will not have access to any bucket. Please contact admin for permissions.
 
-To stop the application, press `CTRL`+`C` at the console.
+To stop the application, press <kbd>CTRL</kbd>+<kbd>C</kbd> at the console.
