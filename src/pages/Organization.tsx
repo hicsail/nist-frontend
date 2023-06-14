@@ -11,6 +11,7 @@ import { FileSearch } from '../components/FileSearch';
 import AddIcon from '@mui/icons-material/Add';
 import { FileListView } from '../components/file-list-view';
 import { OrganizationContext } from '../contexts/organization.context';
+import { S3Viewer, DocViewPlugin } from '@bu-sail/s3-viewer';
 
 const FileBreadcrumbs: FC<{ path: string }> = ({ path }) => {
   const { organization } = useContext(OrganizationContext);
@@ -191,8 +192,12 @@ export const Organization: FC = () => {
           </Grid>
         </Box>
       </Box>
-
-      <FileListView path={path} bucket={organization?.bucket || null} setSnackBarSettings={setSnackBarSettings} shouldReload={shouldReload} setShouldReload={setShouldReload} />
+      <S3Viewer
+        bucket={organization!.bucket}
+        bucketDisplayedName={organization!.name}
+        client={s3Client}
+        plugins={[new DocViewPlugin()]}
+      />
       <Snackbar open={snackBarSettings.open} autoHideDuration={6000} onClose={() => setSnackBarSettings({ message: '', open: false, severity: 'success' })}>
         <Alert severity={snackBarSettings.severity} sx={{ width: '100%' }}>
           {snackBarSettings.message}
