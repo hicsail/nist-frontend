@@ -1,12 +1,7 @@
 import { useEffect, useState, useContext, FC } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import { uploadToS3, createFolder } from '../aws-client';
-import { Button, TextField, Breadcrumbs, Typography, Box, Grid, Divider, AlertColor, Snackbar, Alert, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
 import { PermissionsContext } from '../contexts/Permissions';
 import { S3Context } from '../contexts/s3.context';
 import { CargoPermissions } from '../graphql/graphql';
-import HomeIcon from '@mui/icons-material/Home';
-import FolderIcon from '@mui/icons-material/Folder';
 import { OrganizationContext } from '../contexts/organization.context';
 import { S3Viewer, DocViewPlugin } from '@bu-sail/s3-viewer';
 
@@ -31,13 +26,18 @@ export const Organization: FC = () => {
 
   // TODO:
   //  * Include permissions
-  //  * Handle passing the path into the s3 viewer
+  //  * Allow navigation changes (going back/forward) to change the path of
+  //    the S3Viewer
   return (
-     <S3Viewer
-      bucket={organization!.bucket}
-      bucketDisplayedName={organization!.name}
-      client={s3Client}
-      plugins={[new DocViewPlugin()]}
-    />
+    <>
+     {organization && (
+      <S3Viewer
+        bucket={organization!.bucket}
+        bucketDisplayedName={organization!.name}
+        client={s3Client}
+        plugins={[new DocViewPlugin()]}
+      />
+      )}
+    </>
   );
 };
