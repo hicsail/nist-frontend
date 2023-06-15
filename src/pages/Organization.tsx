@@ -7,7 +7,7 @@ import { S3Viewer, DocViewPlugin } from '@bu-sail/s3-viewer';
 
 export const Organization: FC = () => {
   const { organization } = useContext(OrganizationContext);
-  const [_userPermissions, setUserPermissions] = useState<any>();
+  const [userPermissions, setUserPermissions] = useState<CargoPermissions | null>(null);
   const s3Client = useContext(S3Context);
 
   const permissions = useContext(PermissionsContext);
@@ -20,22 +20,29 @@ export const Organization: FC = () => {
   useEffect(() => {
     if (permissions && organization) {
       const permissions = getPermissionsForOrganization(organization.bucket);
-      setUserPermissions(permissions);
+      setUserPermissions(permissions || null);
     }
   }, [permissions]);
 
   // TODO:
-  //  * Include permissions
   //  * Allow navigation changes (going back/forward) to change the path of
   //    the S3Viewer
   return (
     <>
-     {organization && (
+     {organization && userPermissions && (
       <S3Viewer
         bucket={organization!.bucket}
         bucketDisplayedName={organization!.name}
         client={s3Client}
         plugins={[new DocViewPlugin()]}
+        disableRead={!userPermissions.read}
+        disableWrite={!userPermissions.write}
+        disableUpload={!userPermissions.write}
+        disablePreview={!userPermissions.read}
+        disableDelete={!userPermissions.delete}
+        disableDownload={!userPermissions.read}
+        disableRename={!userPermissions.write}
+        disableCreateFolder={!userPermissions.write}
       />
       )}
     </>
