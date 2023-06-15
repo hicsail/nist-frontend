@@ -1546,7 +1546,7 @@
 
 "@bu-sail/s3-viewer@file:../../microservices/s3-viewer":
   "resolved" "file:../../microservices/s3-viewer"
-  "version" "0.0.0"
+  "version" "0.0.1-alpha.1"
   dependencies:
     "@aws-sdk/s3-request-presigner" "^3.342.0"
     "@cyntler/react-doc-viewer" "^1.13.0"
