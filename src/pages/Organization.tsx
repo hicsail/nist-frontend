@@ -4,7 +4,7 @@ import { S3Context } from '../contexts/s3.context';
 import { CargoPermissions } from '../graphql/graphql';
 import { OrganizationContext } from '../contexts/organization.context';
 import { S3Viewer, DocViewPlugin } from '@bu-sail/s3-viewer';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 
 export const Organization: FC = () => {
   const { organization } = useContext(OrganizationContext);
@@ -36,9 +36,13 @@ export const Organization: FC = () => {
     setCurrentPath(`${splat}`);
   }, [splat]);
 
-  // TODO:
-  //  * Allow navigation changes (going back/forward) to change the path of
-  //    the S3Viewer
+  // Update the URI to match the redirect
+  const navigate = useNavigate();
+  useEffect(() => {
+    console.log(currentPath);
+    navigate(`/organization/${currentPath}`);
+  }, [currentPath]);
+
   return (
     <>
      {organization && userPermissions && (
