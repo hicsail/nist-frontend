@@ -7,6 +7,7 @@ import { S3Viewer, DocViewPlugin } from '@bu-sail/s3-viewer';
 import { useParams, useNavigate } from 'react-router-dom';
 import { CargoPresignDocument } from '../graphql/sign/sign';
 import { useApolloClient } from '@apollo/client';
+import { SeqVizPlugin } from '../components/SequenceViz';
 
 export const Organization: FC = () => {
   const { organization } = useContext(OrganizationContext);
@@ -66,7 +67,7 @@ export const Organization: FC = () => {
         client={s3Client}
         getSignedUrl={getSignedUrl}
         pathControl={{ currentPath, setCurrentPath }}
-        plugins={[new DocViewPlugin()]}
+        plugins={[new DocViewPlugin(), new SeqVizPlugin()]}
         disableRead={!userPermissions.read}
         disableWrite={!userPermissions.write}
         disableUpload={!userPermissions.write}

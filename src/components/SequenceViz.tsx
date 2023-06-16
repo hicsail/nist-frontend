@@ -1,8 +1,10 @@
-import { Divider, IconButton, Paper, Typography } from '@mui/material';
-import CloseIcon from '@mui/icons-material/Close';
 import SeqViz from 'seqviz';
-import seqparse from 'seqparse';
+import seqparse, { Seq } from 'seqparse';
 import { useEffect, useState } from 'react';
+import { Plugin } from '@bu-sail/s3-viewer';
+import { S3Object, useS3Context } from '@bu-sail/s3-viewer';
+import { FC, ReactNode } from 'react';
+import { Paper, Typography, Divider, IconButton } from '@mui/material';
 
 const style = {
   position: 'absolute',
@@ -18,33 +20,46 @@ const style = {
   p: 4
 };
 
-type SequenceVizProps = {
-  title: string;
-  onClose: () => void;
-  fileString: string;
-  size?: { width: string; height: string };
-};
 
-export default function SequenceViz(props: SequenceVizProps) {
-  const { title, onClose, fileString, size } = props;
-  const [sequence, setSequence] = useState<any>();
+export class SeqVizPlugin implements Plugin {
+  name: string;
+  description: string;
+  fileExtensions: string[];
+
+  constructor() {
+    this.name = 'SeqViz';
+    this.description = 'DNA and RNA visualization';
+    this.fileExtensions = ['dna', 'fasta', 'gb'];
+  }
+
+  getView(object: S3Object): ReactNode {
+    return <SeqVizWrapper object={object} />
+  }
+}
+
+const SeqVizWrapper: FC< { object: S3Object }> = ({ object }) => {
+  const { bucket, getSignedUrl } = useS3Context();
+  const [sequence, setSequence] = useState<Seq | null>();
+
+  const loadSequence = async () => {
+    // Get the sequence string from the file
+    const url = await getSignedUrl(bucket, object.$raw.Key, 60);
+    const fileContents = await fetch(url);
+    const fileString = await fileContents.text();
+
+    // Parse and update the sequence
+    const seq = await seqparse(fileString);
+    setSequence(seq);
+  };
 
   useEffect(() => {
-    seqparse(fileString).then((seq) => setSequence(seq));
+    loadSequence();
   }, []);
-
-  if (size) {
-    style.width = size.width;
-    style.height = size.height;
-  }
 
   return (
     <Paper sx={style}>
       <Typography variant="h6" sx={{ m: 0, p: 2 }}>
-        {title}
-        <IconButton onClick={onClose} aria-label="close" sx={{ position: 'absolute', right: 8, top: 8 }}>
-          <CloseIcon />
-        </IconButton>
+        {'SeqViz'}
       </Typography>
       <Divider sx={{ my: 2 }} />
       <div style={{ flexGrow: 1 }}>
@@ -52,4 +67,4 @@ export default function SequenceViz(props: SequenceVizProps) {
       </div>
     </Paper>
   );
-}
+};
