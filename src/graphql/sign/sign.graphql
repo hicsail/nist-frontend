@@ -1,0 +1,3 @@
+query cargoPresign($presignRequest: CargoPresignRequest!) {
+  cargoPresign(presignRequest: $presignRequest)
+}
