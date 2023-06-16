@@ -5,11 +5,25 @@ import { CargoPermissions } from '../graphql/graphql';
 import { OrganizationContext } from '../contexts/organization.context';
 import { S3Viewer, DocViewPlugin } from '@bu-sail/s3-viewer';
 import { useParams, useNavigate } from 'react-router-dom';
+import { CargoPresignDocument } from '../graphql/sign/sign';
+import { useApolloClient } from '@apollo/client';
 
 export const Organization: FC = () => {
   const { organization } = useContext(OrganizationContext);
   const [userPermissions, setUserPermissions] = useState<CargoPermissions | null>(null);
   const s3Client = useContext(S3Context);
+
+  // Make the getSignedUrl function for the s3 viewer to use that leverages
+  // Cargo. Cannot use React hooks so the Apollo Client is used directly
+  const apolloClient = useApolloClient();
+  const getSignedUrl = async (bucket: string, key: string, expires: number): Promise<string> => {
+    const query = await apolloClient.query({
+      query: CargoPresignDocument,
+      variables: { presignRequest: { bucket, key, expires } }
+    });
+
+    return query.data.cargoPresign;
+  };
 
   const permissions = useContext(PermissionsContext);
 
@@ -50,6 +64,7 @@ export const Organization: FC = () => {
         bucket={organization!.bucket}
         bucketDisplayedName={organization!.name}
         client={s3Client}
+        getSignedUrl={getSignedUrl}
         pathControl={{ currentPath, setCurrentPath }}
         plugins={[new DocViewPlugin()]}
         disableRead={!userPermissions.read}
