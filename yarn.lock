@@ -1544,11 +1544,10 @@
     "cross-fetch" "^3.1.5"
     "graphql" "^16.6.0"
 
-"@bu-sail/s3-viewer@file:../../microservices/s3-viewer":
+"@bu-sail/s3-viewer@^0.0.1-alpha.1":
   "resolved" "file:../../microservices/s3-viewer"
   "version" "0.0.1-alpha.1"
   dependencies:
-    "@aws-sdk/s3-request-presigner" "^3.342.0"
     "@cyntler/react-doc-viewer" "^1.13.0"
     "@emotion/react" "^11.11.0"
     "@emotion/styled" "^11.11.0"
