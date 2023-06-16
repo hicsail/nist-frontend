@@ -60,23 +60,23 @@ export const Organization: FC = () => {
 
   return (
     <>
-     {organization && userPermissions && (
-      <S3Viewer
-        bucket={organization!.bucket}
-        bucketDisplayedName={organization!.name}
-        client={s3Client}
-        getSignedUrl={getSignedUrl}
-        pathControl={{ currentPath, setCurrentPath }}
-        plugins={[new DocViewPlugin(), new SeqVizPlugin()]}
-        disableRead={!userPermissions.read}
-        disableWrite={!userPermissions.write}
-        disableUpload={!userPermissions.write}
-        disablePreview={!userPermissions.read}
-        disableDelete={!userPermissions.delete}
-        disableDownload={!userPermissions.read}
-        disableRename={!userPermissions.write}
-        disableCreateFolder={!userPermissions.write}
-      />
+      {organization && userPermissions && (
+        <S3Viewer
+          bucket={organization!.bucket}
+          bucketDisplayedName={organization!.name}
+          client={s3Client}
+          getSignedUrl={getSignedUrl}
+          pathControl={{ currentPath, setCurrentPath }}
+          plugins={[new DocViewPlugin(), new SeqVizPlugin()]}
+          disableRead={!userPermissions.read}
+          disableWrite={!userPermissions.write}
+          disableUpload={!userPermissions.write}
+          disablePreview={!userPermissions.read}
+          disableDelete={!userPermissions.delete}
+          disableDownload={!userPermissions.read}
+          disableRename={!userPermissions.write}
+          disableCreateFolder={!userPermissions.write}
+        />
       )}
     </>
   );

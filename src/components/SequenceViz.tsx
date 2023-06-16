@@ -20,7 +20,6 @@ const style = {
   p: 4
 };
 
-
 export class SeqVizPlugin implements Plugin {
   name: string;
   description: string;
@@ -33,11 +32,11 @@ export class SeqVizPlugin implements Plugin {
   }
 
   getView(object: S3Object): ReactNode {
-    return <SeqVizWrapper object={object} />
+    return <SeqVizWrapper object={object} />;
   }
 }
 
-const SeqVizWrapper: FC< { object: S3Object }> = ({ object }) => {
+const SeqVizWrapper: FC<{ object: S3Object }> = ({ object }) => {
   const { bucket, getSignedUrl } = useS3Context();
   const [sequence, setSequence] = useState<Seq | null>();
 
