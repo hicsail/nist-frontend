@@ -8,6 +8,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { CargoPresignDocument } from '../graphql/sign/sign';
 import { useApolloClient } from '@apollo/client';
 import { SeqVizPlugin } from '../components/SequenceViz';
+import { RcsbMolestarPlugin } from '../components/RcsbMolestar';
 
 export const Organization: FC = () => {
   const { organization } = useContext(OrganizationContext);
@@ -67,7 +68,7 @@ export const Organization: FC = () => {
           client={s3Client}
           getSignedUrl={getSignedUrl}
           pathControl={{ currentPath, setCurrentPath }}
-          plugins={[new DocViewPlugin(), new SeqVizPlugin()]}
+          plugins={[new DocViewPlugin(), new SeqVizPlugin(), new RcsbMolestarPlugin()]}
           disableRead={!userPermissions.read}
           disableWrite={!userPermissions.write}
           disableUpload={!userPermissions.write}
