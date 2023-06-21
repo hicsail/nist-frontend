@@ -45,6 +45,20 @@ const MolestarWrapper: FC<{ object: S3Object }> = ({ object }) => {
     if (!doc) {
       return;
     }
+
+    if (!node) {
+      return;
+    }
+
+    const styleLink = document.createElement('link');
+    styleLink.href = '/src/assets/rcsb-molstar.css';
+    styleLink.rel = 'stylesheet';
+    styleLink.type = 'text/css';
+
+    const iframeHead = node.current?.contentWindow?.document.head;
+    if (iframeHead) {
+      iframeHead.appendChild(styleLink);
+    }
   }, []);
 
   const { bucket, getSignedUrl } = useS3Context();
