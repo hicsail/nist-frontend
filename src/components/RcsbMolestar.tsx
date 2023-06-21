@@ -9,8 +9,8 @@ const style = {
   top: '50%',
   left: '50%',
   transform: 'translate(-50%, -50%)',
-  width: '100%',
-  height: '100%',
+  width: '90%',
+  height: '90%',
   bgcolor: 'background.paper',
   overflow: 'hidden',
   display: 'flex',
@@ -40,16 +40,10 @@ const MolestarWrapper: FC<{ object: S3Object }> = ({ object }) => {
   const [doc, setDoc] = useState<Document | null>();
 
   useEffect(() => {
-    setDoc(node.current?.contentDocument);
-    // Add the top level style
-    if (!doc) {
-      return;
-    }
-
+    // Add in style to iframe
     if (!node) {
       return;
     }
-
     const styleLink = document.createElement('link');
     styleLink.href = '/src/assets/rcsb-molstar.css';
     styleLink.rel = 'stylesheet';
@@ -59,6 +53,9 @@ const MolestarWrapper: FC<{ object: S3Object }> = ({ object }) => {
     if (iframeHead) {
       iframeHead.appendChild(styleLink);
     }
+
+
+    setDoc(node.current?.contentDocument);
   }, []);
 
   const { bucket, getSignedUrl } = useS3Context();
@@ -78,7 +75,7 @@ const MolestarWrapper: FC<{ object: S3Object }> = ({ object }) => {
   return (
     <Paper sx={style}>
       <Typography variant="h6" sx={{ m: 0, p: 2 }}>
-        {'RCSB Molestar'}
+        {'RCSB PDB Mol* Viewer'}
       </Typography>
       <Divider sx={{ my: 2 }} />
       <div style={{ flexGrow: 1 }}>
@@ -93,14 +90,6 @@ const MolestarWrapper: FC<{ object: S3Object }> = ({ object }) => {
 
 const Molestar: FC<{ url: string }> = ({ url }) => {
   const ref = useRef(null);
-
-  useEffect(() => {
-    const styleLink = document.createElement('link');
-    styleLink.href = '/src/assets/rcsb-molstar.css';
-    styleLink.rel = 'stylesheet';
-    styleLink.type = 'text/css';
-    document.head.appendChild(styleLink);
-  }, []);
 
   useEffect(() => {
     if (!ref.current) {
