@@ -59,14 +59,6 @@ const MolestarWrapper: FC<{ object: S3Object }> = ({ object }) => {
     loadPDB();
   }, []);
 
-  useEffect(() => {
-    const styleLink = document.createElement('link');
-    styleLink.href = '/src/assets/rcsb-molstar.css';
-    styleLink.rel = 'stylesheet';
-    styleLink.type = 'text/css';
-    document.head.appendChild(styleLink);
-  }, []);
-
   // Wrap the protein view in an iframe since the view is not provided
   // as a typical React node.
   return (
@@ -87,6 +79,14 @@ const MolestarWrapper: FC<{ object: S3Object }> = ({ object }) => {
 
 const Molestar: FC<{ url: string }> = ({ url }) => {
   const ref = useRef(null);
+
+  useEffect(() => {
+    const styleLink = document.createElement('link');
+    styleLink.href = '/src/assets/rcsb-molstar.css';
+    styleLink.rel = 'stylesheet';
+    styleLink.type = 'text/css';
+    document.head.appendChild(styleLink);
+  }, []);
 
   useEffect(() => {
     if (!ref.current) {
