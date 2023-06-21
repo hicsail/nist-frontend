@@ -1,6 +1,7 @@
-import { FC, ReactNode, useEffect } from 'react';
+import { FC, LegacyRef, ReactNode, useEffect, useRef, useState } from 'react';
 import { Plugin, S3Object, useS3Context } from '@bu-sail/s3-viewer';
 import { Viewer } from '@rcsb/rcsb-molstar/build/src/viewer/index';
+import { createPortal } from 'react-dom';
 
 export class RcsbMolestarPlugin implements Plugin {
   name: string;
@@ -19,12 +20,40 @@ export class RcsbMolestarPlugin implements Plugin {
 }
 
 const MolestarWrapper: FC<{ object: S3Object }> = ({ object }) => {
+  const node = useRef<HTMLIFrameElement>(null);
+  const [doc, setDoc] = useState<Document | null>();
+
+  useEffect(() => {
+    setDoc(node.current?.contentDocument);
+  }, []);
+
   const { bucket, getSignedUrl } = useS3Context();
+  const [url, setUrl] = useState<string | null>(null);
+
 
   const loadPDB = async () => {
-    const url = await getSignedUrl(bucket, object.$raw.Key, 120);
-    console.log(url);
-    const viewer = new Viewer('viewer', {
+    setUrl(await getSignedUrl(bucket, object.$raw.Key, 120));
+  };
+
+  useEffect(() => {
+    console.log('here');
+    loadPDB();
+  }, []);
+
+  return (
+    <iframe ref={node}>
+      {node && doc && url && createPortal(<Molestar url={url}/>, doc.body)}
+    </iframe>
+  );
+};
+
+const Molestar: FC<{ url: string }> = ({ url }) => {
+  const ref = useRef(null);
+
+  useEffect(() => {
+    if (!ref.current) { return; }
+
+    const viewer = new Viewer(ref.current, {
       showImportControls: true,
       showSessionControls: true,
       layoutShowLog: true,
@@ -35,15 +64,11 @@ const MolestarWrapper: FC<{ object: S3Object }> = ({ object }) => {
     });
 
     viewer.loadStructureFromUrl(url, 'pdb', false);
-  };
-
-  useEffect(() => {
-    console.log('here');
-    loadPDB();
-  }, []);
+  }, [ref]);
 
   return (
-    <div id="viewer">
+    <div id={'viewer'} ref={ref}>
+      <p>hello</p>
     </div>
-  );
+  )
 };
