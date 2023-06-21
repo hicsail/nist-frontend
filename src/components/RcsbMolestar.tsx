@@ -9,8 +9,8 @@ const style = {
   top: '50%',
   left: '50%',
   transform: 'translate(-50%, -50%)',
-  width: '90%',
-  height: '90%',
+  width: '100%',
+  height: '100%',
   bgcolor: 'background.paper',
   overflow: 'hidden',
   display: 'flex',
@@ -41,6 +41,10 @@ const MolestarWrapper: FC<{ object: S3Object }> = ({ object }) => {
 
   useEffect(() => {
     setDoc(node.current?.contentDocument);
+    // Add the top level style
+    if (!doc) {
+      return;
+    }
   }, []);
 
   const { bucket, getSignedUrl } = useS3Context();
@@ -53,6 +57,14 @@ const MolestarWrapper: FC<{ object: S3Object }> = ({ object }) => {
 
   useEffect(() => {
     loadPDB();
+  }, []);
+
+  useEffect(() => {
+    const styleLink = document.createElement('link');
+    styleLink.href = '/src/assets/rcsb-molstar.css';
+    styleLink.rel = 'stylesheet';
+    styleLink.type = 'text/css';
+    document.head.appendChild(styleLink);
   }, []);
 
   // Wrap the protein view in an iframe since the view is not provided
@@ -82,8 +94,8 @@ const Molestar: FC<{ url: string }> = ({ url }) => {
     }
 
     const viewer = new Viewer(ref.current, {
-      showImportControls: true,
-      showSessionControls: true,
+      showImportControls: false,
+      showSessionControls: false,
       layoutShowLog: false,
       layoutShowControls: true,
       showMembraneOrientationPreset: true,
@@ -95,8 +107,8 @@ const Molestar: FC<{ url: string }> = ({ url }) => {
   }, [ref]);
 
   return (
-    <div id={'viewer'} ref={ref}>
-      <p>hello</p>
-    </div>
+    <>
+      <div id={'viewer'} ref={ref} />
+    </>
   )
 };
