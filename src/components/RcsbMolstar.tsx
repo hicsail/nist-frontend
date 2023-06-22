@@ -86,7 +86,6 @@ const MolstarWrapper: FC<{ object: S3Object }> = ({ object }) => {
   );
 };
 
-
 /** Provides the internal view that is modified by the RCSB code */
 const Molstar: FC<{ url: string }> = ({ url }) => {
   const ref = useRef(null);
