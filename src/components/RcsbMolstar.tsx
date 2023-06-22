@@ -18,7 +18,7 @@ const style = {
   p: 4
 };
 
-export class RcsbMolestarPlugin implements Plugin {
+export class RcsbMolstarPlugin implements Plugin {
   name: string;
   description: string;
   fileExtensions: string[];
@@ -30,11 +30,12 @@ export class RcsbMolestarPlugin implements Plugin {
   }
 
   getView(object: S3Object): ReactNode {
-    return <MolestarWrapper object={object} />;
+    return <MolstarWrapper object={object} />;
   }
 }
 
-const MolestarWrapper: FC<{ object: S3Object }> = ({ object }) => {
+/** Wrapper that provides an iframe for the molstar view */
+const MolstarWrapper: FC<{ object: S3Object }> = ({ object }) => {
   // Handle the logic to embed the view in an iframe
   const node = useRef<HTMLIFrameElement>(null);
   const [doc, setDoc] = useState<Document | null>();
@@ -60,7 +61,6 @@ const MolestarWrapper: FC<{ object: S3Object }> = ({ object }) => {
   const { bucket, getSignedUrl } = useS3Context();
   const [url, setUrl] = useState<string | null>(null);
 
-
   const loadPDB = async () => {
     setUrl(await getSignedUrl(bucket, object.$raw.Key, 360));
   };
@@ -79,14 +79,16 @@ const MolestarWrapper: FC<{ object: S3Object }> = ({ object }) => {
       <Divider sx={{ my: 2 }} />
       <div style={{ flexGrow: 1 }}>
         <iframe ref={node} style={{ width: '100%', height: '100%' }}>
-          {node && doc && url && createPortal(<Molestar url={url}/>, doc.body)}
+          {node && doc && url && createPortal(<Molstar url={url} />, doc.body)}
         </iframe>
       </div>
     </Paper>
   );
 };
 
-const Molestar: FC<{ url: string }> = ({ url }) => {
+
+/** Provides the internal view that is modified by the RCSB code */
+const Molstar: FC<{ url: string }> = ({ url }) => {
   const ref = useRef(null);
 
   useEffect(() => {
@@ -107,7 +109,5 @@ const Molestar: FC<{ url: string }> = ({ url }) => {
     viewer.loadStructureFromUrl(url, 'pdb', false);
   }, [ref]);
 
-  return (
-    <div id={'viewer'} ref={ref} />
-  )
+  return <div id={'viewer'} ref={ref} />;
 };
