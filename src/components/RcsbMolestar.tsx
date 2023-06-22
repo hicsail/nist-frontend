@@ -49,24 +49,12 @@ const MolestarWrapper: FC<{ object: S3Object }> = ({ object }) => {
     styleLink.rel = 'stylesheet';
     styleLink.type = 'text/css';
 
-    const script = document.createElement('script');
-    script.src = '/src/assets/rcsb-molstar.js';
-    script.type = 'text/css';
-
-    const meta = document.createElement('meta');
-    meta.name = 'viewport';
-    meta.content = 'width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0';
-
     const iframeHead = node.current?.contentWindow?.document.head;
     if (iframeHead) {
-      iframeHead.appendChild(meta);
       iframeHead.appendChild(styleLink);
-      iframeHead.appendChild(script);
     }
 
     setDoc(node.current?.contentDocument);
-
-
   }, []);
 
   const { bucket, getSignedUrl } = useS3Context();
@@ -75,7 +63,6 @@ const MolestarWrapper: FC<{ object: S3Object }> = ({ object }) => {
 
   const loadPDB = async () => {
     setUrl(await getSignedUrl(bucket, object.$raw.Key, 360));
-    console.log(url);
   };
 
   useEffect(() => {
@@ -121,8 +108,6 @@ const Molestar: FC<{ url: string }> = ({ url }) => {
   }, [ref]);
 
   return (
-    <>
-      <div id={'viewer'} ref={ref} />
-    </>
+    <div id={'viewer'} ref={ref} />
   )
 };
