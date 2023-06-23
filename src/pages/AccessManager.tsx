@@ -1,19 +1,5 @@
 import React, { useEffect, useState, useContext, useMemo } from 'react';
-import {
-  TextField,
-  MenuItem,
-  InputLabel,
-  Select,
-  TableContainer,
-  Table,
-  TableRow,
-  TableCell,
-  TableBody,
-  Checkbox,
-  Snackbar,
-  TablePagination,
-  Typography
-} from '@mui/material';
+import { TextField, MenuItem, InputLabel, Select, TableContainer, Table, TableRow, TableCell, TableBody, Checkbox, Snackbar, TablePagination, Typography } from '@mui/material';
 import { PermissionsContext } from '../contexts/Permissions';
 import { HandleUpdate } from '../components/UpdatePermissionsButton';
 import { UIContext } from '../contexts/UI';
