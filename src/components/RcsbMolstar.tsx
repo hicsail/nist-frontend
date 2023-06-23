@@ -46,7 +46,7 @@ const MolstarWrapper: FC<{ object: S3Object }> = ({ object }) => {
       return;
     }
     const styleLink = document.createElement('link');
-    styleLink.href = '/src/assets/rcsb-molstar.css';
+    styleLink.href = '/rcsb-molstar.css';
     styleLink.rel = 'stylesheet';
     styleLink.type = 'text/css';
 
