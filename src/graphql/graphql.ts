@@ -261,6 +261,7 @@ export type Organization = {
   __typename?: 'Organization';
   _id: Scalars['ID'];
   bucket: Scalars['String'];
+  logoURL: Scalars['String'];
   name: Scalars['String'];
   owner?: Maybe<Scalars['String']>;
 };
