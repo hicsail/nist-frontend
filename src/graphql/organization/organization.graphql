@@ -2,6 +2,7 @@ query getOrganizations {
   getOriganizations {
     _id,
     name,
-    bucket
+    bucket,
+    logoURL
   }
 }
