@@ -6,7 +6,6 @@ import logo from '../assets/nist-logo.png';
 import StarIcon from '@mui/icons-material/Star';
 import biomadeLogo from '../assets/BIOMADE-LOGO.png';
 import buLogo from '../assets/bu-logo.png';
-import haririLogo from '../assets/Hariri_Institute_SAIL_Logotype_White_Web.png';
 import sailLogo from '../assets/sail-logo.png';
 
 export const SideNav: FC = () => {

@@ -1,20 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Checkbox, Button } from '@mui/material';
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Checkbox } from '@mui/material';
 import { HandleUpdate } from './UpdatePermissionsButton';
 
 type User = {
   id: number;
   name: string;
-  read: boolean;
-  write: boolean;
-  delete: boolean;
-  admin: boolean;
-};
-
-type CargoPermission = {
-  _id: string;
-  user: string;
-  bucket: string;
   read: boolean;
   write: boolean;
   delete: boolean;

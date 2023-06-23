@@ -1,6 +1,6 @@
 import { Snackbar } from '@mui/material';
 import Button from '@mui/material/Button';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useCargoChangePermissionsMutation } from '../graphql/permissions/permissions';
 
 export function HandleUpdate({ user }: any) {
@@ -11,7 +11,7 @@ export function HandleUpdate({ user }: any) {
   };
 
   // GraphQL mutation query
-  const [cargoChangePermissions, { error, loading }] = useCargoChangePermissionsMutation();
+  const cargoChangePermissions = useCargoChangePermissionsMutation()[0];
 
   // On submit, change the user permissions
   const handleUpdate = () => {
@@ -31,7 +31,7 @@ export function HandleUpdate({ user }: any) {
         setUpdateMessage(message);
         setSnackbarOpen(true);
       },
-      onError: (error) => {
+      onError: (_error) => {
         let message = 'Failed to update permissions';
         setUpdateMessage(message);
         setSnackbarOpen(true);

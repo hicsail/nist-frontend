@@ -1,19 +1,15 @@
 import { useState, useContext, useEffect } from 'react';
 import { Typography } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
 import { PermissionsContext } from '../contexts/Permissions';
 import { UIContext } from '../contexts/UI';
 import { useGetOrganizationsQuery } from '../graphql/organization/organization';
 import { Organization } from '../graphql/graphql';
 import OrganizationCard from '../components/OrganizationCard';
-import { OrganizationContext } from '../contexts/organization.context';
 
 export default function Dashboard() {
-  const { organization, setOrganization } = useContext(OrganizationContext);
   const [adminOrganizations, setAdminOrganizations] = useState<any>([]);
   const [accessOrganizations, setAccessOrganizations] = useState<any>([]);
   const [noAccessOrganizations, setNoAccessOrganizations] = useState<any>([]);
-  const navigate = useNavigate();
   const permissions = useContext(PermissionsContext);
   const { path, setPath } = useContext(UIContext);
 
@@ -69,13 +65,6 @@ export default function Dashboard() {
       console.error(orgQuery.error);
     }
   }, [orgQuery.data, orgQuery.error, permissions]);
-
-  const routeToOrganization = (organization: Organization) => {
-    // route to path /organization/:orgId and pass organization as props
-    setOrganization(organization);
-    window.localStorage.setItem('organization', JSON.stringify(organization));
-    navigate(`/organization/`);
-  };
 
   useEffect(() => {
     // if set path has been added to global context from app

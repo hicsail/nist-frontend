@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { Plugin } from '@bu-sail/s3-viewer';
 import { S3Object, useS3Context } from '@bu-sail/s3-viewer';
 import { FC, ReactNode } from 'react';
-import { Paper, Typography, Divider, IconButton } from '@mui/material';
+import { Paper, Typography, Divider } from '@mui/material';
 
 const style = {
   position: 'absolute',

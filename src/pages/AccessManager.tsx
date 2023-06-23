@@ -1,22 +1,5 @@
 import React, { useEffect, useState, useContext, useMemo } from 'react';
-import {
-  TextField,
-  MenuItem,
-  InputLabel,
-  Select,
-  TableContainer,
-  Table,
-  TableHead,
-  TableRow,
-  TableCell,
-  TableBody,
-  Checkbox,
-  Snackbar,
-  Button,
-  Paper,
-  TablePagination,
-  Typography
-} from '@mui/material';
+import { TextField, MenuItem, InputLabel, Select, TableContainer, Table, TableRow, TableCell, TableBody, Checkbox, Snackbar, TablePagination, Typography } from '@mui/material';
 import { PermissionsContext } from '../contexts/Permissions';
 import { HandleUpdate } from '../components/UpdatePermissionsButton';
 import { UIContext } from '../contexts/UI';
@@ -112,7 +95,7 @@ const AccessManager = () => {
     }
   };
 
-  const handleRequestSort = (event: React.MouseEvent<unknown>, property: string) => {
+  const handleRequestSort = (_event: React.MouseEvent<unknown>, property: string) => {
     const isAsc = orderBy === property && order === 'asc';
     setOrder(isAsc ? 'desc' : 'asc');
     setOrderBy(property);
@@ -145,7 +128,7 @@ const AccessManager = () => {
     setUserPermissions(updatedPermissions);
   };
 
-  const handleChangePage = (event: any, newPage: number) => {
+  const handleChangePage = (_event: any, newPage: number) => {
     setPage(newPage);
   };
 
