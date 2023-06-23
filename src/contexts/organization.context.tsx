@@ -1,4 +1,4 @@
-import { createContext, Dispatch, FC, ReactNode, SetStateAction, useEffect } from 'react';
+import { createContext, Dispatch, FC, ReactNode, SetStateAction } from 'react';
 import { Organization } from '../graphql/graphql';
 
 interface OrganizationContextType {

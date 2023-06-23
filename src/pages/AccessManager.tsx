@@ -6,14 +6,11 @@ import {
   Select,
   TableContainer,
   Table,
-  TableHead,
   TableRow,
   TableCell,
   TableBody,
   Checkbox,
   Snackbar,
-  Button,
-  Paper,
   TablePagination,
   Typography
 } from '@mui/material';
@@ -112,7 +109,7 @@ const AccessManager = () => {
     }
   };
 
-  const handleRequestSort = (event: React.MouseEvent<unknown>, property: string) => {
+  const handleRequestSort = (_event: React.MouseEvent<unknown>, property: string) => {
     const isAsc = orderBy === property && order === 'asc';
     setOrder(isAsc ? 'desc' : 'asc');
     setOrderBy(property);
@@ -145,7 +142,7 @@ const AccessManager = () => {
     setUserPermissions(updatedPermissions);
   };
 
-  const handleChangePage = (event: any, newPage: number) => {
+  const handleChangePage = (_event: any, newPage: number) => {
     setPage(newPage);
   };
 

@@ -11,14 +11,14 @@ import jwtDecode from 'jwt-decode';
 import { UIContext } from './contexts/UI';
 import { MuiThemeProvider } from './contexts/theme.providers';
 import { S3Provider } from './contexts/s3.context';
-import { OrganizationContext, OrganizationProvider } from './contexts/organization.context';
+import { OrganizationProvider } from './contexts/organization.context';
 import { Organization } from './graphql/graphql';
 
 function App() {
   const [token, setToken] = useState<string | null>(null);
   const [path, setPath] = useState<any[]>([]);
   const [isAuthenticated, setIsAuthenticated] = React.useState(false);
-  const [organization, setOrganization] = React.useState<Organization | null>(null);
+  const [_organization, setOrganization] = React.useState<Organization | null>(null);
   const navigate = useNavigate();
   const uri = `${import.meta.env.VITE_AUTH_URL}/graphql`;
 
