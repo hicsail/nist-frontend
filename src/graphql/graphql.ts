@@ -33,6 +33,7 @@ export type AcceptInviteModel = {
 export type AccessToken = {
   __typename?: 'AccessToken';
   accessToken: Scalars['String'];
+  refreshToken: Scalars['String'];
 };
 
 export type CargoPermissionChange = {
@@ -155,12 +156,14 @@ export type Mutation = {
   loginEmail: AccessToken;
   loginGoogle: AccessToken;
   loginUsername: AccessToken;
+  refresh: AccessToken;
   resendInvite: InviteModel;
   resetPassword: Scalars['Boolean'];
   signup: AccessToken;
   updateProject: ProjectModel;
   updateProjectAuthMethods: ProjectModel;
   updateProjectSettings: ProjectModel;
+  updateUser: UserModel;
 };
 
 
@@ -225,6 +228,11 @@ export type MutationLoginUsernameArgs = {
 };
 
 
+export type MutationRefreshArgs = {
+  refreshToken: Scalars['String'];
+};
+
+
 export type MutationResendInviteArgs = {
   id: Scalars['ID'];
 };
@@ -255,6 +263,12 @@ export type MutationUpdateProjectAuthMethodsArgs = {
 export type MutationUpdateProjectSettingsArgs = {
   id: Scalars['String'];
   projectSettings: ProjectSettingsInput;
+};
+
+
+export type MutationUpdateUserArgs = {
+  email: Scalars['String'];
+  fullname: Scalars['String'];
 };
 
 export type Organization = {
@@ -334,6 +348,7 @@ export type Query = {
   invite: InviteModel;
   invites: Array<InviteModel>;
   listProjects: Array<ProjectModel>;
+  me: UserModel;
   projectUsers: Array<UserModel>;
   publicKey: Array<Scalars['String']>;
   users: Array<UserModel>;
