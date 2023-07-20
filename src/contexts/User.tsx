@@ -18,5 +18,9 @@ export const UserProvider: FC<UserProviderProps> = ({ children }) => {
     }
   }, [data]);
 
-  return <UserContext.Provider value={user}>{children}</UserContext.Provider>;
+  return (
+    <UserContext.Provider value={user}>
+      {children}
+    </UserContext.Provider>
+  );
 };
