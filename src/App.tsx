@@ -13,6 +13,7 @@ import { MuiThemeProvider } from './contexts/theme.providers';
 import { S3Provider } from './contexts/s3.context';
 import { OrganizationProvider } from './contexts/organization.context';
 import { Organization } from './graphql/graphql';
+import { UserProvider } from './contexts/User';
 
 function App() {
   const [token, setToken] = useState<string | null>(null);
@@ -93,16 +94,18 @@ function App() {
             <ApolloProvider client={client}>
               <UIContext.Provider value={{ path: path, setPath: setPath }}>
                 {isAuthenticated ? (
-                  <PermissionsProvider>
-                    <OrganizationProvider setOrganization={setOrganization}>
-                      <Box sx={{ display: 'flex' }}>
-                        <SideNav />
-                        <Box sx={{ flexGrow: 1, p: 3 }}>
-                          <Outlet />
+                  <UserProvider>
+                    <PermissionsProvider>
+                      <OrganizationProvider setOrganization={setOrganization}>
+                        <Box sx={{ display: 'flex' }}>
+                          <SideNav />
+                          <Box sx={{ flexGrow: 1, p: 3 }}>
+                            <Outlet />
+                          </Box>
                         </Box>
-                      </Box>
-                    </OrganizationProvider>
-                  </PermissionsProvider>
+                      </OrganizationProvider>
+                    </PermissionsProvider>
+                  </UserProvider>
                 ) : (
                   <div>
                     <Typography variant="h2">Please login</Typography>

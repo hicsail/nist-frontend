@@ -1,0 +1,26 @@
+query GetUser($id: ID!) {
+  getUser(id: $id) {
+    id
+    projectId
+    username
+    fullname
+    email
+    role
+    createdAt
+    updatedAt
+    deletedAt
+  }
+}
+
+query GetMe{
+  me {
+    username
+    fullname
+    email
+    createdAt
+    id
+    projectId
+    role
+    updatedAt
+  }
+}
