@@ -19,17 +19,30 @@ export class JupyterNotebookPlugin implements Plugin {
 
 const JupterNotebookView: FC<{ object: S3Object }> = ({ object }) => {
   const { bucket, getSignedUrl } = useS3Context();
+  const [objectURL, setObjectURL] = useState<string | null>(null);
   const [notebookURL, setNotebookURL] = useState<string | null>(null);
 
-  const spawnNotebook = async () => {
+  const generateObjectURL = async () => {
     const url = await getSignedUrl(bucket, object.$raw.Key, 600);
-    setNotebookURL(url);
+    setObjectURL(url);
   };
 
-  // Startup the notebook
+  // Get the Object URL
   useEffect(() => {
-    spawnNotebook();
+    generateObjectURL();
   }, []);
+
+  // When the object URL is generated, spawn the notebook
+  useEffect(() => {
+    // Do nothing if the object URL is not yet set
+    if (!objectURL) {
+      return;
+    }
+
+    // TODO: Make GraphQL request for notebook
+
+    setNotebookURL('placeholder');
+  }, [objectURL]);
 
   return (
     <>
