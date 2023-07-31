@@ -17,6 +17,12 @@ export class JupyterNotebookPlugin implements Plugin {
   }
 }
 
+
+/**
+ * Wrapper which handles the process of generating the object URL. The object
+ * URL is the presigned URL which is then passed to the Jupyter Notebook for
+ * viewing
+ */
 const JupyterNotebookWrapper: FC<{ object: S3Object }> = ({ object }) => {
   const { bucket, getSignedUrl } = useS3Context();
   const [objectURL, setObjectURL] = useState<string | null>(null);
@@ -33,12 +39,17 @@ const JupyterNotebookWrapper: FC<{ object: S3Object }> = ({ object }) => {
 
   return (
     <>
-      objectURL && <JupyterNotebookView objectURL={objectURL!} />
+      objectURL && <JupyterNotebookView objectURL={objectURL!} objectName={object.name} />
     </>
   );
 }
 
-const JupyterNotebookView: FC<{ objectURL: string }> = ({ objectURL }) => {
+
+/**
+ * The Jupyter Notebook view visualizes a file that is provided as a
+ * presigned URL
+ */
+const JupyterNotebookView: FC<{ objectURL: string, objectName: string }> = ({ objectURL, objectName }) => {
   const [notebookURL, setNotebookURL] = useState<string | null>(null);
 
   // TODO: Add GQL query
