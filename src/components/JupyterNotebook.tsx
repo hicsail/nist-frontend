@@ -13,14 +13,13 @@ export class JupyterNotebookPlugin implements Plugin {
   }
 
   getView(object: S3Object): ReactNode {
-    return <JupterNotebookView object={object} />;
+    return <JupyterNotebookWrapper object={object} />;
   }
 }
 
-const JupterNotebookView: FC<{ object: S3Object }> = ({ object }) => {
+const JupyterNotebookWrapper: FC<{ object: S3Object }> = ({ object }) => {
   const { bucket, getSignedUrl } = useS3Context();
   const [objectURL, setObjectURL] = useState<string | null>(null);
-  const [notebookURL, setNotebookURL] = useState<string | null>(null);
 
   const generateObjectURL = async () => {
     const url = await getSignedUrl(bucket, object.$raw.Key, 600);
@@ -32,21 +31,29 @@ const JupterNotebookView: FC<{ object: S3Object }> = ({ object }) => {
     generateObjectURL();
   }, []);
 
-  // When the object URL is generated, spawn the notebook
-  useEffect(() => {
-    // Do nothing if the object URL is not yet set
-    if (!objectURL) {
-      return;
-    }
+  return (
+    <>
+      objectURL && <JupyterNotebookView objectURL={objectURL!} />
+    </>
+  );
+}
 
-    // TODO: Make GraphQL request for notebook
+const JupyterNotebookView: FC<{ objectURL: string }> = ({ objectURL }) => {
+  const [notebookURL, setNotebookURL] = useState<string | null>(null);
+
+  // TODO: Add GQL query
+
+  // With the query result, set the notebook URL to visualize
+  // TODO: Add query result to update list
+  useEffect(() => {
 
     setNotebookURL('placeholder');
-  }, [objectURL]);
+  }, []);
+
 
   return (
     <>
       notebookURL && <iframe src={notebookURL!} />
     </>
-  );
-}
+  )
+};
