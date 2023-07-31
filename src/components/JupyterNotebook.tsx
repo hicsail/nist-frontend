@@ -17,7 +17,6 @@ export class JupyterNotebookPlugin implements Plugin {
   }
 }
 
-
 /**
  * Wrapper which handles the process of generating the object URL. The object
  * URL is the presigned URL which is then passed to the Jupyter Notebook for
@@ -42,14 +41,13 @@ const JupyterNotebookWrapper: FC<{ object: S3Object }> = ({ object }) => {
       objectURL && <JupyterNotebookView objectURL={objectURL!} objectName={object.name} />
     </>
   );
-}
-
+};
 
 /**
  * The Jupyter Notebook view visualizes a file that is provided as a
  * presigned URL
  */
-const JupyterNotebookView: FC<{ objectURL: string, objectName: string }> = ({ objectURL, objectName }) => {
+const JupyterNotebookView: FC<{ objectURL: string; objectName: string }> = ({ objectURL, objectName }) => {
   const [notebookURL, setNotebookURL] = useState<string | null>(null);
 
   // TODO: Add GQL query
@@ -57,14 +55,12 @@ const JupyterNotebookView: FC<{ objectURL: string, objectName: string }> = ({ ob
   // With the query result, set the notebook URL to visualize
   // TODO: Add query result to update list
   useEffect(() => {
-
     setNotebookURL('placeholder');
   }, []);
-
 
   return (
     <>
       notebookURL && <iframe src={notebookURL!} />
     </>
-  )
+  );
 };
