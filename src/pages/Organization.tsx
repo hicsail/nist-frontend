@@ -9,6 +9,7 @@ import { CargoPresignDocument } from '../graphql/sign/sign';
 import { useApolloClient } from '@apollo/client';
 import { SeqVizPlugin } from '../components/SequenceViz';
 import { RcsbMolstarPlugin } from '../components/RcsbMolstar';
+import { JupyterNotebookPlugin } from '../components/JupyterNotebook';
 
 export const Organization: FC = () => {
   const { organization } = useContext(OrganizationContext);
@@ -68,7 +69,7 @@ export const Organization: FC = () => {
           client={s3Client}
           getSignedUrl={getSignedUrl}
           pathControl={{ currentPath, setCurrentPath }}
-          plugins={[new DocViewPlugin(), new SeqVizPlugin(), new RcsbMolstarPlugin()]}
+          plugins={[new DocViewPlugin(), new SeqVizPlugin(), new RcsbMolstarPlugin(), new JupyterNotebookPlugin()]}
           disableRead={!userPermissions.read}
           disableWrite={!userPermissions.write}
           disableUpload={!userPermissions.write}
