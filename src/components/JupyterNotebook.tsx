@@ -1,5 +1,6 @@
 import { FC, ReactNode, useEffect, useState } from 'react';
 import { Plugin, S3Object, useS3Context } from '@bu-sail/s3-viewer';
+import { useNistGetJupterNotebookMutation } from '../graphql/jupyterhub/jupyterhub';
 
 export class JupyterNotebookPlugin implements Plugin {
   name: string;
@@ -38,7 +39,7 @@ const JupyterNotebookWrapper: FC<{ object: S3Object }> = ({ object }) => {
 
   return (
     <>
-      objectURL && <JupyterNotebookView objectURL={objectURL!} objectName={object.name} />
+      {objectURL && <JupyterNotebookView objectURL={objectURL!} objectName={object.name} />}
     </>
   );
 };
@@ -50,17 +51,36 @@ const JupyterNotebookWrapper: FC<{ object: S3Object }> = ({ object }) => {
 const JupyterNotebookView: FC<{ objectURL: string; objectName: string }> = ({ objectURL, objectName }) => {
   const [notebookURL, setNotebookURL] = useState<string | null>(null);
 
-  // TODO: Add GQL query
+  const mutation = useNistGetJupterNotebookMutation()[0];
+
+  const getURL = async () => {
+    const result = await mutation({ variables: { fileName: objectName, fileURL: objectURL } });
+
+    if (result.errors) {
+      console.error(result.errors);
+      return;
+    }
+
+    if (!result.data) {
+      console.error('Failed to retrieve notebook URL');
+      return;
+    }
+
+    console.log(result.data.nistGetJupterNotebook);
+
+    setNotebookURL(result.data.nistGetJupterNotebook);
+  };
+
 
   // With the query result, set the notebook URL to visualize
   // TODO: Add query result to update list
   useEffect(() => {
-    setNotebookURL('placeholder');
+    getURL();
   }, []);
 
   return (
     <>
-      notebookURL && <iframe src={notebookURL!} />
+      {notebookURL && <iframe src={notebookURL!} />}
     </>
   );
 };
