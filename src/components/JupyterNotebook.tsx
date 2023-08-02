@@ -1,6 +1,7 @@
 import { FC, ReactNode, useEffect, useState } from 'react';
 import { Plugin, S3Object, useS3Context } from '@bu-sail/s3-viewer';
 import { useNistGetJupterNotebookMutation } from '../graphql/jupyterhub/jupyterhub';
+import { Paper } from '@mui/material';
 
 export class JupyterNotebookPlugin implements Plugin {
   name: string;
@@ -44,6 +45,20 @@ const JupyterNotebookWrapper: FC<{ object: S3Object }> = ({ object }) => {
   );
 };
 
+const style = {
+  position: 'absolute',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  width: '90%',
+  height: '90%',
+  bgcolor: 'background.paper',
+  overflow: 'hidden',
+  display: 'flex',
+  flexDirection: 'column',
+  p: 4
+};
+
 /**
  * The Jupyter Notebook view visualizes a file that is provided as a
  * presigned URL
@@ -79,8 +94,8 @@ const JupyterNotebookView: FC<{ objectURL: string; objectName: string }> = ({ ob
   }, []);
 
   return (
-    <>
-      {notebookURL && <iframe src={notebookURL!} />}
-    </>
+    <Paper sx={style}>
+      {notebookURL && <iframe src={notebookURL!} style={{ width: '100%', height: '100%' }} />}
+    </Paper>
   );
 };
