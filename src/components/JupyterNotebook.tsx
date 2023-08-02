@@ -38,11 +38,7 @@ const JupyterNotebookWrapper: FC<{ object: S3Object }> = ({ object }) => {
     generateObjectURL();
   }, []);
 
-  return (
-    <>
-      {objectURL && <JupyterNotebookView objectURL={objectURL!} objectName={object.name} />}
-    </>
-  );
+  return <>{objectURL && <JupyterNotebookView objectURL={objectURL!} objectName={object.name} />}</>;
 };
 
 const style = {
@@ -86,16 +82,11 @@ const JupyterNotebookView: FC<{ objectURL: string; objectName: string }> = ({ ob
     setNotebookURL(result.data.nistGetJupterNotebook);
   };
 
-
   // With the query result, set the notebook URL to visualize
   // TODO: Add query result to update list
   useEffect(() => {
     getURL();
   }, []);
 
-  return (
-    <Paper sx={style}>
-      {notebookURL && <iframe src={notebookURL!} style={{ width: '100%', height: '100%' }} />}
-    </Paper>
-  );
+  return <Paper sx={style}>{notebookURL && <iframe src={notebookURL!} style={{ width: '100%', height: '100%' }} />}</Paper>;
 };
