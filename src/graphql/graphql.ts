@@ -156,6 +156,8 @@ export type Mutation = {
   loginEmail: AccessToken;
   loginGoogle: AccessToken;
   loginUsername: AccessToken;
+  /** Create new JupyterNotebook for user */
+  nistGetJupterNotebook: Scalars['String'];
   refresh: AccessToken;
   resendInvite: InviteModel;
   resetPassword: Scalars['Boolean'];
@@ -228,6 +230,12 @@ export type MutationLoginUsernameArgs = {
 };
 
 
+export type MutationNistGetJupterNotebookArgs = {
+  fileName: Scalars['String'];
+  fileURL: Scalars['String'];
+};
+
+
 export type MutationRefreshArgs = {
   refreshToken: Scalars['String'];
 };
@@ -292,11 +300,11 @@ export type ProjectAuthMethodsModel = {
 };
 
 export type ProjectCreateInput = {
-  allowSignup: Scalars['Boolean'];
-  description: Scalars['String'];
-  displayProjectName: Scalars['Boolean'];
-  emailAuth: Scalars['Boolean'];
-  googleAuth: Scalars['Boolean'];
+  allowSignup?: InputMaybe<Scalars['Boolean']>;
+  description?: InputMaybe<Scalars['String']>;
+  displayProjectName?: InputMaybe<Scalars['Boolean']>;
+  emailAuth?: InputMaybe<Scalars['Boolean']>;
+  googleAuth?: InputMaybe<Scalars['Boolean']>;
   homePage?: InputMaybe<Scalars['String']>;
   logo?: InputMaybe<Scalars['String']>;
   muiTheme?: InputMaybe<Scalars['JSON']>;

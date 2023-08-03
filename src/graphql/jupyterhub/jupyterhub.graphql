@@ -1,0 +1,3 @@
+mutation nistGetJupterNotebook($fileURL: String!, $fileName: String!) {
+  nistGetJupterNotebook(fileURL: $fileURL, fileName: $fileName)
+}
