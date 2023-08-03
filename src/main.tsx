@@ -9,6 +9,7 @@ import { Organization } from './pages/Organization';
 import Login from './pages/Login';
 import Callback from './pages/Callback';
 import AccessManager from './pages/AccessManager';
+import Account from './pages/Account';
 
 const appRouter = createBrowserRouter([
   {
@@ -28,6 +29,10 @@ const appRouter = createBrowserRouter([
       {
         path: '/access-manager',
         element: <AccessManager />
+      },
+      {
+        path: '/account',
+        element: <Account />
       },
       {
         path: '/organization/*',
