@@ -1,5 +1,6 @@
-import { FC, useContext } from 'react';
-import { Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
+import React from 'react'
+import { useContext } from 'react';
+import { Drawer, List, ListItem, ListItemButton, ListItemIcon } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../contexts/Auth';
 import HomeIcon from '@mui/icons-material/Home';
@@ -11,8 +12,8 @@ interface SideNavProps {
   open: boolean;
 }
 
-export function SideNav({ open }: SideNavProps) {
-  const drawerWidth = 256;
+export default function smallSideNav({open}: SideNavProps) {
+  const drawerWidth = 88;
 
   const { setIsAuthenticated, setToken } = useContext(AuthContext);
   const navigate = useNavigate();
@@ -42,6 +43,7 @@ export function SideNav({ open }: SideNavProps) {
           color: 'white',
           paddingTop: 18,
           mt: "64px",
+          alignContent: "center",
         },
       }}
       anchor="left"
@@ -53,7 +55,6 @@ export function SideNav({ open }: SideNavProps) {
             <ListItemIcon>
               <HomeIcon />
             </ListItemIcon>
-            <ListItemText primary="Dashboard" />
           </ListItemButton>
         </ListItem>
         <ListItem>
@@ -61,7 +62,6 @@ export function SideNav({ open }: SideNavProps) {
             <ListItemIcon>
               <FolderOpen />
             </ListItemIcon>
-            <ListItemText primary="Permissions" />
           </ListItemButton>
         </ListItem>
         {/* <ListItem>
@@ -69,7 +69,6 @@ export function SideNav({ open }: SideNavProps) {
             <ListItemIcon>
               <SettingsIcon />
             </ListItemIcon>
-            <ListItemText primary="Account" />
           </ListItemButton>
         </ListItem> */}
         <ListItem>
@@ -77,7 +76,6 @@ export function SideNav({ open }: SideNavProps) {
             <ListItemIcon>
               <LockRounded />
             </ListItemIcon>
-            <ListItemText primary="Logout" />
           </ListItemButton>
         </ListItem>
       </List>
