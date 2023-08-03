@@ -1,4 +1,4 @@
-import React from 'react'
+import React from 'react';
 import { useContext } from 'react';
 import { Drawer, List, ListItem, ListItemButton, ListItemIcon } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
@@ -12,7 +12,7 @@ interface SideNavProps {
   open: boolean;
 }
 
-export default function smallSideNav({open}: SideNavProps) {
+export default function smallSideNav({ open }: SideNavProps) {
   const drawerWidth = 88;
 
   const { setIsAuthenticated, setToken } = useContext(AuthContext);
@@ -42,23 +42,23 @@ export default function smallSideNav({open}: SideNavProps) {
           backgroundColor: '#103F68',
           color: 'white',
           paddingTop: 18,
-          mt: "64px",
-          alignContent: "center",
-        },
+          mt: '64px',
+          alignContent: 'center'
+        }
       }}
       anchor="left"
       open={open}
     >
       <List>
         <ListItem>
-          <ListItemButton component="a" onClick={()=> handleNavigate("/dashboard")}>
+          <ListItemButton component="a" onClick={() => handleNavigate('/dashboard')}>
             <ListItemIcon>
               <HomeIcon />
             </ListItemIcon>
           </ListItemButton>
         </ListItem>
         <ListItem>
-          <ListItemButton component="a" onClick={()=> handleNavigate("/access-manager")}>
+          <ListItemButton component="a" onClick={() => handleNavigate('/access-manager')}>
             <ListItemIcon>
               <FolderOpen />
             </ListItemIcon>
