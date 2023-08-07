@@ -1,9 +1,9 @@
-import { FC, useContext } from 'react';
+import { useContext } from 'react';
 import { Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../contexts/Auth';
 import HomeIcon from '@mui/icons-material/Home';
-import SettingsIcon from '@mui/icons-material/Settings';
+//import SettingsIcon from '@mui/icons-material/Settings';
 import { FolderOpen } from '@mui/icons-material';
 import { LockRounded } from '@mui/icons-material';
 
