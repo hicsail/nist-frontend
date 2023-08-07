@@ -3,7 +3,6 @@ import './App.css';
 import { SideNav } from './components/SideNav';
 import { Outlet, useNavigate } from 'react-router-dom';
 import { ApolloClient, InMemoryCache, ApolloProvider, HttpLink } from '@apollo/client';
-import { Box, Typography } from '@mui/material';
 import { AuthContext } from './contexts/Auth';
 import { PermissionsProvider } from './contexts/Permissions';
 import { setContext } from '@apollo/client/link/context';
@@ -14,6 +13,30 @@ import { S3Provider } from './contexts/s3.context';
 import { OrganizationProvider } from './contexts/organization.context';
 import { Organization } from './graphql/graphql';
 import { UserProvider } from './contexts/User';
+import { Box, Typography, styled } from '@mui/material';
+import Header from './components/Header';
+import SmallSideNav from './components/SmallSideNav';
+
+const drawerWidth = 240;
+
+const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })<{
+  open?: boolean;
+}>(({ theme, open }) => ({
+  flexGrow: 1,
+  padding: theme.spacing(3),
+  transition: theme.transitions.create('margin', {
+    easing: theme.transitions.easing.sharp,
+    duration: theme.transitions.duration.leavingScreen
+  }),
+  marginLeft: `-${drawerWidth}px`,
+  ...(open && {
+    transition: theme.transitions.create('margin', {
+      easing: theme.transitions.easing.easeOut,
+      duration: theme.transitions.duration.enteringScreen
+    }),
+    marginLeft: 0
+  })
+}));
 
 function App() {
   const [token, setToken] = useState<string | null>(null);
@@ -22,6 +45,7 @@ function App() {
   const [_organization, setOrganization] = React.useState<Organization | null>(null);
   const navigate = useNavigate();
   const uri = `${import.meta.env.VITE_AUTH_URL}/graphql`;
+  const [open, setOpen] = useState(true);
 
   const httpLink = new HttpLink({
     fetch: fetch,
@@ -97,12 +121,23 @@ function App() {
                   <UserProvider>
                     <PermissionsProvider>
                       <OrganizationProvider setOrganization={setOrganization}>
-                        <Box sx={{ display: 'flex' }}>
-                          <SideNav />
-                          <Box sx={{ flexGrow: 1, p: 3 }}>
-                            <Outlet />
-                          </Box>
+                        <Box>
+                          <Header open={open} setOpen={setOpen} />
                         </Box>
+                        <Main
+                          open={open}
+                          sx={{
+                            marginTop: '64px'
+                          }}
+                        >
+                          <Box sx={{ display: 'flex' }}>
+                            <SideNav open={open} />
+                            <SmallSideNav open={!open} />
+                            <Box sx={{ flexGrow: 1, p: 3 }}>
+                              <Outlet />
+                            </Box>
+                          </Box>
+                        </Main>
                       </OrganizationProvider>
                     </PermissionsProvider>
                   </UserProvider>
