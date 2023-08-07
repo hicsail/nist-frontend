@@ -6,14 +6,13 @@ import React from 'react';
 interface HeaderProps {
   open: boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
-};
+}
 
-export default function Header({open, setOpen} : HeaderProps) {
-  
+export default function Header({ open, setOpen }: HeaderProps) {
   return (
     <AppBar>
       <Toolbar sx={{ backgroundColor: 'white' }}>
-        <IconButton size="large" edge="start" color="inherit" aria-label="menu" sx={{ mr: 4, ml: 2 }} onClick={()=> setOpen(!open)}>
+        <IconButton size="large" edge="start" color="inherit" aria-label="menu" sx={{ mr: 4, ml: 2 }} onClick={() => setOpen(!open)}>
           <Menu sx={{ color: 'black' }} />
         </IconButton>
         <Box

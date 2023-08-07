@@ -41,15 +41,15 @@ export function SideNav({ open }: SideNavProps) {
           backgroundColor: '#103F68',
           color: 'white',
           paddingTop: 18,
-          mt: "64px",
-        },
+          mt: '64px'
+        }
       }}
       anchor="left"
       open={open}
     >
       <List>
         <ListItem>
-          <ListItemButton component="a" onClick={()=> handleNavigate("/dashboard")}>
+          <ListItemButton component="a" onClick={() => handleNavigate('/dashboard')}>
             <ListItemIcon>
               <HomeIcon />
             </ListItemIcon>
@@ -57,7 +57,7 @@ export function SideNav({ open }: SideNavProps) {
           </ListItemButton>
         </ListItem>
         <ListItem>
-          <ListItemButton component="a" onClick={()=> handleNavigate("/access-manager")}>
+          <ListItemButton component="a" onClick={() => handleNavigate('/access-manager')}>
             <ListItemIcon>
               <FolderOpen />
             </ListItemIcon>
