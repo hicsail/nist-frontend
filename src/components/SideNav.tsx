@@ -3,7 +3,7 @@ import { Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText } fr
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../contexts/Auth';
 import HomeIcon from '@mui/icons-material/Home';
-//import SettingsIcon from '@mui/icons-material/Settings';
+import SettingsIcon from '@mui/icons-material/Settings';
 import { FolderOpen } from '@mui/icons-material';
 import { LockRounded } from '@mui/icons-material';
 
@@ -64,14 +64,14 @@ export function SideNav({ open }: SideNavProps) {
             <ListItemText primary="Permissions" />
           </ListItemButton>
         </ListItem>
-        {/* <ListItem>
+        <ListItem>
           <ListItemButton component="a" onClick={()=> handleNavigate("/account")}>
             <ListItemIcon>
               <SettingsIcon />
             </ListItemIcon>
             <ListItemText primary="Account" />
           </ListItemButton>
-        </ListItem> */}
+        </ListItem>
         <ListItem>
           <ListItemButton onClick={logout}>
             <ListItemIcon>

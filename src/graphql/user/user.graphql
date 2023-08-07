@@ -24,3 +24,10 @@ query GetMe{
     updatedAt
   }
 }
+
+mutation UpdateUser($fullname: String!, $email: String!) {
+  updateUser(fullname: $fullname, email: $email) {
+    fullname
+    email
+  }
+}
