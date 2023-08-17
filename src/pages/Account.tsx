@@ -28,7 +28,7 @@ export default function Account() {
     // if user has no organizations assigned, set noOrganizationsAssigned to true
     if (permissions) {
       // loop over permissions and check if user has any organizations assigned
-      
+
       for (let i = 0; i < permissions.length; i++) {
         if (permissions[i].read === true || permissions[i].write === true || permissions[i].admin === true || permissions[i].delete === true) {
           setUserHasOrganizationsAssigned(true);
@@ -114,12 +114,8 @@ export default function Account() {
             Assigned Organizations
           </Typography>
           <br />
-          {
-            !userHasOrganizationsAssigned &&
-            <Typography variant="body1">No organizations assigned</Typography>
-          }
-          {
-            userHasOrganizationsAssigned && 
+          {!userHasOrganizationsAssigned && <Typography variant="body1">No organizations assigned</Typography>}
+          {userHasOrganizationsAssigned && (
             <Grid container spacing={2} alignItems="center">
               <Grid item xs={4}>
                 <Typography variant="body1">Organization</Typography>
@@ -139,7 +135,7 @@ export default function Account() {
                 </Grid>
               </Grid>
             </Grid>
-          }
+          )}
           {permissions.map((permission) => {
             if (permission.admin || permission.read || permission.write || permission.delete) {
               const organization = organizations.find((organization) => organization.bucket === permission.bucket);

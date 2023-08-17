@@ -3,7 +3,6 @@ import { useGetMeQuery, useUpdateUserMutation } from '../graphql/user/user';
 import { UserModel } from '../graphql/graphql';
 import React from 'react';
 
-
 interface UserProviderProps {
   children: ReactNode;
 }
@@ -21,21 +20,21 @@ interface UserContextProps {
 }
 
 export const UserContext = createContext<UserContextProps>({
-   user: undefined, 
-   setUser: () => { }, 
-   updateError: false,
-   updateSuccess: false,
-   updateErrorMessage: '',
-   setUpdateError: () => { },
-   setUpdateSuccess: () => { },
-   setUpdateErrorMessage: () => { },
-   updating: false,
+  user: undefined,
+  setUser: () => {},
+  updateError: false,
+  updateSuccess: false,
+  updateErrorMessage: '',
+  setUpdateError: () => {},
+  setUpdateSuccess: () => {},
+  setUpdateErrorMessage: () => {},
+  updating: false
 });
 
 export const UserProvider: FC<UserProviderProps> = ({ children }) => {
   const [user, setUser] = useState<UserModel | undefined>();
   const { data } = useGetMeQuery({});
-  const [updateUser, {loading : updating}] = useUpdateUserMutation({});
+  const [updateUser, { loading: updating }] = useUpdateUserMutation({});
   const [updateSuccess, setUpdateSuccess] = useState<boolean>(false);
   const [updateError, setUpdateError] = useState<boolean>(false);
   const [updateErrorMessage, setUpdateErrorMessage] = useState<string>('');
@@ -51,7 +50,7 @@ export const UserProvider: FC<UserProviderProps> = ({ children }) => {
       updateUser({
         variables: {
           fullname: user.fullname,
-          email: user.email,
+          email: user.email
         },
         onCompleted: () => {
           setUpdateSuccess(true);
@@ -62,8 +61,8 @@ export const UserProvider: FC<UserProviderProps> = ({ children }) => {
           setUser({
             ...user,
             fullname: data?.me?.fullname,
-            email: data?.me?.email,
-          })
+            email: data?.me?.email
+          });
         }
       });
     }
@@ -78,7 +77,7 @@ export const UserProvider: FC<UserProviderProps> = ({ children }) => {
     setUpdateError,
     setUpdateSuccess,
     setUpdateErrorMessage,
-    updating,
+    updating
   };
 
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
@@ -90,4 +89,4 @@ export const useUser = () => {
     throw new Error('useUser must be used within a UserProvider');
   }
   return context;
-}
+};

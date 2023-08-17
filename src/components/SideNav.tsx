@@ -65,7 +65,7 @@ export function SideNav({ open }: SideNavProps) {
           </ListItemButton>
         </ListItem>
         <ListItem>
-          <ListItemButton component="a" onClick={()=> handleNavigate("/account")}>
+          <ListItemButton component="a" onClick={() => handleNavigate('/account')}>
             <ListItemIcon>
               <SettingsIcon />
             </ListItemIcon>
