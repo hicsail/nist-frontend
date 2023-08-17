@@ -55,7 +55,9 @@ function App() {
   const authLogic = async (headers: any) => {
     const token = localStorage.getItem('token');
     if (token) {
+      
       const decodedToken: any = jwtDecode(token);
+      console.log(decodedToken);
       if (decodedToken.exp < Date.now() / 1000) {
         // token expired, logic for handling token expiration
         localStorage.removeItem('token');

@@ -22,6 +22,7 @@
     "@mui/icons-material": "^5.11.11",
     "@mui/material": "^5.11.11",
     "@rcsb/rcsb-molstar": "^2.6.2",
+    "@types/styled-components": "^5.1.26",
     "graphql": "^16.6.0",
     "jwt-decode": "^3.1.2",
     "react": "^18.2.0",
@@ -29,8 +30,10 @@
     "react-dom": "^18.2.0",
     "react-dropzone": "^14.2.3",
     "react-router-dom": "^6.8.2",
+    "react-scroll": "^1.8.9",
     "seqparse": "^0.2.1",
-    "seqviz": "^3.8.6"
+    "seqviz": "^3.8.6",
+    "styled-components": "^6.0.7"
   },
   "devDependencies": {
     "@graphql-codegen/cli": "^3.2.2",

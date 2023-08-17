@@ -12,6 +12,7 @@ export default function Account() {
   const [snackbarMessage, setSnackbarMessage] = React.useState<string>('');
   const [organizations, setOrganizations] = React.useState<any[]>([]);
   const permissions = useContext(PermissionsContext);
+  const [userHasOrganizationsAssigned, setUserHasOrganizationsAssigned] = React.useState<boolean>(false);
 
   useGetOrganizationsQuery({
     onCompleted: (data) => {
@@ -22,6 +23,20 @@ export default function Account() {
       console.log(error);
     }
   });
+
+  React.useEffect(() => {
+    // if user has no organizations assigned, set noOrganizationsAssigned to true
+    if (permissions) {
+      // loop over permissions and check if user has any organizations assigned
+      
+      for (let i = 0; i < permissions.length; i++) {
+        if (permissions[i].read === true || permissions[i].write === true || permissions[i].admin === true || permissions[i].delete === true) {
+          setUserHasOrganizationsAssigned(true);
+          break;
+        }
+      }
+    }
+  }, [permissions]);
 
   React.useEffect(() => {
     if (user) {
@@ -99,33 +114,41 @@ export default function Account() {
             Assigned Organizations
           </Typography>
           <br />
-
-          <Grid container spacing={2} alignItems="center">
-            <Grid item xs={4}>
-              <Typography variant="body1">Organization</Typography>
-            </Grid>
-            <Grid item container xs={8} spacing={2}>
-              <Grid item xs={2}>
-                <Typography variant="body1">Admin</Typography>
-              </Grid>
-              <Grid item xs={2}>
-                <Typography variant="body1">Read</Typography>
-              </Grid>
-              <Grid item xs={2}>
-                <Typography variant="body1">Write</Typography>
-              </Grid>
-            </Grid>
-          </Grid>
-
-          {organizations.map((organization) => (
-            <Grid key={organization._id} container spacing={2} alignItems="center">
+          {
+            !userHasOrganizationsAssigned &&
+            <Typography variant="body1">No organizations assigned</Typography>
+          }
+          {
+            userHasOrganizationsAssigned && 
+            <Grid container spacing={2} alignItems="center">
               <Grid item xs={4}>
-                <TextField value={organization.name} margin="normal" disabled fullWidth />
+                <Typography variant="body1">Organization</Typography>
               </Grid>
-
-              {permissions.map((permission) => {
-                if (permission.bucket === organization.bucket) {
-                  return (
+              <Grid item container xs={8} spacing={2}>
+                <Grid item xs={2}>
+                  <Typography variant="body1">Admin</Typography>
+                </Grid>
+                <Grid item xs={2}>
+                  <Typography variant="body1">Read</Typography>
+                </Grid>
+                <Grid item xs={2}>
+                  <Typography variant="body1">Write</Typography>
+                </Grid>
+                <Grid item xs={2}>
+                  <Typography variant="body1">Delete</Typography>
+                </Grid>
+              </Grid>
+            </Grid>
+          }
+          {permissions.map((permission) => {
+            if (permission.admin || permission.read || permission.write || permission.delete) {
+              const organization = organizations.find((organization) => organization.bucket === permission.bucket);
+              return (
+                <div>
+                  <Grid key={organization._id} container spacing={2} alignItems="center">
+                    <Grid item xs={4}>
+                      <TextField value={organization.name} margin="normal" disabled fullWidth />
+                    </Grid>
                     <Grid key={permission.bucket} container item xs={8} spacing={2} alignItems="center">
                       <Grid item xs={2}>
                         <Checkbox checked={permission.admin} disabled />
@@ -136,13 +159,15 @@ export default function Account() {
                       <Grid item xs={2}>
                         <Checkbox checked={permission.write} disabled />
                       </Grid>
+                      <Grid item xs={2}>
+                        <Checkbox checked={permission.delete} disabled />
+                      </Grid>
                     </Grid>
-                  );
-                }
-                return null;
-              })}
-            </Grid>
-          ))}
+                  </Grid>
+                </div>
+              );
+            }
+          })}
 
           <br />
           <div>
