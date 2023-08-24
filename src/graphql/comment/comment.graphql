@@ -1,0 +1,69 @@
+query GetComments($fileId: String!) {
+  getFileByFileId(fileId: $fileId) {
+    comments {
+      _id
+      user {
+        id
+        username
+        fullname
+        email
+      }
+      date
+      content
+      replies {
+        _id
+        user {
+          id
+          username
+          fullname
+          email
+        }
+        date
+        content
+      }
+    }
+  }
+}
+
+mutation AddComment($fileId: String!, $content: String!) {
+  addComment(input: { file: $fileId, content: $content }) {
+    _id
+    file {
+      _id
+      fileId
+      bucket
+    }
+    user {
+      id
+      username
+      fullname
+      email
+    }
+    date
+    content
+  }
+}
+
+mutation AddReply($fileId: String!, $parentId: String!, $content: String!) {
+  addComment(input: { file: $fileId, parentId: $parentId, content: $content }) {
+    _id
+    file {
+      _id
+      fileId
+      bucket
+    }
+    parentId
+    user {
+      id
+      username
+      fullname
+      email
+    }
+    date
+    content
+  }
+}
+
+mutation DeleteComment($id: String!) {
+  deleteComment(id: $id)
+}

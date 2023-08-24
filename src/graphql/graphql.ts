@@ -88,6 +88,17 @@ export type CargoSignedRequest = {
   timestamp: Scalars['String'];
 };
 
+export type Comment = {
+  __typename?: 'Comment';
+  _id: Scalars['ID'];
+  content: Scalars['String'];
+  date: Scalars['DateTime'];
+  file?: Maybe<File>;
+  parentId?: Maybe<Scalars['ID']>;
+  replies: Array<Comment>;
+  user: UserModel;
+};
+
 export type ConfigurableProjectSettings = {
   description?: InputMaybe<Scalars['String']>;
   homePage?: InputMaybe<Scalars['String']>;
@@ -97,10 +108,29 @@ export type ConfigurableProjectSettings = {
   redirectUrl?: InputMaybe<Scalars['String']>;
 };
 
+export type CreateCommentInput = {
+  content: Scalars['String'];
+  file: Scalars['String'];
+  parentId?: InputMaybe<Scalars['String']>;
+};
+
+export type CreateFileInput = {
+  bucket: Scalars['String'];
+  fileId: Scalars['String'];
+};
+
 export type EmailLoginDto = {
   email: Scalars['String'];
   password: Scalars['String'];
   projectId: Scalars['String'];
+};
+
+export type File = {
+  __typename?: 'File';
+  _id: Scalars['ID'];
+  bucket: Scalars['String'];
+  comments: Array<Comment>;
+  fileId: Scalars['String'];
 };
 
 export type ForgotDto = {
@@ -146,12 +176,16 @@ export enum InviteStatus {
 export type Mutation = {
   __typename?: 'Mutation';
   acceptInvite: InviteModel;
+  addComment: Comment;
+  addFile: File;
   cancelInvite: InviteModel;
   cargoChangePermissions: CargoPermissions;
   cargoServiceAddUser: Array<CargoPermissions>;
   cargoServiceChangePermissions: CargoPermissions;
   createInvite: InviteModel;
   createProject: ProjectModel;
+  deleteComment: Scalars['Boolean'];
+  deleteFile: Scalars['Boolean'];
   forgotPassword: Scalars['Boolean'];
   loginEmail: AccessToken;
   loginGoogle: AccessToken;
@@ -171,6 +205,16 @@ export type Mutation = {
 
 export type MutationAcceptInviteArgs = {
   input: AcceptInviteModel;
+};
+
+
+export type MutationAddCommentArgs = {
+  input: CreateCommentInput;
+};
+
+
+export type MutationAddFileArgs = {
+  input: CreateFileInput;
 };
 
 
@@ -207,6 +251,16 @@ export type MutationCreateInviteArgs = {
 
 export type MutationCreateProjectArgs = {
   project: ProjectCreateInput;
+};
+
+
+export type MutationDeleteCommentArgs = {
+  id: Scalars['String'];
+};
+
+
+export type MutationDeleteFileArgs = {
+  fileId: Scalars['String'];
 };
 
 
@@ -350,6 +404,7 @@ export type Query = {
   cargoGetPermissionsForBucket: CargoPermissions;
   cargoPresign: Scalars['String'];
   cargoSignRequest: CargoSignedRequest;
+  getFileByFileId?: Maybe<File>;
   getOriganizations: Array<Organization>;
   getProject: ProjectModel;
   getUser: UserModel;
@@ -380,6 +435,11 @@ export type QueryCargoPresignArgs = {
 
 export type QueryCargoSignRequestArgs = {
   request: CargoResourceRequest;
+};
+
+
+export type QueryGetFileByFileIdArgs = {
+  fileId: Scalars['String'];
 };
 
 
