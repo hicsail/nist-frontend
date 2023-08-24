@@ -70,6 +70,7 @@ export const Organization: FC = () => {
           getSignedUrl={getSignedUrl}
           pathControl={{ currentPath, setCurrentPath }}
           plugins={[new DocViewPlugin(), new SeqVizPlugin(), new RcsbMolstarPlugin(), new JupyterNotebookPlugin(), new FileCommentPlugin()]}
+          sideNavTopPadding="64px"
           disableRead={!userPermissions.read}
           disableWrite={!userPermissions.write}
           disableUpload={!userPermissions.write}

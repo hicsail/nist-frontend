@@ -160,8 +160,8 @@ const FileCommentPanel: FC<{ object: S3Object | undefined }> = ({ object }) => {
                     <Divider orientation="vertical" variant="middle" flexItem sx={{ border: 1, borderColor: '#E0E0E0', marginRight: '16px' }} />
                     <Box width="100%">
                       {comment.replies.map((reply, replyIndex) => (
-                        <Stack key={reply._id} spacing={1}>
-                          {replyIndex !== 0 && <Divider sx={{ paddingTop: 1 }} />}
+                        <Stack key={reply._id} spacing="8px">
+                          {replyIndex !== 0 && <Divider sx={{ paddingTop: '8px' }} />}
                           <Box display="flex">
                             <Box marginRight="16px">
                               <Avatar>{reply.user.name.split(' ')[0].charAt(0) + reply.user.name.split(' ')[1].charAt(0)}</Avatar>

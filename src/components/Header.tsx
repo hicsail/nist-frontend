@@ -10,7 +10,7 @@ interface HeaderProps {
 
 export default function Header({ open, setOpen }: HeaderProps) {
   return (
-    <AppBar>
+    <AppBar sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
       <Toolbar sx={{ backgroundColor: 'white' }}>
         <IconButton size="large" edge="start" color="inherit" aria-label="menu" sx={{ mr: 4, ml: 2 }} onClick={() => setOpen(!open)}>
           <Menu sx={{ color: 'black' }} />
