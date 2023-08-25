@@ -52,7 +52,6 @@ export class FileCommentPlugin implements SideNavPlugin {
   subscriptions: { objectUploaded?: ((data: any) => void) | undefined; objectUpdated?: ((data: any) => void) | undefined; objectDeleted?: ((data: any) => void) | undefined };
 
   constructor(client: ApolloClient<any>) {
-    console.log(client);
     this.client = client;
     this.name = 'Comment';
     this.description = 'Comment on documents';
