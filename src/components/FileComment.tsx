@@ -1,4 +1,4 @@
-import { ChangeEvent, FC, ReactNode, useEffect, useState } from 'react';
+import { ChangeEvent, FC, ReactNode, useContext, useEffect, useState } from 'react';
 import { S3Object, SideNavPlugin } from '@bu-sail/s3-viewer';
 import {
   Avatar,
@@ -21,19 +21,24 @@ import AddCommentIcon from '@mui/icons-material/AddComment';
 import CommentIcon from '@mui/icons-material/Comment';
 import SendIcon from '@mui/icons-material/Send';
 import ReplyIcon from '@mui/icons-material/Reply';
-import { dummyComments } from './DummyComments';
+import { OrganizationContext } from '../contexts/organization.context';
+import { useAddFileMutation, useGetFileQuery } from '../graphql/file/file';
+import { useAddCommentMutation, useAddReplyMutation, useGetCommentsQuery } from '../graphql/comment/comment';
 
 export type Comment = {
+  __typename?: 'Comment';
   _id: string;
   user: User;
-  date: Date;
+  file: any;
+  date: string;
   content: string;
-  replies: Comment[];
+  replies?: Comment[];
 };
 
 export type User = {
-  _id: string;
-  name: string;
+  id: string;
+  username: string;
+  fullname: string;
   email: string;
 };
 
@@ -58,7 +63,23 @@ export class FileCommentPlugin implements SideNavPlugin {
 }
 
 const FileCommentPanel: FC<{ object: S3Object | undefined }> = ({ object }) => {
-  const [comments, setComments] = useState<Comment[]>([]);
+  const { organization } = useContext(OrganizationContext);
+
+  const fileQuery = useGetFileQuery({
+    variables: {
+      id: object!.id!
+    }
+  });
+  const [addFileMutation] = useAddFileMutation();
+  const commentQuery = useGetCommentsQuery({
+    variables: {
+      fileId: object!.id!
+    }
+  });
+  const [addCommentMutation] = useAddCommentMutation();
+  const [addReplyMutation] = useAddReplyMutation();
+
+  const [comments, setComments] = useState<any[]>([]);
   const initExpandThreadState = comments.reduce((acc, _, index) => {
     acc[index] = false;
     return acc;
@@ -95,9 +116,31 @@ const FileCommentPanel: FC<{ object: S3Object | undefined }> = ({ object }) => {
     setExpandReply((prev) => ({ ...prev, [index]: false }));
   };
 
-  const handleReply = async (user: User | null, content: string, index: number, commentId?: string) => {
+  const handleComment = async (content: string) => {
     // api call to post comment
-    console.log('post comment', user, content, index, commentId);
+    await addCommentMutation({
+      variables: {
+        fileId: object!.id!,
+        content
+      }
+    });
+
+    commentQuery.refetch();
+    setNewComment('');
+  };
+
+  const handleReply = async (_user: User | null, content: string, index: number, commentId: string) => {
+    // TODO: may need to fix comment schema to include replyTo field
+    // api call to post comment
+    await addReplyMutation({
+      variables: {
+        fileId: object!.id!,
+        parentId: commentId,
+        content
+      }
+    });
+
+    commentQuery.refetch();
 
     setReplyTo(null);
     setReplyContents((prev) => ({ ...prev, [index]: '' }));
@@ -113,13 +156,26 @@ const FileCommentPanel: FC<{ object: S3Object | undefined }> = ({ object }) => {
   };
 
   useEffect(() => {
-    const getComments = async (object: S3Object) => {
-      // TODO: api call to get comments
-      setComments(dummyComments);
+    const initFile = async (object: S3Object) => {
+      // check if file exists in db
+      if (!fileQuery.data?.getFileByFileId) {
+        await addFileMutation({
+          variables: {
+            id: object.id!,
+            bucket: organization!.bucket
+          }
+        });
+      }
     };
 
-    getComments(object);
+    initFile(object!);
   }, []);
+
+  useEffect(() => {
+    if (commentQuery.data) {
+      setComments(commentQuery.data?.getFileByFileId?.comments || []);
+    }
+  }, [object, commentQuery.data, commentQuery.error]);
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', height: 'calc(100% - 60px)', backgroundColor: '#f5f5f5' }}>
@@ -128,9 +184,9 @@ const FileCommentPanel: FC<{ object: S3Object | undefined }> = ({ object }) => {
           <Grid key={comment._id} item marginBottom="8px">
             <Card>
               <CardHeader
-                avatar={<Avatar>{comment.user.name.split(' ')[0].charAt(0) + comment.user.name.split(' ')[1].charAt(0)}</Avatar>}
-                title={comment.user.name}
-                subheader={formatDate(comment.date)}
+                avatar={<Avatar>{(comment.user.fullname || comment.user.username || comment.user.email)[0]}</Avatar>}
+                title={comment.user.fullname || comment.user.username || comment.user.email}
+                subheader={formatDate(new Date(comment.date))}
                 sx={{ paddingBottom: '8px' }}
               />
               <CardContent sx={{ paddingY: '8px' }}>
@@ -141,8 +197,8 @@ const FileCommentPanel: FC<{ object: S3Object | undefined }> = ({ object }) => {
                   <IconButton onClick={() => handleExpandReply(null, index)}>
                     <AddCommentIcon />
                   </IconButton>
-                  <IconButton disabled={comment.replies.length === 0} onClick={() => handleExpandThread(index)}>
-                    <Badge badgeContent={comment.replies.length} color="primary">
+                  <IconButton disabled={!Boolean(comment.replies) || comment.replies?.length === 0} onClick={() => handleExpandThread(index)}>
+                    <Badge badgeContent={comment.replies!.length} color="primary">
                       <CommentIcon />
                     </Badge>
                   </IconButton>
@@ -159,17 +215,17 @@ const FileCommentPanel: FC<{ object: S3Object | undefined }> = ({ object }) => {
                   >
                     <Divider orientation="vertical" variant="middle" flexItem sx={{ border: 1, borderColor: '#E0E0E0', marginRight: '16px' }} />
                     <Box width="100%">
-                      {comment.replies.map((reply, replyIndex) => (
+                      {comment.replies?.map((reply: any, replyIndex: number) => (
                         <Stack key={reply._id} spacing="8px">
                           {replyIndex !== 0 && <Divider sx={{ paddingTop: '8px' }} />}
                           <Box display="flex">
                             <Box marginRight="16px">
-                              <Avatar>{reply.user.name.split(' ')[0].charAt(0) + reply.user.name.split(' ')[1].charAt(0)}</Avatar>
+                              <Avatar>{(comment.user.fullname || comment.user.username || comment.user.email)[0]}</Avatar>
                             </Box>
                             <Box>
-                              <Typography variant="body2">{reply.user.name}</Typography>
+                              <Typography variant="body2">{comment.user.fullname || comment.user.username || comment.user.email}</Typography>
                               <Typography variant="body2" color="text.secondary">
-                                {formatDate(reply.date)}
+                                {formatDate(new Date(reply.date))}
                               </Typography>
                             </Box>
                           </Box>
@@ -191,11 +247,11 @@ const FileCommentPanel: FC<{ object: S3Object | undefined }> = ({ object }) => {
                 <ClickAwayListener onClickAway={() => handleCollapseReply(index)}>
                   <CardContent sx={{ paddingY: '8px' }}>
                     <TextField
-                      placeholder={replyTo ? `Reply to ${replyTo.name}:` : ''}
+                      placeholder={replyTo ? `Reply to ${replyTo.fullname || replyTo.username || replyTo.email}:` : ''}
                       variant="standard"
                       sx={{ width: 'calc(100% - 40px)' }}
                       value={replyContents[index]}
-                      onChange={() => handleReplyInput(event, index)}
+                      onChange={(event) => handleReplyInput(event, index)}
                       multiline
                     />
                     <IconButton onClick={() => handleReply(replyTo, replyContents[index], index, comment._id)}>
@@ -222,7 +278,7 @@ const FileCommentPanel: FC<{ object: S3Object | undefined }> = ({ object }) => {
         }}
       >
         <TextField sx={{ width: 'calc(100% - 40px)' }} value={newComment} size="small" onChange={handleCommentInput} multiline />
-        <IconButton sx={{ alignItems: 'center' }}>
+        <IconButton onClick={() => handleComment(newComment)} sx={{ alignItems: 'center' }}>
           <SendIcon />
         </IconButton>
       </Box>
