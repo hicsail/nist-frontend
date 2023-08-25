@@ -22,8 +22,9 @@ import CommentIcon from '@mui/icons-material/Comment';
 import SendIcon from '@mui/icons-material/Send';
 import ReplyIcon from '@mui/icons-material/Reply';
 import { OrganizationContext } from '../contexts/organization.context';
-import { useAddFileMutation, useGetFileQuery } from '../graphql/file/file';
+import { DeleteFileDocument, useAddFileMutation, useGetFileQuery } from '../graphql/file/file';
 import { useAddCommentMutation, useAddReplyMutation, useGetCommentsQuery } from '../graphql/comment/comment';
+import { ApolloClient } from '@apollo/client';
 
 export type Comment = {
   __typename?: 'Comment';
@@ -43,22 +44,36 @@ export type User = {
 };
 
 export class FileCommentPlugin implements SideNavPlugin {
+  client: ApolloClient<any>;
   name: string;
   description: string;
   icon: ReactNode;
   fileExtensions: string[];
   subscriptions: { objectUploaded?: ((data: any) => void) | undefined; objectUpdated?: ((data: any) => void) | undefined; objectDeleted?: ((data: any) => void) | undefined };
 
-  constructor() {
+  constructor(client: ApolloClient<any>) {
+    console.log(client);
+    this.client = client;
     this.name = 'Comment';
     this.description = 'Comment on documents';
     this.icon = <CommentIcon />;
     this.fileExtensions = ['*']; // wildcard. support all files
-    this.subscriptions = {};
+    this.subscriptions = {
+      objectDeleted: (data: any) => this.deleteFileRecord(data.objectDeleted)
+    };
   }
 
   getView(object: S3Object): ReactNode {
     return <FileCommentPanel object={object} />;
+  }
+
+  async deleteFileRecord(object: S3Object): Promise<void> {
+    await this.client.mutate({
+      mutation: DeleteFileDocument,
+      variables: {
+        id: object.id
+      }
+    });
   }
 }
 
@@ -67,13 +82,13 @@ const FileCommentPanel: FC<{ object: S3Object | undefined }> = ({ object }) => {
 
   const fileQuery = useGetFileQuery({
     variables: {
-      id: object!.id!
+      id: object?.id!
     }
   });
   const [addFileMutation] = useAddFileMutation();
   const commentQuery = useGetCommentsQuery({
     variables: {
-      fileId: object!.id!
+      fileId: object?.id!
     }
   });
   const [addCommentMutation] = useAddCommentMutation();
@@ -120,7 +135,7 @@ const FileCommentPanel: FC<{ object: S3Object | undefined }> = ({ object }) => {
     // api call to post comment
     await addCommentMutation({
       variables: {
-        fileId: object!.id!,
+        fileId: object?.id!,
         content
       }
     });
@@ -134,7 +149,7 @@ const FileCommentPanel: FC<{ object: S3Object | undefined }> = ({ object }) => {
     // api call to post comment
     await addReplyMutation({
       variables: {
-        fileId: object!.id!,
+        fileId: object?.id!,
         parentId: commentId,
         content
       }
@@ -168,7 +183,7 @@ const FileCommentPanel: FC<{ object: S3Object | undefined }> = ({ object }) => {
       }
     };
 
-    initFile(object!);
+    if (object) initFile(object);
   }, []);
 
   useEffect(() => {

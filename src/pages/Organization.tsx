@@ -69,7 +69,7 @@ export const Organization: FC = () => {
           client={s3Client}
           getSignedUrl={getSignedUrl}
           pathControl={{ currentPath, setCurrentPath }}
-          plugins={[new DocViewPlugin(), new SeqVizPlugin(), new RcsbMolstarPlugin(), new JupyterNotebookPlugin(), new FileCommentPlugin()]}
+          plugins={[new DocViewPlugin(), new SeqVizPlugin(), new RcsbMolstarPlugin(), new JupyterNotebookPlugin(), new FileCommentPlugin(apolloClient)]}
           sideNavTopPadding="64px"
           disableRead={!userPermissions.read}
           disableWrite={!userPermissions.write}
