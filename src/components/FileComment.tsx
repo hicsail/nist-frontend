@@ -160,6 +160,7 @@ const ReplyPanel: FC<CommentPanelProps> = (props) => {
   const handleReply = async (_user: User | null, content: string, commentId: string) => {
     // TODO: may need to fix comment schema to include replyTo field
     // api call to post comment
+    if (!content) return;
     await addReplyMutation({
       variables: {
         fileId: object?.id!,
@@ -300,6 +301,7 @@ const FileCommentPanel: FC<{ object: S3Object | undefined }> = ({ object }) => {
 
   const handleComment = async (content: string) => {
     // api call to post comment
+    if (!content) return;
     await addCommentMutation({
       variables: {
         fileId: object?.id!,
@@ -314,6 +316,7 @@ const FileCommentPanel: FC<{ object: S3Object | undefined }> = ({ object }) => {
   const handleReply = async (content: string, index: number, commentId: string) => {
     // TODO: may need to fix comment schema to include replyTo field
     // api call to post comment
+    if (!content) return;
     await addReplyMutation({
       variables: {
         fileId: object?.id!,
