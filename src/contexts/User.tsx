@@ -2,6 +2,7 @@ import { createContext, ReactNode, FC, useEffect, useState } from 'react';
 import { useGetMeQuery, useUpdateUserMutation } from '../graphql/user/user';
 import { UserModel } from '../graphql/graphql';
 import React from 'react';
+import { useSnackbar } from './snackbar.context';
 
 interface UserProviderProps {
   children: ReactNode;
@@ -10,24 +11,12 @@ interface UserProviderProps {
 interface UserContextProps {
   user: UserModel | undefined;
   setUser: React.Dispatch<React.SetStateAction<UserModel | undefined>>;
-  updateError: boolean;
-  updateSuccess: boolean;
-  updateErrorMessage: string;
-  setUpdateError: React.Dispatch<React.SetStateAction<boolean>>;
-  setUpdateSuccess: React.Dispatch<React.SetStateAction<boolean>>;
-  setUpdateErrorMessage: React.Dispatch<React.SetStateAction<string>>;
   updating: boolean;
 }
 
 export const UserContext = createContext<UserContextProps>({
   user: undefined,
   setUser: () => {},
-  updateError: false,
-  updateSuccess: false,
-  updateErrorMessage: '',
-  setUpdateError: () => {},
-  setUpdateSuccess: () => {},
-  setUpdateErrorMessage: () => {},
   updating: false
 });
 
@@ -35,9 +24,7 @@ export const UserProvider: FC<UserProviderProps> = ({ children }) => {
   const [user, setUser] = useState<UserModel | undefined>();
   const { data } = useGetMeQuery({});
   const [updateUser, { loading: updating }] = useUpdateUserMutation({});
-  const [updateSuccess, setUpdateSuccess] = useState<boolean>(false);
-  const [updateError, setUpdateError] = useState<boolean>(false);
-  const [updateErrorMessage, setUpdateErrorMessage] = useState<string>('');
+  const { pushMessage } = useSnackbar();
 
   useEffect(() => {
     if (data?.me) {
@@ -53,11 +40,10 @@ export const UserProvider: FC<UserProviderProps> = ({ children }) => {
           email: user.email
         },
         onCompleted: () => {
-          setUpdateSuccess(true);
+          pushMessage('Successfully updated user', 'success');
         },
         onError: (error) => {
-          setUpdateError(true);
-          setUpdateErrorMessage(error.message);
+          pushMessage(error.message, 'error');
           setUser({
             ...user,
             fullname: data?.me?.fullname,
@@ -71,12 +57,6 @@ export const UserProvider: FC<UserProviderProps> = ({ children }) => {
   const value = {
     user,
     setUser,
-    updateError,
-    updateSuccess,
-    updateErrorMessage,
-    setUpdateError,
-    setUpdateSuccess,
-    setUpdateErrorMessage,
     updating
   };
 

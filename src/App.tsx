@@ -16,6 +16,7 @@ import { UserProvider } from './contexts/User';
 import { Box, Typography, styled } from '@mui/material';
 import Header from './components/Header';
 import SmallSideNav from './components/SmallSideNav';
+import { SnackbarProvider } from './contexts/snackbar.context';
 
 const drawerWidth = 240;
 
@@ -116,38 +117,40 @@ function App() {
         <S3Provider s3Endpoint={import.meta.env.VITE_S3_ENDPOINT} cargoEndpoint={import.meta.env.VITE_CARGO_ENDPOINT}>
           <AuthContext.Provider value={authContext}>
             <ApolloProvider client={client}>
-              <UIContext.Provider value={{ path: path, setPath: setPath }}>
-                {isAuthenticated ? (
-                  <UserProvider>
-                    <PermissionsProvider>
-                      <OrganizationProvider setOrganization={setOrganization}>
-                        <Box>
-                          <Header open={open} setOpen={setOpen} />
-                        </Box>
-                        <Main
-                          open={open}
-                          sx={{
-                            marginTop: '64px'
-                          }}
-                        >
-                          <Box sx={{ display: 'flex' }}>
-                            <SideNav open={open} />
-                            <SmallSideNav open={!open} />
-                            <Box sx={{ flexGrow: 1, p: 3 }}>
-                              <Outlet />
-                            </Box>
+              <SnackbarProvider>
+                <UIContext.Provider value={{ path: path, setPath: setPath }}>
+                  {isAuthenticated ? (
+                    <UserProvider>
+                      <PermissionsProvider>
+                        <OrganizationProvider setOrganization={setOrganization}>
+                          <Box>
+                            <Header open={open} setOpen={setOpen} />
                           </Box>
-                        </Main>
-                      </OrganizationProvider>
-                    </PermissionsProvider>
-                  </UserProvider>
-                ) : (
-                  <div>
-                    <Typography variant="h2">Please login</Typography>
-                    <Outlet />
-                  </div>
-                )}
-              </UIContext.Provider>
+                          <Main
+                            open={open}
+                            sx={{
+                              marginTop: '64px'
+                            }}
+                          >
+                            <Box sx={{ display: 'flex' }}>
+                              <SideNav open={open} />
+                              <SmallSideNav open={!open} />
+                              <Box sx={{ flexGrow: 1, p: 3 }}>
+                                <Outlet />
+                              </Box>
+                            </Box>
+                          </Main>
+                        </OrganizationProvider>
+                      </PermissionsProvider>
+                    </UserProvider>
+                  ) : (
+                    <div>
+                      <Typography variant="h2">Please login</Typography>
+                      <Outlet />
+                    </div>
+                  )}
+                </UIContext.Provider>
+              </SnackbarProvider>
             </ApolloProvider>
           </AuthContext.Provider>
         </S3Provider>

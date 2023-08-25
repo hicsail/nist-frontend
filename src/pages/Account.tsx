@@ -1,18 +1,18 @@
-import { Button, Checkbox, FormControl, Grid, Paper, Snackbar, TextField, Typography } from '@mui/material';
+import { Button, Checkbox, FormControl, Grid, Paper, TextField, Typography } from '@mui/material';
 import React, { useContext } from 'react';
 import { useUser } from '../contexts/User';
 import { PermissionsContext } from '../contexts/Permissions';
 import { useGetOrganizationsQuery } from '../graphql/organization/organization';
+import { useSnackbar } from '../contexts/snackbar.context';
 
 export default function Account() {
-  const { user, setUser, updateError, setUpdateError, updateSuccess, setUpdateSuccess, updateErrorMessage, setUpdateErrorMessage, updating } = useUser();
+  const { user, setUser, updating } = useUser();
   const [fullname, setFullname] = React.useState<any>();
   const [email, setEmail] = React.useState<any>();
-  const [snackbarOpen, setSnackbarOpen] = React.useState<boolean>(false);
-  const [snackbarMessage, setSnackbarMessage] = React.useState<string>('');
   const [organizations, setOrganizations] = React.useState<any[]>([]);
   const permissions = useContext(PermissionsContext);
   const [userHasOrganizationsAssigned, setUserHasOrganizationsAssigned] = React.useState<boolean>(false);
+  const { pushMessage } = useSnackbar();
 
   useGetOrganizationsQuery({
     onCompleted: (data) => {
@@ -45,29 +45,24 @@ export default function Account() {
     }
   }, [user]);
 
-  React.useEffect(() => {
-    if (updateError) {
-      setSnackbarOpen(true);
-      setUpdateError(false);
-      setSnackbarMessage(updateErrorMessage);
-      handleRevert();
-    }
-  }, [updateError]);
-
-  React.useEffect(() => {
-    if (updateSuccess) {
-      setSnackbarOpen(true);
-      setUpdateSuccess(false);
-      setSnackbarMessage('Successfully updated user');
-    }
-  }, [updateSuccess]);
-
   const handleSave = () => {
     // check if fullname and email are valid
-    if (!user) return;
-    if (!fullname || !email) return;
-    if (fullname.length < 3 || email.length < 3) return;
-    if (!email.includes('@')) return;
+    if (!user) {
+      pushMessage('User not found', 'error');
+      return;
+    }
+    if (!fullname || !email) {
+      pushMessage('Full name and email are required', 'error');
+      return;
+    }
+    if (fullname.length < 3 || email.length < 3) {
+      pushMessage('Full name and email must be at least 3 characters', 'error');
+      return;
+    }
+    if (!email.includes('@')) {
+      pushMessage('Email must be valid', 'error');
+      return;
+    }
 
     setUser({
       ...user,
@@ -81,14 +76,6 @@ export default function Account() {
       setFullname(user.fullname);
       setEmail(user.email);
     }
-  };
-
-  const handleSnackbarClose = () => {
-    setSnackbarOpen(false);
-    setUpdateSuccess(false);
-    setUpdateError(false);
-    setUpdateErrorMessage('');
-    setSnackbarMessage('');
   };
 
   return (
@@ -177,7 +164,6 @@ export default function Account() {
           </div>
         </FormControl>
       </Paper>
-      <Snackbar open={snackbarOpen} autoHideDuration={6000} onClose={handleSnackbarClose} message={snackbarMessage} />
     </div>
   );
 }
