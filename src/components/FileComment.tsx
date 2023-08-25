@@ -416,19 +416,17 @@ const FileCommentPanel: FC<{ object: S3Object | undefined }> = ({ object }) => {
       </Grid>
       <Box
         sx={{
-          display: 'flex',
           position: 'absolute',
           width: '100%',
           bottom: 0,
           padding: '10px',
           zIndex: 1,
           borderTop: 1,
-          borderColor: 'rgba(0, 0, 0, 0.12)',
-          backgroundColor: 'white'
+          borderColor: 'rgba(0, 0, 0, 0.12)'
         }}
       >
         <TextField sx={{ width: 'calc(100% - 40px)' }} value={newComment} size="small" onChange={handleCommentInput} multiline />
-        <IconButton onClick={() => handleComment(newComment)} sx={{ alignItems: 'center' }}>
+        <IconButton onClick={() => handleComment(newComment)}>
           <SendIcon />
         </IconButton>
       </Box>
