@@ -86,8 +86,48 @@ interface CommentPanelProps {
   object: S3Object | undefined;
   comment: Comment;
   expand: boolean;
-  onDelete: (reply: Comment) => void;
+  onDelete: (id: string) => void;
 }
+
+interface MoreHorizMenuProps {
+  id: string;
+  onDelete: (id: string) => void;
+}
+
+const MoreHorizMenu: FC<MoreHorizMenuProps> = (props) => {
+  const { id, onDelete: handleDeleteCommentReply } = props;
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const open = Boolean(anchorEl);
+
+  const handleClickMore = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleCloseMore = () => {
+    setAnchorEl(null);
+  };
+
+  return (
+    <>
+      <IconButton size="small" onClick={handleClickMore}>
+        <MoreHorizIcon fontSize="small" sx={{ margin: 0 }} />
+      </IconButton>{' '}
+      <Menu anchorEl={anchorEl} open={open} onClose={handleCloseMore} elevation={2}>
+        <MenuItem
+          onClick={() => {
+            handleDeleteCommentReply(id);
+            setAnchorEl(null);
+          }}
+        >
+          <ListItemIcon>
+            <DeleteIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>Delete</ListItemText>
+        </MenuItem>
+      </Menu>
+    </>
+  );
+};
 
 const ReplyPanel: FC<CommentPanelProps> = (props) => {
   const { object, comment, expand, onDelete: handleDeleteCommentReply } = props;
@@ -102,16 +142,6 @@ const ReplyPanel: FC<CommentPanelProps> = (props) => {
   const [expandReply, setExpandReply] = useState<boolean>(false);
   const [replyTo, setReplyTo] = useState<User | null>(null);
   const [replyContents, setReplyContents] = useState<string>('');
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const open = Boolean(anchorEl);
-
-  const handleClickMore = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleCloseMore = () => {
-    setAnchorEl(null);
-  };
 
   const handleExpandReply = (replyTo: User | null) => {
     setReplyTo(replyTo);
@@ -177,24 +207,13 @@ const ReplyPanel: FC<CommentPanelProps> = (props) => {
                     </Box>
                   </Box>
                   <Box>
-                    <Typography variant="body2">{reply._id}</Typography>
                     <Typography variant="body2">{reply.content}</Typography>
                   </Box>
                   <Box textAlign="end">
                     <IconButton size="small" onClick={() => handleExpandReply(reply.user)}>
                       <ReplyIcon fontSize="small" sx={{ margin: 0 }} />
                     </IconButton>
-                    <IconButton size="small" onClick={handleClickMore}>
-                      <MoreHorizIcon fontSize="small" sx={{ margin: 0 }} />
-                    </IconButton>
-                    <Menu anchorEl={anchorEl} open={open} onClose={handleCloseMore} elevation={2}>
-                      <MenuItem onClick={() => handleDeleteCommentReply(reply)}>
-                        <ListItemIcon>
-                          <DeleteIcon fontSize="small" />
-                        </ListItemIcon>
-                        <ListItemText>Delete</ListItemText>
-                      </MenuItem>
-                    </Menu>
+                    <MoreHorizMenu id={reply._id} onDelete={handleDeleteCommentReply} />
                   </Box>
                 </Stack>
               ))}
@@ -239,6 +258,7 @@ const FileCommentPanel: FC<{ object: S3Object | undefined }> = ({ object }) => {
   });
   const [addCommentMutation] = useAddCommentMutation();
   const [addReplyMutation] = useAddReplyMutation();
+  const [deleteCommentMutation] = useDeleteCommentMutation();
 
   const [comments, setComments] = useState<any[]>([]);
   const initExpandThreadState = comments.reduce((acc, _, index) => {
@@ -254,19 +274,13 @@ const FileCommentPanel: FC<{ object: S3Object | undefined }> = ({ object }) => {
   const [expandReply, setExpandReply] = useState<{ [key: number]: boolean }>(initExpandReplyState);
   const [replyContents, setReplyContents] = useState<{ [key: number]: string }>({});
   const [newComment, setNewComment] = useState<string>('');
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const open = Boolean(anchorEl);
-
-  const handleClickMore = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleCloseMore = () => {
-    setAnchorEl(null);
-  };
 
   const handleExpandThread = (index: number) => {
     setExpandThread((prev) => ({ ...prev, [index]: !prev[index] }));
+  };
+
+  const handleResetExpandThread = () => {
+    setExpandThread(initExpandThreadState);
   };
 
   const handleExpandReply = (index: number) => {
@@ -322,15 +336,14 @@ const FileCommentPanel: FC<{ object: S3Object | undefined }> = ({ object }) => {
     setNewComment(event.target.value);
   };
 
-  const handleDeleteCommentReply = (comment: Comment) => {
-    // await deleteCommentMutation({
-    //   variables: {
-    //     id
-    //   }
-    // });
-    // commentQuery.refetch();
-    console.log(comment);
-    handleCloseMore();
+  const handleDeleteCommentReply = async (id: string) => {
+    await deleteCommentMutation({
+      variables: {
+        id
+      }
+    });
+    commentQuery.refetch();
+    handleResetExpandThread();
   };
 
   useEffect(() => {
@@ -368,7 +381,6 @@ const FileCommentPanel: FC<{ object: S3Object | undefined }> = ({ object }) => {
                 sx={{ paddingBottom: '8px' }}
               />
               <CardContent sx={{ paddingY: '8px' }}>
-                <Typography variant="body2">{comment._id}</Typography>
                 <Typography variant="body2">{comment.content}</Typography>
               </CardContent>
               <CardActions disableSpacing>
@@ -381,17 +393,7 @@ const FileCommentPanel: FC<{ object: S3Object | undefined }> = ({ object }) => {
                       <CommentIcon />
                     </Badge>
                   </IconButton>
-                  <IconButton onClick={handleClickMore}>
-                    <MoreHorizIcon />
-                  </IconButton>
-                  <Menu anchorEl={anchorEl} open={open} onClose={handleCloseMore} elevation={2}>
-                    <MenuItem onClick={() => handleDeleteCommentReply(comment)}>
-                      <ListItemIcon>
-                        <DeleteIcon fontSize="small" />
-                      </ListItemIcon>
-                      <ListItemText>Delete</ListItemText>
-                    </MenuItem>
-                  </Menu>
+                  <MoreHorizMenu id={comment._id} onDelete={handleDeleteCommentReply} />
                 </Box>
               </CardActions>
               <ReplyPanel object={object} comment={comment} expand={expandThread[index]} onDelete={handleDeleteCommentReply} />
