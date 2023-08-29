@@ -70,7 +70,7 @@ export const SideNav: FC<SideNavProps> = ({ open }) => {
       open={open}
     >
       <List>
-        {navItems.map((navItem) => <NavItem {...navItem} />)}
+        {navItems.map((navItem) => <NavItem {...navItem} key={navItem.name} />)}
       </List>
     </Drawer>
   );
