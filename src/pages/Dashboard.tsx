@@ -14,7 +14,6 @@ export const Dashboard: FC = () => {
     navigate(`/organization`);
   };
 
-
   return (
     <>
       {/* Header information */}
