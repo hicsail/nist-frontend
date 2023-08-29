@@ -57,7 +57,7 @@ export const OrgFileView: FC = () => {
   const navigate = useNavigate();
   useEffect(() => {
     console.log(currentPath);
-    navigate(`/organization/${currentPath}`);
+    navigate(`/organization-files/${currentPath}`);
   }, [currentPath]);
 
   return (

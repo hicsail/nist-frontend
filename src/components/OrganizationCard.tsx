@@ -15,14 +15,6 @@ export const OrganizationCard: FC<OrganizationCardProps> = ({ organization, canC
   const navigate = useNavigate();
   const { setOrganization } = useContext(OrganizationContext);
 
-  const routeToOrganization = (organization: Organization) => {
-    // Set the current organization and route to that organization's file
-    // view
-    setOrganization(organization);
-    window.localStorage.setItem('organization', JSON.stringify(organization));
-    navigate(`/organization/`);
-  };
-
   return (
     <Card onClick={() => (canClick ? action(organization) : alert('Contact Administrator for Org to request Access'))} style={{ width: 330, margin: 10 }}>
       <CardActionArea>

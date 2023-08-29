@@ -35,7 +35,7 @@ const appRouter = createBrowserRouter([
         element: <AccessManager />
       },
       {
-        path: '/organization/*',
+        path: '/organization-files/*',
         element: <OrgFileView />
       },
       {

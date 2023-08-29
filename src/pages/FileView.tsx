@@ -37,7 +37,7 @@ export const FileView: FC = () => {
     // view
     setOrganization(organization);
     window.localStorage.setItem('organization', JSON.stringify(organization));
-    navigate(`/organization/`);
+    navigate(`/organization-files/`);
   };
 
 
