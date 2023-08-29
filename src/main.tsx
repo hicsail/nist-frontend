@@ -4,8 +4,9 @@ import App from './App';
 import './index.css';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import ErrorPage from './pages/error-route';
-import Dashboard from './pages/Dashboard';
+import { FileView } from './pages/FileView';
 import { Organization } from './pages/Organization';
+import { Dashboard } from './pages/Dashboard';
 import Login from './pages/Login';
 import Callback from './pages/Callback';
 import AccessManager from './pages/AccessManager';
@@ -21,10 +22,13 @@ const appRouter = createBrowserRouter([
         path: '/',
         element: <Dashboard />
       },
-
       {
         path: '/dashboard',
         element: <Dashboard />
+      },
+      {
+        path: '/file-view',
+        element: <FileView />
       },
       {
         path: '/access-manager',
