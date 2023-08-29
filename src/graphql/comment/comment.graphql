@@ -18,6 +18,12 @@ query GetComments($fileId: String!) {
           fullname
           email
         }
+        replyTo {
+          id
+          username
+          fullname
+          email
+        }
         date
         content
       }
@@ -39,13 +45,19 @@ mutation AddComment($fileId: String!, $content: String!) {
       fullname
       email
     }
+    replyTo {
+      id
+      username
+      fullname
+      email
+    }
     date
     content
   }
 }
 
-mutation AddReply($fileId: String!, $parentId: String!, $content: String!) {
-  addComment(input: { file: $fileId, parentId: $parentId, content: $content }) {
+mutation AddReply($fileId: String!, $parentId: String!, $content: String!, $replyTo: String) {
+  addComment(input: { file: $fileId, parentId: $parentId, content: $content, replyTo: $replyTo }) {
     _id
     file {
       _id
@@ -54,6 +66,12 @@ mutation AddReply($fileId: String!, $parentId: String!, $content: String!) {
     }
     parentId
     user {
+      id
+      username
+      fullname
+      email
+    }
+    replyTo {
       id
       username
       fullname

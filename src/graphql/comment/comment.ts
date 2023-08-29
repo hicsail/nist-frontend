@@ -10,7 +10,7 @@ export type GetCommentsQueryVariables = Types.Exact<{
 }>;
 
 
-export type GetCommentsQuery = { __typename?: 'Query', getFileByFileId?: { __typename?: 'File', comments: Array<{ __typename?: 'Comment', _id: string, date: any, content: string, user: { __typename?: 'UserModel', id: string, username?: string | null, fullname?: string | null, email?: string | null }, replies: Array<{ __typename?: 'Comment', _id: string, date: any, content: string, user: { __typename?: 'UserModel', id: string, username?: string | null, fullname?: string | null, email?: string | null } }> }> } | null };
+export type GetCommentsQuery = { __typename?: 'Query', getFileByFileId?: { __typename?: 'File', comments: Array<{ __typename?: 'Comment', _id: string, date: any, content: string, user: { __typename?: 'UserModel', id: string, username?: string | null, fullname?: string | null, email?: string | null }, replies: Array<{ __typename?: 'Comment', _id: string, date: any, content: string, user: { __typename?: 'UserModel', id: string, username?: string | null, fullname?: string | null, email?: string | null }, replyTo?: { __typename?: 'UserModel', id: string, username?: string | null, fullname?: string | null, email?: string | null } | null }> }> } | null };
 
 export type AddCommentMutationVariables = Types.Exact<{
   fileId: Types.Scalars['String'];
@@ -18,16 +18,17 @@ export type AddCommentMutationVariables = Types.Exact<{
 }>;
 
 
-export type AddCommentMutation = { __typename?: 'Mutation', addComment: { __typename?: 'Comment', _id: string, date: any, content: string, file?: { __typename?: 'File', _id: string, fileId: string, bucket: string } | null, user: { __typename?: 'UserModel', id: string, username?: string | null, fullname?: string | null, email?: string | null } } };
+export type AddCommentMutation = { __typename?: 'Mutation', addComment: { __typename?: 'Comment', _id: string, date: any, content: string, file?: { __typename?: 'File', _id: string, fileId: string, bucket: string } | null, user: { __typename?: 'UserModel', id: string, username?: string | null, fullname?: string | null, email?: string | null }, replyTo?: { __typename?: 'UserModel', id: string, username?: string | null, fullname?: string | null, email?: string | null } | null } };
 
 export type AddReplyMutationVariables = Types.Exact<{
   fileId: Types.Scalars['String'];
   parentId: Types.Scalars['String'];
   content: Types.Scalars['String'];
+  replyTo?: Types.InputMaybe<Types.Scalars['String']>;
 }>;
 
 
-export type AddReplyMutation = { __typename?: 'Mutation', addComment: { __typename?: 'Comment', _id: string, parentId?: string | null, date: any, content: string, file?: { __typename?: 'File', _id: string, fileId: string, bucket: string } | null, user: { __typename?: 'UserModel', id: string, username?: string | null, fullname?: string | null, email?: string | null } } };
+export type AddReplyMutation = { __typename?: 'Mutation', addComment: { __typename?: 'Comment', _id: string, parentId?: string | null, date: any, content: string, file?: { __typename?: 'File', _id: string, fileId: string, bucket: string } | null, user: { __typename?: 'UserModel', id: string, username?: string | null, fullname?: string | null, email?: string | null }, replyTo?: { __typename?: 'UserModel', id: string, username?: string | null, fullname?: string | null, email?: string | null } | null } };
 
 export type DeleteCommentMutationVariables = Types.Exact<{
   id: Types.Scalars['String'];
@@ -53,6 +54,12 @@ export const GetCommentsDocument = gql`
       replies {
         _id
         user {
+          id
+          username
+          fullname
+          email
+        }
+        replyTo {
           id
           username
           fullname
@@ -108,6 +115,12 @@ export const AddCommentDocument = gql`
       fullname
       email
     }
+    replyTo {
+      id
+      username
+      fullname
+      email
+    }
     date
     content
   }
@@ -141,8 +154,10 @@ export type AddCommentMutationHookResult = ReturnType<typeof useAddCommentMutati
 export type AddCommentMutationResult = Apollo.MutationResult<AddCommentMutation>;
 export type AddCommentMutationOptions = Apollo.BaseMutationOptions<AddCommentMutation, AddCommentMutationVariables>;
 export const AddReplyDocument = gql`
-    mutation AddReply($fileId: String!, $parentId: String!, $content: String!) {
-  addComment(input: {file: $fileId, parentId: $parentId, content: $content}) {
+    mutation AddReply($fileId: String!, $parentId: String!, $content: String!, $replyTo: String) {
+  addComment(
+    input: {file: $fileId, parentId: $parentId, content: $content, replyTo: $replyTo}
+  ) {
     _id
     file {
       _id
@@ -151,6 +166,12 @@ export const AddReplyDocument = gql`
     }
     parentId
     user {
+      id
+      username
+      fullname
+      email
+    }
+    replyTo {
       id
       username
       fullname
@@ -179,6 +200,7 @@ export type AddReplyMutationFn = Apollo.MutationFunction<AddReplyMutation, AddRe
  *      fileId: // value for 'fileId'
  *      parentId: // value for 'parentId'
  *      content: // value for 'content'
+ *      replyTo: // value for 'replyTo'
  *   },
  * });
  */

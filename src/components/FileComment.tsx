@@ -13,6 +13,7 @@ import {
   Divider,
   Grid,
   IconButton,
+  Link,
   ListItemIcon,
   ListItemText,
   Menu,
@@ -36,6 +37,7 @@ export type Comment = {
   __typename?: 'Comment';
   _id: string;
   user: User;
+  replyTo?: User;
   file: any;
   date: string;
   content: string;
@@ -157,14 +159,14 @@ const ReplyPanel: FC<CommentPanelProps> = (props) => {
     setReplyContents(event.target.value);
   };
 
-  const handleReply = async (_user: User | null, content: string, commentId: string) => {
-    // TODO: may need to fix comment schema to include replyTo field
+  const handleReply = async (user: User | null, content: string, commentId: string) => {
     // api call to post comment
     if (!content) return;
     await addReplyMutation({
       variables: {
         fileId: object?.id!,
         parentId: commentId,
+        replyTo: user?.id,
         content
       }
     });
@@ -193,31 +195,42 @@ const ReplyPanel: FC<CommentPanelProps> = (props) => {
           >
             <Divider orientation="vertical" variant="middle" flexItem sx={{ border: 1, borderColor: '#E0E0E0', marginRight: '16px' }} />
             <Box width="100%">
-              {comment.replies?.map((reply: any, replyIndex: number) => (
-                <Stack key={reply._id} spacing="8px">
-                  {replyIndex !== 0 && <Divider sx={{ paddingTop: '8px' }} />}
-                  <Box display="flex">
-                    <Box marginRight="16px">
-                      <Avatar>{(reply.user.fullname || reply.user.username || reply.user.email)[0]}</Avatar>
+              {comment.replies?.map((reply: any, replyIndex: number) => {
+                const displayedName = reply.user.fullname || reply.user.username || reply.user.email;
+
+                return (
+                  <Stack key={reply._id} spacing="8px">
+                    {replyIndex !== 0 && <Divider sx={{ paddingTop: '8px' }} />}
+                    <Box display="flex">
+                      <Box marginRight="16px">
+                        <Avatar>{displayedName[0]}</Avatar>
+                      </Box>
+                      <Box>
+                        <Typography variant="body2">{displayedName}</Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          {formatDate(new Date(reply.date))}
+                        </Typography>
+                      </Box>
                     </Box>
                     <Box>
-                      <Typography variant="body2">{reply.user.fullname || reply.user.username || reply.user.email}</Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        {formatDate(new Date(reply.date))}
+                      <Typography variant="body2">
+                        {reply.replyTo && (
+                          <Link href="#" underline="hover">
+                            {`@${displayedName}: `}
+                          </Link>
+                        )}
+                        {reply.content}
                       </Typography>
                     </Box>
-                  </Box>
-                  <Box>
-                    <Typography variant="body2">{reply.content}</Typography>
-                  </Box>
-                  <Box textAlign="end">
-                    <IconButton size="small" onClick={() => handleExpandReply(reply.user)}>
-                      <ReplyIcon fontSize="small" sx={{ margin: 0 }} />
-                    </IconButton>
-                    <MoreHorizMenu id={reply._id} onDelete={handleDeleteCommentReply} />
-                  </Box>
-                </Stack>
-              ))}
+                    <Box textAlign="end">
+                      <IconButton size="small" onClick={() => handleExpandReply(reply.user)}>
+                        <ReplyIcon fontSize="small" sx={{ margin: 0 }} />
+                      </IconButton>
+                      <MoreHorizMenu id={reply._id} onDelete={handleDeleteCommentReply} />
+                    </Box>
+                  </Stack>
+                );
+              })}
             </Box>
           </Box>
         </CardContent>

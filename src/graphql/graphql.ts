@@ -96,6 +96,7 @@ export type Comment = {
   file?: Maybe<File>;
   parentId?: Maybe<Scalars['ID']>;
   replies: Array<Comment>;
+  replyTo?: Maybe<UserModel>;
   user: UserModel;
 };
 
@@ -112,6 +113,7 @@ export type CreateCommentInput = {
   content: Scalars['String'];
   file: Scalars['String'];
   parentId?: InputMaybe<Scalars['String']>;
+  replyTo?: InputMaybe<Scalars['String']>;
 };
 
 export type CreateFileInput = {
