@@ -61,7 +61,7 @@ export class FileCommentPlugin implements SideNavPlugin {
 
   constructor(client: ApolloClient<any>) {
     this.client = client;
-    this.name = 'Comment';
+    this.name = 'Comments';
     this.description = 'Comment on documents';
     this.icon = <CommentIcon />;
     this.fileExtensions = ['*']; // wildcard. support all files
