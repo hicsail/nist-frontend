@@ -1,5 +1,5 @@
 import { FC } from 'react';
 
-export const Organization: FC = () => {
+export const OrganizationView: FC = () => {
   return <p>Hello World</p>;
 }
