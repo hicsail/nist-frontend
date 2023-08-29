@@ -5,6 +5,7 @@ import { UIContext } from '../contexts/UI';
 import { Organization } from '../graphql/graphql';
 import { OrganizationCard } from '../components/OrganizationCard';
 import { OrganizationContext } from '../contexts/organization.context';
+import { useNavigate } from 'react-router-dom';
 
 export const FileView: FC = () => {
   const [adminOrganizations, setAdminOrganizations] = useState<any>([]);
@@ -13,12 +14,39 @@ export const FileView: FC = () => {
   const permissions = useContext(PermissionsContext);
   const { path, setPath } = useContext(UIContext);
 
+  // Get and populate the organization information
+  const { organizations, setOrganization } = useContext(OrganizationContext);
+  useEffect(() => {
+    setAdminOrganizations(filterOrgsByPermission(organizations, 'admin'));
+    setAccessOrganizations(filterOrgsByPermission(organizations, 'access'));
+    setNoAccessOrganizations(filterOrgsByPermission(organizations, 'noAccess'));
+  }, [organizations, permissions]);
+
+  useEffect(() => {
+    // if set path has been added to global context from app
+    if (path) {
+      // if the path is not the same as the current path
+      // set the path to the current path
+      setPath([{ name: 'Dashboard', path: '/dashboard' }]);
+    }
+  }, []);
+
+  const navigate = useNavigate();
+  const routeToOrganization = (organization: Organization) => {
+    // Set the current organization and route to that organization's file
+    // view
+    setOrganization(organization);
+    window.localStorage.setItem('organization', JSON.stringify(organization));
+    navigate(`/organization/`);
+  };
+
+
   // function that takes in a list of organizations and returns a list of JSX elements with folder icon and organization name along with a placeholder icon to mark as favorite
   const renderOrganizations = (organizations: Organization[], canClick: boolean, accessType: string) => {
     // card for each organization that show cases organization name and thumbnail image
     return organizations.map((organization: Organization) => (
       <div key={organization._id}>
-        <OrganizationCard organization={organization} canClick={canClick} accessType={accessType} />
+        <OrganizationCard organization={organization} canClick={canClick} accessType={accessType} action={routeToOrganization} />
       </div>
     ));
   };
@@ -51,23 +79,6 @@ export const FileView: FC = () => {
 
     return orgs;
   };
-
-  // Get and populate the organization information
-  const { organizations } = useContext(OrganizationContext);
-  useEffect(() => {
-    setAdminOrganizations(filterOrgsByPermission(organizations, 'admin'));
-    setAccessOrganizations(filterOrgsByPermission(organizations, 'access'));
-    setNoAccessOrganizations(filterOrgsByPermission(organizations, 'noAccess'));
-  }, [organizations, permissions]);
-
-  useEffect(() => {
-    // if set path has been added to global context from app
-    if (path) {
-      // if the path is not the same as the current path
-      // set the path to the current path
-      setPath([{ name: 'Dashboard', path: '/dashboard' }]);
-    }
-  }, []);
 
   return (
     <div>
