@@ -16,7 +16,8 @@ export const Dashboard: FC = () => {
 
       {/* List of card views */}
       <Box sx={{ display: 'flex' }}>
-        {organizations.map((organization) => <OrganizationCard organization={organization} canClick={true} accessType={'read'} />)}
+        {organizations.map((organization) =>
+          <OrganizationCard organization={organization} canClick={true} key={organization.name} action={(_org) => console.log(_org)}/>)}
       </Box>
     </>
   );
