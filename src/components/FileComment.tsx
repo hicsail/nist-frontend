@@ -64,7 +64,7 @@ export class FileCommentPlugin implements SideNavPlugin {
     this.icon = <CommentIcon />;
     this.fileExtensions = ['*']; // wildcard. support all files
     this.subscriptions = {
-      objectDeleted: (data: any) => this.deleteFileRecord(data.objectDeleted)
+      objectDeleted: this.deleteFileRecord
     };
   }
 
