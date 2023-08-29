@@ -5,7 +5,7 @@ import './index.css';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import ErrorPage from './pages/error-route';
 import { FileView } from './pages/FileView';
-import { Organization } from './pages/Organization';
+import { OrgFileView } from './pages/OrgFileView';
 import { Dashboard } from './pages/Dashboard';
 import Login from './pages/Login';
 import Callback from './pages/Callback';
@@ -36,7 +36,7 @@ const appRouter = createBrowserRouter([
       },
       {
         path: '/organization/*',
-        element: <Organization />
+        element: <OrgFileView />
       },
       {
         path: '/login',

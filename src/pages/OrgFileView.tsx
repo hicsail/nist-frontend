@@ -11,7 +11,7 @@ import { SeqVizPlugin } from '../components/SequenceViz';
 import { RcsbMolstarPlugin } from '../components/RcsbMolstar';
 import { JupyterNotebookPlugin } from '../components/JupyterNotebook';
 
-export const Organization: FC = () => {
+export const OrgFileView: FC = () => {
   const { organization } = useContext(OrganizationContext);
   const [userPermissions, setUserPermissions] = useState<CargoPermissions | null>(null);
   const s3Client = useContext(S3Context);
