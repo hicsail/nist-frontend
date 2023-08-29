@@ -1,14 +1,20 @@
-import { createContext, Dispatch, FC, ReactNode, SetStateAction } from 'react';
+import { createContext, Dispatch, FC, ReactNode, SetStateAction, useEffect, useState } from 'react';
 import { Organization } from '../graphql/graphql';
+import { useGetOrganizationsQuery } from '../graphql/organization/organization';
 
 interface OrganizationContextType {
+  /** Currently selected organizaiton */
   organization: Organization | null;
+  /** Update the selected organization */
   setOrganization: Dispatch<SetStateAction<Organization | null>>;
+  /** List of all available organizations */
+  organizations: Organization[];
 }
 
 export const OrganizationContext = createContext<OrganizationContextType>({
   organization: null,
-  setOrganization: (_org) => {}
+  setOrganization: (_org) => {},
+  organizations: []
 });
 
 export interface OrganizationProviderProps {
@@ -24,5 +30,15 @@ export const OrganizationProvider: FC<OrganizationProviderProps> = (props) => {
     currentOrganization = JSON.parse(orgStr);
   }
 
-  return <OrganizationContext.Provider value={{ organization: currentOrganization, setOrganization: props.setOrganization }}>{props.children}</OrganizationContext.Provider>;
+  // Setup list of available organizations
+  const orgQuery = useGetOrganizationsQuery();
+  useEffect(() => {
+    if (orgQuery.data) {
+      setOrganizations(orgQuery.data.getOriganizations);
+    }
+  }, [orgQuery.data, orgQuery.error]);
+  const [organizations, setOrganizations] = useState<Organization[]>([]);
+
+
+  return <OrganizationContext.Provider value={{ organization: currentOrganization, setOrganization: props.setOrganization, organizations: organizations }}>{props.children}</OrganizationContext.Provider>;
 };

@@ -2,9 +2,9 @@ import { useState, useContext, useEffect, FC } from 'react';
 import { Typography } from '@mui/material';
 import { PermissionsContext } from '../contexts/Permissions';
 import { UIContext } from '../contexts/UI';
-import { useGetOrganizationsQuery } from '../graphql/organization/organization';
 import { Organization } from '../graphql/graphql';
-import OrganizationCard from '../components/OrganizationCard';
+import { OrganizationCard } from '../components/OrganizationCard';
+import { OrganizationContext } from '../contexts/organization.context';
 
 export const FileView: FC = () => {
   const [adminOrganizations, setAdminOrganizations] = useState<any>([]);
@@ -53,18 +53,12 @@ export const FileView: FC = () => {
   };
 
   // Get and populate the organization information
-  const orgQuery = useGetOrganizationsQuery();
+  const { organizations } = useContext(OrganizationContext);
   useEffect(() => {
-    if (orgQuery.data) {
-      const organizations = orgQuery.data.getOriganizations;
-      setAdminOrganizations(filterOrgsByPermission(organizations, 'admin'));
-      setAccessOrganizations(filterOrgsByPermission(organizations, 'access'));
-      setNoAccessOrganizations(filterOrgsByPermission(organizations, 'noAccess'));
-    }
-    if (orgQuery.error) {
-      console.error(orgQuery.error);
-    }
-  }, [orgQuery.data, orgQuery.error, permissions]);
+    setAdminOrganizations(filterOrgsByPermission(organizations, 'admin'));
+    setAccessOrganizations(filterOrgsByPermission(organizations, 'access'));
+    setNoAccessOrganizations(filterOrgsByPermission(organizations, 'noAccess'));
+  }, [organizations, permissions]);
 
   useEffect(() => {
     // if set path has been added to global context from app
@@ -78,7 +72,7 @@ export const FileView: FC = () => {
   return (
     <div>
       <Typography variant="h1" style={{ marginBottom: 20 }}>
-        Institutions
+        Institution Folders
       </Typography>
       {adminOrganizations.length > 0 && (
         <>

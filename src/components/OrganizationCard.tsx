@@ -1,5 +1,5 @@
 import { Card, CardActionArea, Chip, Typography } from '@mui/material';
-import { useContext } from 'react';
+import { useContext, FC } from 'react';
 import { Organization } from '../graphql/graphql';
 import { useNavigate } from 'react-router';
 import { OrganizationContext } from '../contexts/organization.context';
@@ -10,7 +10,7 @@ type OrganizationCardProps = {
   accessType: string;
 };
 
-export default function ({ organization, canClick, accessType }: OrganizationCardProps) {
+export const OrganizationCard: FC<OrganizationCardProps> = ({ organization, canClick, accessType }: OrganizationCardProps) => {
   const navigate = useNavigate();
   const { setOrganization } = useContext(OrganizationContext);
 
