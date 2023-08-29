@@ -1,5 +1,6 @@
 import { Box, Typography, Tabs, Tab } from '@mui/material';
 import { FC, ReactNode, useContext, useState } from 'react';
+import { ProtocolView } from '../components/ProtocolView';
 import { OrganizationContext } from '../contexts/organization.context';
 
 interface TabPanelProps {
@@ -29,8 +30,8 @@ export const OrganizationView: FC = () => {
             <Tab label='About' />
             <Tab label='Protocols' />
           </Tabs>
-          <TabPanel value={value} index={0} children={<p>About</p>}/>
-          <TabPanel value={value} index={1} children={<p>Protocols</p>} />
+          <TabPanel value={value} index={0}>About</TabPanel>
+          <TabPanel value={value} index={1}><ProtocolView organization={organization}/></TabPanel>
         </Box>
       }
     </>
