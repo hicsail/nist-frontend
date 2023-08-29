@@ -1,8 +1,6 @@
 import { Card, CardActionArea, Chip, Typography } from '@mui/material';
-import { useContext, FC } from 'react';
+import { FC } from 'react';
 import { Organization } from '../graphql/graphql';
-import { useNavigate } from 'react-router';
-import { OrganizationContext } from '../contexts/organization.context';
 
 type OrganizationCardProps = {
   organization: Organization;
@@ -12,9 +10,6 @@ type OrganizationCardProps = {
 };
 
 export const OrganizationCard: FC<OrganizationCardProps> = ({ organization, canClick, accessType, action }: OrganizationCardProps) => {
-  const navigate = useNavigate();
-  const { setOrganization } = useContext(OrganizationContext);
-
   return (
     <Card onClick={() => (canClick ? action(organization) : alert('Contact Administrator for Org to request Access'))} style={{ width: 330, margin: 10 }}>
       <CardActionArea>
