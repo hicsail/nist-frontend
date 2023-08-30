@@ -3,6 +3,7 @@ query getOrganizations {
     _id,
     name,
     bucket,
-    logoURL
+    logoURL,
+    protocolBucket
   }
 }

@@ -8,7 +8,7 @@ const defaultOptions = {} as const;
 export type GetOrganizationsQueryVariables = Types.Exact<{ [key: string]: never; }>;
 
 
-export type GetOrganizationsQuery = { __typename?: 'Query', getOriganizations: Array<{ __typename?: 'Organization', _id: string, name: string, bucket: string, logoURL: string }> };
+export type GetOrganizationsQuery = { __typename?: 'Query', getOriganizations: Array<{ __typename?: 'Organization', _id: string, name: string, bucket: string, logoURL: string, protocolBucket: string }> };
 
 
 export const GetOrganizationsDocument = gql`
@@ -18,6 +18,7 @@ export const GetOrganizationsDocument = gql`
     name
     bucket
     logoURL
+    protocolBucket
   }
 }
     `;
