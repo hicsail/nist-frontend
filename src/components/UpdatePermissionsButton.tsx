@@ -1,9 +1,15 @@
 import { Snackbar } from '@mui/material';
 import Button from '@mui/material/Button';
-import { useState } from 'react';
+import { useState, FC } from 'react';
 import { useCargoChangePermissionsMutation } from '../graphql/permissions/permissions';
+import { CargoPermissions, Organization } from '../graphql/graphql';
 
-export function HandleUpdate({ user }: any) {
+interface HandleUpdateProps {
+  user: CargoPermissions;
+  organization: Organization;
+}
+
+export const HandleUpdate: FC<HandleUpdateProps> = ({ user, organization }) => {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [updateMessage, setUpdateMessage] = useState('');
   const handleCloseSnackbar = () => {
@@ -14,7 +20,8 @@ export function HandleUpdate({ user }: any) {
   const cargoChangePermissions = useCargoChangePermissionsMutation()[0];
 
   // On submit, change the user permissions
-  const handleUpdate = () => {
+  const handleUpdate = async () => {
+    /* Handle change on files bucket
     cargoChangePermissions({
       variables: {
         change: {
@@ -36,7 +43,30 @@ export function HandleUpdate({ user }: any) {
         setUpdateMessage(message);
         setSnackbarOpen(true);
       }
+    }); */
+
+    // Make cooresponding changes to protocol bucket
+    const changeRequest = {
+      change: {
+        read: user.read,
+        write: user.write,
+        delete: user.delete,
+        admin: user.admin
+      },
+      user: user.user.id,
+    };
+
+    // Update the permissions for the main bucket
+    const result = await cargoChangePermissions({
+      variables: { ...changeRequest, bucket: organization.bucket }
     });
+
+    console.log(result);
+
+    // Update the permissions for the protocol bucket
+    cargoChangePermissions({
+      variables: { ...changeRequest, bucket: organization.protocolBucket }
+    })
   };
 
   return (

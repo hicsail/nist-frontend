@@ -27,6 +27,7 @@ export const ProtocolView: FC<ProtocolViewProps> = ({ organization }) => {
     <>
       <S3Viewer
         bucket={organization.protocolBucket}
+        bucketDisplayedName={`${organization.name} Protocols`}
         client={s3Client}
         getSignedUrl={getSignedUrl}
         disableCreateFolder={true}

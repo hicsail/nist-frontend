@@ -8,6 +8,7 @@ import { AuthContext } from '../contexts/Auth';
 import { useGetOrganizationsQuery } from '../graphql/organization/organization';
 import EnhancedTableHead from '../components/EnhancedTableHead';
 import jwtDecode from 'jwt-decode';
+import { Organization } from '../graphql/graphql';
 
 type Order = 'asc' | 'desc';
 
@@ -19,7 +20,7 @@ const AccessManager = () => {
   const [userPermissions, setUserPermissions] = useState<any>([]);
   const [searchText, setSearchText] = useState('');
   const [organizationsWithAdminAccess, setOrganizationsWithAdminAccess] = useState<any[]>([]);
-  const [currentOrganization, setCurrentOrganization] = useState('');
+  const [currentOrganization, setCurrentOrganization] = useState<Organization | null>(null);
   const [updateMessage, _setUpdateMessage] = useState('');
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [page, setPage] = useState(0);
@@ -42,7 +43,7 @@ const AccessManager = () => {
   const { path, setPath } = useContext(UIContext);
   const { token } = useContext(AuthContext);
 
-  const { loading, error, data } = useCargoGetAllBucketPermissionsQuery({ variables: { bucket: currentOrganization } });
+  const { loading, error, data } = useCargoGetAllBucketPermissionsQuery({ variables: { bucket: currentOrganization?.bucket } });
 
   useGetOrganizationsQuery({
     onCompleted: (data) => {
@@ -208,7 +209,7 @@ const AccessManager = () => {
                             <Checkbox checked={userPermission.admin} onChange={(event) => handlePermissionChange(index, 'admin', event.target.checked)} />
                           </TableCell>
                           <TableCell>
-                            <HandleUpdate user={userPermission} />
+                            <HandleUpdate user={userPermission} organization={currentOrganization} />
                           </TableCell>
                         </TableRow>
                       )
