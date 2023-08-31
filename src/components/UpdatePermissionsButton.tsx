@@ -21,30 +21,6 @@ export const HandleUpdate: FC<HandleUpdateProps> = ({ user, organization }) => {
 
   // On submit, change the user permissions
   const handleUpdate = async () => {
-    /* Handle change on files bucket
-    cargoChangePermissions({
-      variables: {
-        change: {
-          read: user.read,
-          write: user.write,
-          delete: user.delete,
-          admin: user.admin
-        },
-        user: user.user.id,
-        bucket: user.bucket
-      },
-      onCompleted: () => {
-        let message = 'Permissions updated';
-        setUpdateMessage(message);
-        setSnackbarOpen(true);
-      },
-      onError: (_error) => {
-        let message = 'Failed to update permissions';
-        setUpdateMessage(message);
-        setSnackbarOpen(true);
-      }
-    }); */
-
     // Make cooresponding changes to protocol bucket
     const changeRequest = {
       change: {
@@ -61,7 +37,12 @@ export const HandleUpdate: FC<HandleUpdateProps> = ({ user, organization }) => {
       variables: { ...changeRequest, bucket: organization.bucket }
     });
 
-    console.log(result);
+    // If the update failed, send message
+    if (result.errors) {
+      setUpdateMessage('Failed to update permissions');
+      setSnackbarOpen(true);
+      return;
+    }
 
     // Update the permissions for the protocol bucket
     cargoChangePermissions({

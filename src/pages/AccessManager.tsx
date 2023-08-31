@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext, useMemo } from 'react';
+import React, { useEffect, useState, useContext, useMemo, FC } from 'react';
 import { TextField, MenuItem, InputLabel, Select, TableContainer, Table, TableRow, TableCell, TableBody, Checkbox, Snackbar, TablePagination, Typography } from '@mui/material';
 import { PermissionsContext } from '../contexts/Permissions';
 import { HandleUpdate } from '../components/UpdatePermissionsButton';
@@ -10,17 +10,21 @@ import EnhancedTableHead from '../components/EnhancedTableHead';
 import jwtDecode from 'jwt-decode';
 import { Organization } from '../graphql/graphql';
 
+const bucketToOrganization = (organizations: Organization[], bucket: string): Organization | null => {
+  return organizations.find((org) => org.bucket == bucket) || null;
+}
+
 type Order = 'asc' | 'desc';
 
 interface JwtPayload {
   [key: string]: any;
 }
 
-const AccessManager = () => {
+export const AccessManager: FC = () => {
   const [userPermissions, setUserPermissions] = useState<any>([]);
   const [searchText, setSearchText] = useState('');
   const [organizationsWithAdminAccess, setOrganizationsWithAdminAccess] = useState<any[]>([]);
-  const [currentOrganization, setCurrentOrganization] = useState<Organization | null>(null);
+  const [currentOrganization, setCurrentOrganization] = useState('');
   const [updateMessage, _setUpdateMessage] = useState('');
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [page, setPage] = useState(0);
@@ -43,7 +47,7 @@ const AccessManager = () => {
   const { path, setPath } = useContext(UIContext);
   const { token } = useContext(AuthContext);
 
-  const { loading, error, data } = useCargoGetAllBucketPermissionsQuery({ variables: { bucket: currentOrganization?.bucket } });
+  const { loading, error, data } = useCargoGetAllBucketPermissionsQuery({ variables: { bucket: currentOrganization } });
 
   useGetOrganizationsQuery({
     onCompleted: (data) => {
@@ -209,7 +213,7 @@ const AccessManager = () => {
                             <Checkbox checked={userPermission.admin} onChange={(event) => handlePermissionChange(index, 'admin', event.target.checked)} />
                           </TableCell>
                           <TableCell>
-                            <HandleUpdate user={userPermission} organization={currentOrganization} />
+                            <HandleUpdate user={userPermission} organization={bucketToOrganization(organizations, currentOrganization)} />
                           </TableCell>
                         </TableRow>
                       )
@@ -239,5 +243,3 @@ const AccessManager = () => {
     </div>
   );
 };
-
-export default AccessManager;

@@ -9,7 +9,7 @@ import { OrgFileView } from './pages/OrgFileView';
 import { Dashboard } from './pages/Dashboard';
 import Login from './pages/Login';
 import Callback from './pages/Callback';
-import AccessManager from './pages/AccessManager';
+import { AccessManager } from './pages/AccessManager';
 import Account from './pages/Account';
 import { OrganizationView } from './pages/Organization';
 
