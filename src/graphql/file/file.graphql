@@ -1,0 +1,41 @@
+query GetFile($id: String!) {
+  getFileByFileId(fileId: $id) {
+    _id
+    fileId
+    bucket
+    comments {
+      _id
+      user {
+        id
+        username
+        fullname
+        email
+      }
+      date
+      content
+      replies {
+        _id
+        user {
+          id
+          username
+          fullname
+          email
+        }
+        date
+        content
+      }
+    }
+  }
+}
+
+mutation AddFile($id: String!, $bucket: String!) {
+  addFile(input: { fileId: $id, bucket: $bucket }) {
+    _id
+    fileId
+    bucket
+  }
+}
+
+mutation DeleteFile($id: String!) {
+  deleteFile(fileId: $id)
+}

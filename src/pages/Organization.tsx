@@ -10,6 +10,7 @@ import { useApolloClient } from '@apollo/client';
 import { SeqVizPlugin } from '../components/SequenceViz';
 import { RcsbMolstarPlugin } from '../components/RcsbMolstar';
 import { JupyterNotebookPlugin } from '../components/JupyterNotebook';
+import { FileCommentPlugin } from '../components/FileComment';
 
 export const Organization: FC = () => {
   const { organization } = useContext(OrganizationContext);
@@ -56,7 +57,6 @@ export const Organization: FC = () => {
   // Update the URI to match the redirect
   const navigate = useNavigate();
   useEffect(() => {
-    console.log(currentPath);
     navigate(`/organization/${currentPath}`);
   }, [currentPath]);
 
@@ -69,7 +69,8 @@ export const Organization: FC = () => {
           client={s3Client}
           getSignedUrl={getSignedUrl}
           pathControl={{ currentPath, setCurrentPath }}
-          plugins={[new DocViewPlugin(), new SeqVizPlugin(), new RcsbMolstarPlugin(), new JupyterNotebookPlugin()]}
+          plugins={[new DocViewPlugin(), new SeqVizPlugin(), new RcsbMolstarPlugin(), new JupyterNotebookPlugin(), new FileCommentPlugin(apolloClient)]}
+          sideNavTopPadding="64px"
           disableRead={!userPermissions.read}
           disableWrite={!userPermissions.write}
           disableUpload={!userPermissions.write}
