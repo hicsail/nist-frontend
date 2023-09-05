@@ -213,7 +213,7 @@ export const AccessManager: FC = () => {
                             <Checkbox checked={userPermission.admin} onChange={(event) => handlePermissionChange(index, 'admin', event.target.checked)} />
                           </TableCell>
                           <TableCell>
-                            <HandleUpdate user={userPermission} organization={bucketToOrganization(organizations, currentOrganization)} />
+                            <HandleUpdate user={userPermission} organization={bucketToOrganization(organizations, currentOrganization)!} />
                           </TableCell>
                         </TableRow>
                       )
