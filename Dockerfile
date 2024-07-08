@@ -1,7 +1,4 @@
-FROM node:18 as build
-
-WORKDIR /app
-COPY . .
+FROM node:18-alpine as builder
 
 ARG VITE_AWS_KEY
 ARG VITE_AWS_SECRET
@@ -19,15 +16,16 @@ ENV VITE_CARGO_ENDPOINT ${VITE_CARGO_ENDPOINT}
 ENV VITE_S3_ENDPOINT ${VITE_S3_ENDPOINT}
 ENV VITE_AUTHSERVICE_URL ${VITE_AUTHSERVICE_URL}
 
+WORKDIR /app
+COPY . .
+
 RUN npm install
 RUN npm run build
 
-FROM nginx
+FROM registry.access.redhat.com/ubi7/nginx-120
 
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+COPY --from=builder /app/dist .
 
-COPY --from=build /app/dist /usr/share/nginx/html
+ADD ./nginx.conf "${NGINX_CONF_PATH}"
 
-COPY generate_env.sh /
-
-CMD ["/bin/bash", "-c", "/generate_env.sh && nginx -g 'daemon off;'"]
+CMD nginx -g "daemon off;"
